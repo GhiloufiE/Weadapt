@@ -1,0 +1,14 @@
+@import '__settings/init';
+
+.contact-cols {
+	&__row {
+		margin-top: rem(56);
+		display: flex;
+		flex-wrap: wrap;
+		gap: rem(56) 0;
+
+		& + .cpt-content-heading {
+			margin-top: rem(56);
+		}
+	}
+}

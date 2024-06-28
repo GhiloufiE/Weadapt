@@ -1,0 +1,101 @@
+@import '../../../../weadapt/parts/components/single-hero/style.scss';
+
+.single-hero {
+    position: relative;
+	overflow: hidden;
+    color: $static-color--white;
+    background: linear-gradient(0deg, #00994C 0%, #BAC231 100%);
+
+    .theme--dark & {
+		background: $color--white;
+	}
+
+    @include media('>=md') {
+        padding-top: rem(105);
+        padding-bottom: rem(105);
+    }
+
+    &::before, &::after {
+		@include media('>=lg') {
+			content: "";
+			display: block;
+			position: absolute;
+			z-index: 0;
+			background-repeat: no-repeat;
+			pointer-events: none;
+		}
+	}
+
+	&::before {
+		top: rem(-16);
+		left: rem(-6);
+		width: rem(264);
+		height: rem(271);
+		background-image: url('../../../assets/images/svg/hero-left-lines.png');
+	}
+
+	&::after {
+		background-image: url('../../../assets/images/svg/hero-right-lines.png');
+		width: rem(561);
+		height: rem(561);
+		right: rem(-10);
+		bottom: 0;
+	}
+
+    &__container {
+		position: relative;
+		z-index: 1;
+	}
+
+    &__title {
+        color: $static-color--white;
+    }
+
+    &__image {
+        max-width: rem(546);
+        border-radius: rem(10);
+
+        &::before {
+            padding-bottom: 73.261%;
+        }
+
+        img {
+            border-radius: rem(10);
+        }
+    }
+
+    &__subtitle { 
+        color: var(--static-color--white);
+        font-size: 1.5rem;
+        @include font(24, 34);
+        font-weight: 600;
+        margin-bottom: 0;
+    }
+
+    &__title {
+        margin-bottom: rem(22);
+
+        @include media('>=md') {
+            @include font(48, 60);
+        }
+    }
+
+    &__meta {
+        flex-direction: column;
+        gap: rem(5);
+
+        li {
+            letter-spacing: rem(-0.09);
+
+            &:first-child {
+                letter-spacing: 0;
+                font-weight: 600
+            }
+        }
+
+        @include media('>=md') {
+            gap: 0;
+            @include font(18, 27);
+        }
+    }
+}

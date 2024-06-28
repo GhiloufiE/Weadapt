@@ -1,0 +1,40 @@
+@import '../../../../../weadapt/assets/css/shared/cpt-list-item/style.scss';
+
+@import '__settings/init';
+
+.cpt-list-item {
+
+  &__tag {
+
+    &-item {
+      .search & {
+        background-color: $color--tertiary;
+        border-color: $color--tertiary;
+
+        &:hover {
+          background-color: $color--primary;
+          border-color: $color--primary;
+        }
+      }
+
+      .page-content--single & {
+        background-color: $color--tertiary;
+        border-color: $color--tertiary;
+      }
+
+
+      .theme--dark & {
+        background-color: $color--black;
+        border-color: $color--black;
+
+        &:hover {
+          background-color: $color--white;
+        }
+      }
+
+    }
+  }
+
+
+}
+

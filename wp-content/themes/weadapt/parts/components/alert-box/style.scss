@@ -1,0 +1,28 @@
+@import '__settings/init';
+
+.alert-box {
+	background: $color--quote;
+	border-radius: rem(5);
+	padding: rem(16);
+	text-align: center;
+	color: $color--text;
+
+	p {
+		@include font(14, 20);
+
+		@include media('>=md') {
+			@include font(16, 22);
+		}
+
+		&:last-child {
+			margin: 0;
+		}
+	}
+	+ .archive-main__entry {
+		margin-top: rem(32);
+
+		@include media('>=md') {
+			margin-top: rem(40);
+		}
+	}
+}

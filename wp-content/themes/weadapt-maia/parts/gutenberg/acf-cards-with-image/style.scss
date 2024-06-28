@@ -1,0 +1,16 @@
+@import '../../../../weadapt/parts/gutenberg/acf-cards-with-image/style.scss';
+@import '__settings/init';
+
+.cards-with-image {
+	.card-with-image {
+		&__title {
+			a:hover {
+				color: $color--link-hover;
+			}
+		}
+
+		&__button-link {
+			color: $color--link;
+		}
+	}
+}

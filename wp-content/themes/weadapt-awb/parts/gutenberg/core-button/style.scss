@@ -1,0 +1,12 @@
+@import '../../../../weadapt/parts/gutenberg/core-button/style.scss';
+
+@import '__settings/init';
+
+.wp-block-button {
+	&__link {
+		font-family: $font-family-headings;
+		font-weight: $font-weight-heading;
+		color: $static-color--black;
+	}
+
+}

@@ -1,0 +1,117 @@
+@import '__settings/init';
+
+
+.awb-card-item {
+	padding: rem(22);
+	background: $color--white;
+	margin-bottom: rem(22);
+	width: 100%;
+	height: calc(100% - 24px);
+	border-radius: 5px;
+	box-shadow: 0px 4px 24px 0px rgba(0, 0, 0, 0.10);
+
+	.theme--dark & {
+		background: $static-color--black;
+		box-shadow: 0px 4px 24px 0px rgba(255, 255, 255, 0.10);
+	}
+
+	& > *:last-child {
+		margin-bottom: 0;
+	}
+
+	&__title {
+		margin-bottom: rem(8);
+		color: $color--text;
+
+		.title-small & {
+			font-size: rem(24);
+			line-height: rem(32);
+		}
+	}
+
+	&__description {
+		margin-bottom: rem(24);
+
+		& > *:last-child {
+			margin-bottom: 0;
+		}
+	}
+
+	&__icon {
+		margin-bottom: rem(8);
+
+		img {
+			max-width: rem(24);
+			max-height: rem(24);
+			object-fit: contain;
+			display: block;
+		}
+	}
+
+	&__empty-icon {
+		margin-bottom: rem(32);
+	}
+
+	&__more {
+
+		&-btn,
+		&-link {
+			height: fit-content;
+			width: fit-content;
+			display: flex;
+			align-items: center;
+			gap: rem(5);
+			padding: rem(8) rem(16);
+			@include font(14);
+			line-height: rem(22);
+			font-family: $font-family-headings;
+
+			svg {
+				transition: transform $transition;
+			}
+
+			.active & {
+				svg {
+					transform: rotate(90deg);
+				}
+			}
+		}
+
+		&-content {
+			display: none;
+			padding: rem(12) rem(8) 0;
+
+			& > *:last-child {
+				margin-bottom: 0;
+			}
+
+			.active + & {
+				display: block;
+			}
+		}
+	}
+
+	&__person {
+		margin-top: rem(35);
+		display: flex;
+		gap: rem(10);
+
+		&-image {
+			img {
+				min-width: rem(100);
+				height: rem(100);
+				object-fit: cover;
+			}
+		}
+
+		&-title {
+			margin-bottom: rem(5);
+		}
+
+		&-desc {
+			& > *:last-child {
+				margin-bottom: 0;
+			}
+		}
+	}
+}

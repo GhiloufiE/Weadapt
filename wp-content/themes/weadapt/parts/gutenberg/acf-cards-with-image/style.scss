@@ -1,0 +1,115 @@
+@import '__settings/init';
+
+.cards-with-image {
+	&__heading {
+		margin-bottom: rem(32);
+
+		@include media('>=md') {
+			margin-bottom: rem(64);
+		}
+	}
+
+	&__row {
+		gap: rem(32) 0;
+		margin: 0 rem(-12);
+
+		@include media('>=md') {
+			gap: rem(64) 0;
+		}
+	}
+
+	&__col {
+		padding: 0 rem(12);
+	}
+
+	.card-with-image {
+		position: relative;
+
+		&__image {
+			background-color: $static-color--bg;
+			border-radius: rem(5);
+			position: relative;
+			padding-bottom: 56.25%;
+			max-width: 100%;
+			height: auto;
+
+			@include media('>=md') {
+				padding-bottom: 75%;
+			}
+
+			&-link {
+				border-radius: inherit;
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				display: block;
+			}
+
+			img {
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: calc(100% - calc(16px * 2));
+				height: calc(100% - 16px);
+
+				display: block;
+				object-fit: cover;
+				margin: rem(16) rem(16) 0;
+				border-radius: rem(5) rem(5) 0 0;
+
+				@include media('>=md') {
+					margin: rem(21) rem(24) 0;
+					width: calc(100% - calc(24px * 2));
+					height: calc(100% - 21px);
+				}
+			}
+		}
+
+		&__content {
+			padding-top: rem(16);
+
+			& > *:last-child {
+				margin-bottom: 0;
+			}
+		}
+
+		&__title {
+			color: $color--text;
+			margin-bottom: rem(16);
+
+			a {
+				color: currentColor;
+				font-weight: $font-weight-content-medium;
+				@include link();
+			}
+		}
+
+		&__description {
+			@include font(16, 22);
+			margin-bottom: rem(16);
+
+			& > *:last-child {
+				margin-bottom: 0;
+			}
+		}
+
+		&__button {
+			&-link {
+				&::before {
+					content: '';
+					display: block;
+					position: absolute;
+					top: 0;
+					left: 0;
+					width: 100%;
+					height: 100%;
+				}
+
+				color: $color--text-light;
+				@include link-underline();
+			}
+		}
+	}
+}

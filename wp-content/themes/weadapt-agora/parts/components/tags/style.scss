@@ -1,0 +1,25 @@
+@import '../../../../weadapt/parts/components/tags/style.scss';
+
+@import '__settings/init';
+
+.single-tags {
+
+  &__list {
+    gap: rem(12);
+    @include media('>=md') {
+      gap: rem(24);
+    }
+
+  }
+
+  &__link {
+    background-color: $color--tertiary;
+    border-color: $color--tertiary;
+
+    .theme--dark & {
+      background-color: $color--black;
+      border-color: $color--black;
+    }
+  }
+
+}

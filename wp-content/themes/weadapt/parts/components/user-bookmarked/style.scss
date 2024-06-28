@@ -1,0 +1,16 @@
+@import '__settings/init';
+
+.bookmarked {
+	$block: &;
+
+	&__title {
+		@include media('>=md') {
+			font-size: rem(32);
+			margin-bottom: rem(38);
+		}
+	}
+
+	.cpt-query {
+		margin-top: rem(56);
+	}
+}

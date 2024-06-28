@@ -1,0 +1,25 @@
+@import '__settings/init';
+
+/* Text Elements */
+p {
+	margin-bottom: rem(22);
+
+	&:last-child {
+		margin-bottom: 0;
+	}
+
+	&.is-style-uppercase {
+		text-transform: uppercase;
+	}
+
+	&.is-style-preheading {
+		text-transform: uppercase;
+	}
+
+	&.is-style-leadparagraph {
+		@include font(18, 24);
+	}
+	&.is-style-spacing--bottom {
+		margin-bottom: rem(68);
+	}
+}

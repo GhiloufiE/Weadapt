@@ -1,0 +1,87 @@
+@import '__settings/init';
+
+.single-resources {
+	margin: rem(32) 0;
+
+	@include media('>=md') {
+		margin: rem(40) 0;
+	}
+
+	&__row {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		margin: rem(24) 0 0;
+		gap: rem(34) rem(24);
+	}
+
+	&__title {
+		margin-top: rem(32);
+
+		@include media('>=md') {
+			@include font(30, 40);
+		}
+
+		&:last-child,
+		&:nth-last-child(2) {
+			display: none;
+		}
+	}
+
+	&__box {
+		flex: 0 0 100%;
+		max-width: 100%;
+		padding: 0 0 0 rem(40);
+		position: relative;
+
+		&:last-child {
+			margin-bottom: 0;
+		}
+
+		@include media('>=md') {
+			flex: 0 0 calc(50% - 12px);
+			max-width: calc(50% - 12px);
+		}
+
+		&-icon {
+			position: absolute;
+			top: rem(2);
+			left: 0;
+			max-width: rem(24);
+
+			svg path {
+				fill: currentColor;
+			}
+		}
+
+		&-title {
+			margin: 0 0 rem(12);
+			font-weight: $font-weight-content;
+			@include font(16, 22);
+
+			@include media('>=md') {
+				max-width: rem(252);
+				@include font(18, 24);
+				margin-bottom: rem(8);
+			}
+		}
+		&-text {
+			display: block;
+			margin: 0 0 rem(24);
+			color: $color--text-desc;
+
+			@include font(14, 20);
+		}
+
+		.wp-block-button {
+			margin-top: rem(24);
+
+			&__link {
+				&.loading {
+					pointer-events: none;
+					opacity: .6;
+				}
+			}
+		}
+	}
+}

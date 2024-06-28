@@ -1,0 +1,100 @@
+@import '__settings/init';
+
+.cta {
+	background-color: $color--bg;
+
+	&.background {
+		&-white {
+			background-color: $color--white;
+		}
+	}
+
+	&__row {
+		@include media('>=md') {
+			align-items: center;
+			justify-content: space-between;
+		}
+	}
+
+	&__col {
+		&--text {
+			.alignment-right & {
+				text-align: right;
+			}
+
+			.order-text & {
+				order: -1;
+
+				@include media('>=md') {
+					order: initial;
+				}
+			}
+		}
+
+
+		&--image {
+			&.position-right {
+				@include media('>=md') {
+					order: 1;
+					display: flex;
+					justify-content: flex-end;
+				}
+			}
+		}
+	}
+
+	&__content {
+		& > *:last-child {
+			margin-bottom: 0;
+		}
+	}
+
+	&__image {
+		max-width: rem(233);
+		margin-bottom: rem(32);
+
+		.alignment-right & {
+			margin-left: auto;
+
+			@include media('>=md') {
+				margin-left: 0;
+			}
+		}
+
+		.order-text & {
+			margin-bottom: 0;
+			margin-top: rem(32);
+
+			@include media('>=md') {
+				margin-top: 0;
+			}
+		}
+
+		@include media('>=md') {
+			max-width: rem(397);
+			margin-bottom: 0;
+		}
+	}
+
+	&__heading {
+		margin-bottom: rem(24);
+
+		@include media('>=md') {
+			margin-bottom: rem(16);
+		}
+	}
+
+	&__description {
+		margin-bottom: rem(24);
+
+		@include media('>=md') {
+			margin-bottom: rem(32);
+		}
+ 	}
+
+	.wp-block-button__link {
+		height: rem(48);
+
+		@include font(16, 22);
+	}
+}

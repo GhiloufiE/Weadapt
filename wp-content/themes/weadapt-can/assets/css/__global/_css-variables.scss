@@ -1,0 +1,38 @@
+body {
+	--font-family-base: 'Montserrat', sans-serif;
+	--font-family-headings: 'Montserrat', sans-serif;
+
+	--color--bg: #E8ECEF;
+	--color--bg-hero: #ffffff;
+	--color-bg-mega-menu: #ffffff;
+	--color--dark-bg: #F0F0F0;
+
+	--color--primary: #BAC231;
+	--color--tertiary: #F58838;
+
+	--color--text: #154260;
+	--color--text-light: #222222;
+	--static-color--text: #154260;
+
+	--color--red: #EE674D;
+
+	--font-weight-heading: 600;
+	--font-size-mobile: 1rem;
+	--line-height-mobile: 1.5;
+	--line-height-base: 1.5;
+
+	--color--tag: #27688F;
+	--color--tag-light: #6AC8C3;
+
+	--color--link: #27688F;
+
+	--color--border: #CDCDCD;
+
+	&.theme--dark {
+		--color--tag: #ffffff;
+		--color--tag-light: #ffffff;
+		--color--tertiary: #000000;
+
+		--color--red: #ffffff;
+	}
+}

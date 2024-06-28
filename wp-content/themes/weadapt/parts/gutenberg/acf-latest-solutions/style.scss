@@ -1,0 +1,52 @@
+@import '__settings/init';
+
+.latest-solutions {
+	background-color: $color--bg;
+	$block: &;
+
+	&:not(.block-spacing--pb) {
+		#{$block} {
+			&__content {
+				@include media('>=md') {
+					padding-bottom: rem($spacing);
+				}
+			}
+		}
+	}
+
+	&:not(.block-spacing--pt) {
+		#{$block} {
+			&__content {
+				@include media('>=md') {
+					padding-top: rem($spacing);
+				}
+			}
+		}
+	}
+
+	&.background {
+		&-white {
+			background-color: $color--white;
+		}
+	}
+
+	&-solutions__row {
+		display: grid;
+		gap: rem(16);
+		grid-template-columns: 1fr;
+
+		@include media('>=sm') {
+			grid-template-columns: repeat(2, 1fr);
+		}
+
+		@include media('>=md') {
+			grid-template-columns: repeat(3, 1fr);
+			gap: rem(24);
+		}
+	}
+
+	&__heading {
+		color: $color--black;
+	}
+
+}

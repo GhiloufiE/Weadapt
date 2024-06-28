@@ -1,0 +1,59 @@
+@import '__settings/init';
+
+.slider {
+	background-color: $color--bg;
+
+	&.background {
+		&-white {
+			background-color: $color--white;
+		}
+
+		&-light {
+			.swiper-pagination-bullet:not(.swiper-pagination-bullet-active) {
+				background-color: $static-color--white;
+			}
+		}
+	}
+
+	&__body {
+		position: relative;
+	}
+
+	&-section-title {
+		max-width: rem(956);
+		margin: 0 auto rem(24);
+		@include font(30, 40);
+		font-weight: 500;
+	}
+
+	&-swiper {
+		border-radius: rem(10);
+		background: $color--white;
+		box-shadow: 0 rem(4) rem(24) $color--shadow;
+		padding: rem(24);
+		max-width: rem(956);
+		margin: 0 auto;
+	}
+
+	&-slide {
+		margin-right: rem(24);
+
+		&__description {
+			margin-bottom: rem(26);
+
+			p {
+				&:last-of-type {
+					margin-bottom: 0;
+				}
+			}
+
+			@include media('>=md') {
+				@include font(18, 24);
+			}
+		}
+
+		& > *:last-child {
+			margin-bottom: 0;
+		}
+	}
+}

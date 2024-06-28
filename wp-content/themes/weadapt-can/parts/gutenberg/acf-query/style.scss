@@ -1,0 +1,32 @@
+@import '../../../../weadapt/parts/gutenberg/acf-query/style.scss';
+
+.query {
+	&__heading {
+		text-align: center;
+	}
+
+	.cpt-latest {
+		margin-inline: rem(-12);
+
+		@include media('>=md') {
+			margin-top: rem(48);
+		}
+
+		& > div {
+			padding: 0 rem(12);
+		}
+	}
+
+	&__button {
+		.wp-block-button__link {
+			background: $color--white;
+			border-color: $color--text;
+			color: $color--text;
+
+			&:hover {
+				background: $color--text;
+				color: $color--white;
+			}
+		}
+	}
+}

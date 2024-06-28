@@ -1,0 +1,47 @@
+@import '__settings/init';
+
+.file-download {
+    background-color: $color--bg;
+
+	&.background {
+		&-white {
+			background-color: $color--white;
+		}
+	}
+
+    &__header {
+        max-width: rem(564);
+        margin-bottom: rem(44);
+    }
+
+    &__file {
+        max-width: rem(358);
+        
+        &-image {
+            img {
+                box-shadow: 0 rem(4) rem(24) 0 rgba(0, 0, 0, 0.25);
+            }
+        }
+        &-content {
+            margin-top: rem(27);
+            display: flex;
+            justify-content: center;
+        }
+    }
+
+    &__row {
+        display: flex;
+        flex-direction: column;
+        gap: rem(40);
+        flex-wrap: wrap;
+
+        @include media('>=md') {
+            flex-direction: row;
+        }
+        
+        @include media('>=xl') {
+            padding-left: rem(56);
+            gap: rem(40) rem(175);
+        }
+    }
+}

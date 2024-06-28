@@ -1,0 +1,137 @@
+.main-header {
+	display: flex;
+	flex-direction: column;
+	$block: &;
+
+	&--mobile {
+		@include media('>=md') {
+			display: none;
+		}
+
+		#{$block} {
+			&__main-area {
+				padding-top: rem(12);
+				padding-bottom: rem(12);
+			}
+		}
+	}
+
+	&--desktop {
+		display: none;
+
+		@include media('>=md') {
+			display: flex;
+		}
+
+		@include media('<md') {
+			[data-popup="menu-opened"] &,
+			[data-popup="search-opened"] & {
+				display: flex;
+				height: calc(100vh - 48px) !important;
+				overflow-y: auto;
+				padding-bottom: rem(80);
+			}
+			[data-popup="menu-opened"] & {
+				background-color: $color--black-to-dark-reverse;
+			}
+		}
+
+		#{$block} {
+			&__main-area {
+				@include media('<md') {
+					[data-popup="search-opened"] & {
+						padding-top: rem(9);
+						padding-bottom: rem(14);
+					}
+				}
+			}
+		}
+	}
+
+	&__top-area {
+		order: 1;
+		position: relative;
+		background-color: $color--black-to-dark-reverse;
+		color: $static-color--white;
+		padding-top: rem(13);
+		padding-bottom: rem(13);
+		border-bottom: rem(1) solid $color--border-transparent;
+
+		@include media('<md') {
+			[data-popup="search-opened"] & {
+				padding: 0;
+			}
+		}
+		@include media('>=md') {
+			order: 0;
+			padding-top: 0;
+			padding-bottom: 0;
+		}
+
+		> .container {
+			display: flex;
+			align-items: center;
+			justify-content: flex-end;
+		}
+	}
+	&__main-area {
+		position: relative;
+		background-color: $color--bg-hero;
+		right: 0;
+		left: 0;
+		top: 0;
+		padding-top: rem(21);
+		padding-bottom: rem(21);
+		z-index: 1;
+
+		will-change: transform;
+
+		@include media('>=md') {
+			padding-top: rem(0);
+			padding-bottom: rem(0);
+		}
+
+		> .container {
+			display: flex;
+			align-items: center;
+			flex-wrap: wrap;
+
+			@include media('>=md') {
+				flex-wrap: nowrap;
+			}
+		}
+
+		&.sticky {
+			position: fixed;
+			z-index: 999;
+			width: 100%;
+			transform: translateY(-62px);
+			transition: transform $transition-speed cubic-bezier(0.22, 1, 0.36, 1);
+
+			&.pinned {
+				transform: translateY(0);
+			}
+		}
+		&.no-transition {
+			transition: 0s;
+		}
+	}
+}
+
+
+// Google Translate Fix
+html {
+	height: auto !important;
+}
+body {
+	top: 0 !important;
+	position: static !important;
+}
+.skiptranslate {
+	display: none !important;
+}
+.goog-text-highlight {
+	background-color: inherit;
+	box-shadow: none;
+	box-sizing: inherit;
+}

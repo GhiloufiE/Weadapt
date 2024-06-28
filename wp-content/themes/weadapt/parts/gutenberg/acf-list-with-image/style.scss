@@ -1,0 +1,124 @@
+@import '__settings/init';
+
+.list-with-image {
+	background-color: $color--bg;
+	$block: &;
+
+	&:not(.block-spacing--pb) {
+		#{$block} {
+			&__content {
+				@include media('>=md') {
+					padding-bottom: rem($spacing);
+				}
+			}
+		}
+	}
+
+	&:not(.block-spacing--pt) {
+		#{$block} {
+			&__content {
+				@include media('>=md') {
+					padding-top: rem($spacing);
+				}
+			}
+		}
+	}
+
+	&.background {
+		&-white {
+			background-color: $color--white;
+		}
+	}
+
+	&__col {
+		&--image {
+			order: 1;
+			display: flex;
+			justify-content: flex-start;
+
+			@include media('>=md') {
+				order: initial;
+			}
+			&-container__link {
+				padding: 0;
+			}
+			&-container,
+			&-container__link {
+				max-width: rem(360);
+				width: 100%;
+				max-height: rem(323);
+				height: 100%;
+				aspect-ratio: 360/323;
+				border-radius: rem(20);
+			}
+			&-container {
+				box-shadow: 0 rem(4) rem(24) $color--shadow;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				background-color: $color--white;
+			}
+
+			&.right {
+				justify-content: flex-end;
+
+				@include media('>=md') {
+					order: 1;
+				}
+			}
+			img,
+			svg {
+				object-fit: contain;
+			}
+		}
+
+		&--text {
+			height: auto;
+			display: flex;
+			align-items: center;
+		}
+	}
+
+	&__row {
+		padding: rem(30) 0;
+		row-gap: rem(16);
+		@include media('>=md') {
+			padding: rem(60) 0;
+		}
+	}
+
+	&__description {
+		color: $color--text;
+		& > *:last-child {
+			margin-bottom: 0;
+		}
+
+		h1, h2, h3, h4, h5, h6 {
+			margin-bottom: rem(16);
+
+			@include media('>=md') {
+				margin-bottom: rem(32);
+			}
+		}
+	}
+
+	&__content {
+		display: flex;
+		flex-direction: column;
+		gap: rem(16);
+
+		@include media('>=md') {
+			gap: rem(24);
+		}
+	}
+
+	&__title {
+		margin: 0;
+		font-family: $font-family-base;
+		font-weight: $font-weight-heading;
+
+		@include media('>=md') {
+			@include font(35, 49);
+		}
+	}
+}

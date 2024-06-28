@@ -1,0 +1,37 @@
+@import '../../../../weadapt/parts/gutenberg/core-button/style.scss';
+
+.wp-block-button {
+	&__link {
+		font-family: $font-family-base;
+		background-color: $color--primary;
+		border-radius: rem(100);
+		padding: rem(14) rem(35);
+		border-width: 1px!important;
+		@include font(14);
+		&:hover {
+			background-color: $color--dark-bg;
+			color: $color--white;
+			.theme--dark & {
+				color: $color--text;
+			}
+		}
+	}
+	&.is-style-outline {
+		.wp-block-button__link:not(.has-text-color) {
+			border-color: $color--primary;
+			background-color: $color--white;
+			@include media('>=md') {
+				padding: rem(14) rem(35);
+			}
+			&:hover {
+				border-color: $color--black;
+				background-color: $color--white;
+				color: $color--text;
+				.theme--dark & {
+					color: $color--white;
+					background-color: $color--black;
+				}
+			}
+		}
+	}
+}

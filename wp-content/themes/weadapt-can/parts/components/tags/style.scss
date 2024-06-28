@@ -1,0 +1,17 @@
+@import '../../../../weadapt/parts/components/tags/style.scss';
+
+.single-tags {
+    margin: rem(40) 0;
+
+    &__link {
+        color: $color--white;
+        border-color: $color--link !important;
+        font-weight: 500;
+        background-color: $color--link;
+
+        &:hover {
+            background: transparent;
+            color: $color--text;
+        }
+    }
+}

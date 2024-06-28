@@ -1,0 +1,36 @@
+@import '__settings/init';
+
+.badges {
+	$block: &;
+
+	&__title {
+		@include media('>=md') {
+			font-size: rem(32);
+			margin-bottom: rem(38);
+		}
+	}
+
+	&__item {
+		margin-top: rem(40);
+
+		@include media('>=md') {
+			margin-top: rem(55);
+		}
+
+		&__title {
+			font-weight: $font-weight-content-medium;
+			margin: 0;
+
+			&:not(:first-child) {
+				margin-top: rem(17);
+			}
+
+			@include media('>=md') {
+				font-size: rem(24);
+			}
+		}
+		&__desc {
+			margin-top: rem(15);
+		}
+	}
+}

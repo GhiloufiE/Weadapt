@@ -1,0 +1,37 @@
+@import '../../../../weadapt/parts/gutenberg/core-image/style.scss';
+
+.wp-block-image {
+
+  & a {
+    position: relative;
+
+    & img {
+      width: 100%;
+    }
+  }
+
+  & .low-quality-image-text {
+    & p {
+      width: 90%;
+      margin: 0 auto;
+      background-color: #FDC33A;
+      color: $color--black;
+
+      @include media('<=md') {
+        @include font(14, 18);
+        padding: rem(10) rem(8);
+        bottom: rem(16);
+      }
+
+      @include font(16, 22);
+      font-weight: 800;
+      border-radius: rem(5);
+      padding: rem(20) rem(16);
+      text-align: center;
+    }
+    
+    width: 100%;
+    position: absolute;
+    bottom: rem(32);
+  }
+}

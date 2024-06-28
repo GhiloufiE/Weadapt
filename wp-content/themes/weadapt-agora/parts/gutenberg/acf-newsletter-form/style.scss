@@ -1,0 +1,5 @@
+@import '../../../../weadapt/parts/gutenberg/acf-newsletter-form/style.scss';
+
+.newsletter-form {
+	@include bg-lines($color--bg-dark, 0.2);
+}

@@ -1,0 +1,32 @@
+@import '../../../../../weadapt/assets/css/shared/archive/style.scss';
+
+.archive-main {
+	&__row {
+		margin-top: rem(40) !important;
+
+		@include media('>=md') {
+			margin-top: rem(80) !important;
+		}
+	}
+}
+
+.cpt-more {
+	.wp-block-button__link {
+		background: $color--white;
+		border-color: $color--text;
+		color: $color--text;
+
+		&:hover {
+			background: $color--text;
+			color: $color--white;
+		}
+	}
+}
+
+.related-blog {
+	&__row {
+		display: flex;
+		flex-direction: column;
+		gap: rem(40);
+	}
+}

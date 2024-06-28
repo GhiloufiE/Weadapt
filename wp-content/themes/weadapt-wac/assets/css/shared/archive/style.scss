@@ -1,0 +1,33 @@
+@import '../../../../../weadapt/assets/css/shared/archive/style.scss';
+
+@import '__settings/init';
+
+.archive-main {
+
+  &__row {
+
+    &:first-child {
+      @include media('>=md') {
+        margin-top: rem(80);
+      }
+    }
+
+  }
+
+  &__entry {
+    & .wp-block-heading {
+      color: $color--primary;
+    }
+  }
+
+  &__aside {
+    & hr {
+      margin: 0;
+      border: none;
+      border-bottom: 1px solid $color--border;
+    }
+  }
+
+}
+
+

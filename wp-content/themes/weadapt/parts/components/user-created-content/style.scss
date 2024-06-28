@@ -1,0 +1,18 @@
+@import '__settings/init';
+
+.created-content {
+	$block: &;
+
+	&__title {
+		@include media('>=md') {
+			font-size: rem(32);
+			margin-bottom: rem(38);
+		}
+	}
+
+	.cpt-list-item {
+		border-bottom: rem(1) solid $color--border;
+		padding-bottom: rem(32);
+		margin-bottom: rem(32);
+	}
+}

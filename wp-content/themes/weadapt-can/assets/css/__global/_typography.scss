@@ -1,0 +1,23 @@
+
+
+.section { 
+    &-description {
+        letter-spacing: rem(-0.1);
+        line-height: 1.5;
+
+        @include media('>=md') {
+            @include font(18, 27);
+        }
+
+
+        ul {
+            li {
+                margin-bottom: rem(20);
+
+                &:last-child {
+                    margin-bottom: 0;
+                }
+            }
+        }
+    }
+}

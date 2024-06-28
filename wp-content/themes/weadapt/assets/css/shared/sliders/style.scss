@@ -1,0 +1,62 @@
+@import '__settings/init';
+
+.swiper {
+	overflow: hidden;
+
+	&-container {
+		padding-top: rem(50);
+	}
+
+	&-button {
+		&-prev, &-next {
+			top: 0;
+			bottom: auto;
+			margin-top: 0;
+		}
+	}
+
+	&-wrapper {
+		z-index: 0;
+	}
+
+	&-pagination {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		position: relative;
+		margin-top: rem(24);
+
+		&-bullet {
+			background: $static-color--bg;
+			border-radius: rem(2);
+			opacity: 1;
+
+			&-active {
+				background-color: $color--primary;
+			}
+		}
+
+		&-fraction {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+
+			height: rem(44);
+			padding: 0 rem(50);
+
+			top: 0;
+			bottom: auto;
+		}
+	}
+}
+
+button.swiper-pagination-bullet {
+	margin: 0 rem(4);
+	width: rem(12);
+	height: rem(12);
+
+	&-active {
+		width: rem(16);
+		height: rem(16);
+	}
+}

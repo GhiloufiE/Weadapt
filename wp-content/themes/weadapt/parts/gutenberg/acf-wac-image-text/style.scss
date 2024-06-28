@@ -1,0 +1,129 @@
+@import '__settings/init';
+
+.wac-image-text {
+	background-color: $color--bg;
+	$block: &;
+
+	&:not(.block-spacing--pb) {
+		#{$block} {
+			&__content {
+				@include media('>=md') {
+					padding-bottom: rem($spacing);
+				}
+			}
+		}
+	}
+
+	&:not(.block-spacing--pt) {
+		#{$block} {
+			&__content {
+				@include media('>=md') {
+					padding-top: rem($spacing);
+				}
+			}
+		}
+	}
+
+	&.background {
+		&-white {
+			background-color: $color--white;
+		}
+	}
+
+	&__row {
+		@include media('>=md') {
+			&.alignment {
+				&-center {
+					align-items: center;
+				}
+
+				&-bottom {
+					align-items: flex-end;
+				}
+
+				&-top {
+					align-items: flex-start;
+				}
+			}
+		}
+	}
+
+	&__col {
+		&--image {
+			order: 1;
+
+			@include media('>=md') {
+				order: initial;
+			}
+
+			&.right {
+				@include media('>=md') {
+					order: 1;
+				}
+			}
+		}
+	}
+
+
+	&__description {
+		& > *:last-child {
+			margin-bottom: 0;
+		}
+
+		h1, h2, h3, h4, h5, h6 {
+			margin-bottom: rem(16);
+
+			@include media('>=md') {
+				margin-bottom: rem(32);
+			}
+		}
+	}
+
+	&__image {
+		margin-top: rem(24);
+
+		@include media('>=md') {
+			margin-top: 0;
+		}
+
+		svg {
+			max-width: rem(248);
+
+			@include media('>=md') {
+				max-width: 100%;
+			}
+		}
+
+		img {
+			width: 100%;
+			margin-top: rem(8);
+			max-width: rem(466);
+			max-height: rem(466);
+			border-radius: rem(5);
+
+			@include media('>=md') {
+				margin-top: 0;
+			}
+
+			.alignment-top & {
+				.background-light & {
+					max-height: rem(524);
+					max-width: rem(524);
+				}
+			}
+		}
+
+		.right & {
+			display: flex;
+			justify-content: flex-end;
+		}
+	}
+
+	&__button {
+		margin-top: rem(22);
+
+		@include media('>=md') {
+			margin-top: rem(32);
+		}
+	}
+}

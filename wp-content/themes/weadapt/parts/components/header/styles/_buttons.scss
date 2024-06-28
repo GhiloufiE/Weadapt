@@ -1,0 +1,128 @@
+.main-header {
+	&__button {
+		width: rem(24);
+		height: rem(24);
+		margin-left: rem(24);
+
+		position: relative;
+
+		border: 0;
+		background: transparent;
+		box-shadow: none;
+		cursor: pointer;
+		padding: 0;
+
+		transition: color $transition;
+
+		color: $color--black;
+
+		@include media('>=md') {
+			display: none;
+		}
+
+		span {
+			top: 0;
+			display: block;
+
+			width: rem(22);
+			height: rem(2);
+
+			position: absolute;
+			transform: translate3d(1px, 4px, 0) rotate(0deg);
+			transform-origin: left center;
+
+			background: currentColor;
+			opacity: 1;
+
+			transition: transform $transition, opacity $transition, width $transition;
+
+			&:nth-child(2) {
+				transition-delay: $transition-speed;
+			}
+		}
+
+		&.active {
+			span {
+				transition-delay: $transition-speed;
+
+				&:nth-child(2) {
+					transition-delay: 0s;
+				}
+			}
+		}
+
+		&__list {
+			display: flex;
+		}
+
+		&--menu {
+			span {
+				&:nth-child(1) {
+					transform: translate3d(1px, 4px, 0) rotate(0deg);
+				}
+
+				&:nth-child(2) {
+					transform: translate3d(1px, 11px, 0);
+				}
+
+				&:nth-child(3) {
+					transform: translate3d(1px, 18px, 0) rotate(0deg);
+				}
+			}
+			&.active {
+				span {
+					&:nth-child(1) {
+						transform: translate3d(4px, 3px, 0) rotate(45deg);
+					}
+
+					&:nth-child(2) {
+						opacity: 0;
+					}
+
+					&:nth-child(3) {
+						transform: translate3d(4px, 19px, 0) rotate(-45deg);
+					}
+				}
+			}
+		}
+
+		&--search {
+			span {
+				&:nth-child(1) {
+					width: rem(7);
+					transform-origin: right center;
+					transform: translate3d(13px, 19px, 0) rotate(45deg);
+				}
+
+				&:nth-child(2) {
+					width: rem(15);
+					height: rem(15);
+					background: none;
+					border: rem(2) solid currentColor;
+					border-radius: 100%;
+					top: rem(-1);
+					left: rem(2);
+				}
+
+				&:nth-child(3) {
+					width: 0;
+					transform: translate3d(4px, 19px, 0) rotate(-45deg);
+				}
+			}
+			&.active {
+				span {
+					&:nth-child(1) {
+						width: rem(22);
+						transform: translate3d(-2px, 19px, 0) rotate(45deg);
+					}
+					&:nth-child(2) {
+						opacity: 0;
+					}
+					&:nth-child(3) {
+						width: rem(22);
+					}
+				}
+			}
+		}
+	}
+}

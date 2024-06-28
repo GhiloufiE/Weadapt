@@ -1,0 +1,32 @@
+@import '__settings/init';
+
+.interest-articles {
+	background-color: $color--bg;
+	$block: &;
+
+	&:not(.block-spacing--pb) {
+		#{$block} {
+			&__content {
+				@include media('>=md') {
+					padding-bottom: rem($spacing);
+				}
+			}
+		}
+	}
+
+	&:not(.block-spacing--pt) {
+		#{$block} {
+			&__content {
+				@include media('>=md') {
+					padding-top: rem($spacing);
+				}
+			}
+		}
+	}
+
+	&.background {
+		&-white {
+			background-color: $color--white;
+		}
+	}
+}

@@ -1,0 +1,11 @@
+@import '../../../../weadapt/parts/gutenberg/acf-video-text/style.scss';
+
+@import '__settings/init';
+
+.video-text {
+	&__video {
+		&-play {
+			background-color: $static-color--bg;
+		}
+	}
+}

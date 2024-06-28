@@ -1,0 +1,11 @@
+@import '../../../../weadapt/parts/gutenberg/acf-slider/style.scss';
+
+.slider {
+	&.background {
+		&-white {
+			.swiper-pagination-bullet:not(.swiper-pagination-bullet-active) {
+				background-color: $static-color--bg;
+			}
+		}
+	}
+}

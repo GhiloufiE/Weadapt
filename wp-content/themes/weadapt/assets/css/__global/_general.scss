@@ -1,0 +1,162 @@
+*,
+*:before,
+*:after {
+	box-sizing: border-box;
+}
+
+*:focus {
+	outline: $outline !important;
+	outline-offset: $outline-offset;
+
+	body.using-mouse & {
+		outline: none !important;
+	}
+}
+
+html {
+	font-size: 1rem;
+	line-height: 1.5;
+
+	-webkit-text-size-adjust: 100%;
+
+	&[data-popup] {
+		overflow: hidden;
+	}
+}
+
+body,
+button,
+a,
+input,
+select,
+textarea {
+	font-family: $font-family-base;
+}
+
+input,
+select,
+textarea {
+	max-width: 100%;
+}
+
+body {
+	margin: 0;
+
+	font-size: $font-size-mobile;
+	font-weight: $font-weight-content;
+	line-height: $line-height-mobile;
+	color: $color--text-light;
+	background: $color--body-bg;
+
+	transition: background-color $transition, color $transition;
+
+	@include media('>=md') {
+		font-size: $font-size-base;
+		line-height: $line-height-base;
+	}
+}
+
+.no-transition *,
+.no-transition {
+	transition-duration: 0s !important;
+}
+
+figure {
+	margin: 0;
+}
+
+img,
+svg {
+	height: auto;
+	max-width: 100%;
+
+	vertical-align: middle;
+}
+
+nav {
+	ul {
+		padding: 0;
+
+		margin: 0;
+
+		list-style: none;
+	}
+}
+
+.screen-reader-text {
+	width: rem(1);
+	height: rem(1);
+	padding: 0;
+
+	position: absolute;
+	margin: rem(-1);
+
+	word-wrap: normal !important;
+
+	border: 0;
+	overflow: hidden;
+	clip: rect(1px, 1px, 1px, 1px);
+
+	clip-path: inset(50%);
+}
+
+a.skip-link {
+	width: rem(1);
+	height: rem(1);
+
+	position: absolute;
+	z-index: -999;
+	top: auto;
+	left: rem(-999);
+
+	overflow: hidden;
+
+	&:focus,
+	&:active {
+		width: rem(150);
+		height: auto;
+		padding: rem(5);
+
+		z-index: 999;
+		top: rem(20);
+		left: rem(20);
+		margin: 0;
+
+		font-size: rem(16);
+		text-align: center;
+		color: white;
+
+		border: rem(2) solid yellow;
+		border-radius: rem(8);
+		background-color: black;
+		overflow: auto;
+	}
+}
+
+#page {
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh;
+
+	.admin-bar & {
+		min-height: calc(100vh - 32px);
+
+		@include media('<=782px') {
+			min-height: calc(100vh - 46px);
+		}
+	}
+
+	.page-content {
+		flex-grow: 1;
+	}
+}
+
+.page-content {
+	section {
+		border-bottom: rem(1) solid $color--border-transparent;
+	}
+}
+
+#wpadminbar .quicklinks li img.blavatar {
+	max-width: unset;
+}

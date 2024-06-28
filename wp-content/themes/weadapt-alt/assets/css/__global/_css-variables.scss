@@ -1,0 +1,25 @@
+body {
+	--color--primary: #4E7E77;
+	--color--secondary: #213533;
+	--color--link: #231F20;
+	--color--dark-bg: #231F20;
+
+	--color--bg-hero: #4E7E77;
+	--font-family-base: 'NeueHaas', sans-serif;
+	--font-family-headings: 'NeueHaas Display', sans-serif;
+	--font-weight-heading: 500;
+	--color--text: #231F20;
+	--font-weight-content-bold: 500;
+
+	/* Custom CSS Variables For weadaptALT theme */
+	--alt-header-font-family: 'Inter', sans-serif;
+	--alt-secondary-font-family: 'NeueHaas', sans-serif;
+	--alt-font-weight-base: 400;
+
+	/* ACF Hero */
+	--alt-acf-hero-color: #fff;
+	&.theme--dark {
+		--color--secondary: #fff;
+		--color--text: #ffffff;
+	}
+}

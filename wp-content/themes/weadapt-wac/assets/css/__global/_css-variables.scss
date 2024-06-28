@@ -1,0 +1,19 @@
+body {
+  --color--primary: #00072D;
+  --color--secondary: #00B0CE;
+  --color--tertiary: #CEDFF1;
+  --color--tag: #F9F871;
+  --color--grey: #F2F2F2;
+
+  --color--bg: #E7EFF8;
+  --color--bg-hero: #00072D;
+  --color--dark-bg: #00072D;
+  --color-bg-mega-menu: #E7EFF8;
+  --static-color--black: #000000;
+  --static-color--white: #ffffff;
+
+  &.theme--dark {
+    --color--tertiary: #DCDCDC;
+    --color--grey: #000000;
+  }
+}

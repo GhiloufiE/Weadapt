@@ -1,0 +1,16 @@
+@import '../../../../weadapt/parts/gutenberg/acf-image-text-read-more/style.scss';
+
+.image-text-read-more {
+	&__heading {
+		font-family: var(--alt-secondary-font-family);
+		@include media('>=md') {
+			@include font(35, 49);
+		}
+	}
+	&__description {
+		color: $color--text;
+		a {
+			color: $color--text;
+		}
+	}
+}

@@ -1,0 +1,8 @@
+@import '../../../weadapt/assets/css/style.scss';
+@import '../css/__global/init';
+
+.wp-block-image {
+	&.wp-block-map {
+		margin: 0 auto;
+	}
+}

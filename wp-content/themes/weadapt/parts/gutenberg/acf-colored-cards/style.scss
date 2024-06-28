@@ -1,0 +1,29 @@
+@import '__settings/init';
+
+.colored-cards {
+	background-color: $color--bg;
+
+	&.background {
+		&-white {
+			background-color: $color--white;
+		}
+	}
+
+	&__col {
+		margin-bottom: rem(22);
+
+		@include media('>=md') {
+			margin-bottom: 0;
+		}
+
+		&:last-child {
+			margin-bottom: 0;
+		}
+
+		&--right {
+			@include media('>=md') {
+				margin-top: rem(55);
+			}
+		}
+	}
+}

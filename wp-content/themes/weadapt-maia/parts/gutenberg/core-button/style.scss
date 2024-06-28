@@ -1,0 +1,13 @@
+@import '../../../../weadapt/parts/gutenberg/core-button/style.scss';
+
+.wp-block-button {
+	&__link {
+		border-radius: rem(100);
+
+		&:hover {
+			color: $color--black;
+			border-color: $color--black;
+			background-color: transparent;
+		}
+	}
+}

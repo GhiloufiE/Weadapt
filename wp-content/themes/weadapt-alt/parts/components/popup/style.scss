@@ -1,0 +1,41 @@
+@import '../../../../weadapt/parts/components/popup/style.scss';
+
+@import '__settings/init';
+
+.popup {
+	label {
+		font-family: var(--alt-secondary-font-family);
+	}
+	.wp-block-button {
+		.wp-block-button {
+			&__link {
+				font-family: var(--alt-secondary-font-family);
+				padding: rem(14) rem(35);
+				@include font(14);
+			}
+		}
+	}
+	.ajax-form {
+		&__field {
+			.description {
+				font-family: var(--alt-secondary-font-family);
+			}
+		}
+		&__url {
+			a {
+				font-family: var(--alt-secondary-font-family);
+			}
+		}
+	}
+	.sign-up-extra-text {
+		font-family: var(--alt-secondary-font-family);
+	}
+	.create-account-btn {
+		background-color: $color--secondary;
+		border-color: $color--secondary;
+		&:hover {
+			border-color: $color--black;
+			background-color: transparent;
+		}
+	}
+}

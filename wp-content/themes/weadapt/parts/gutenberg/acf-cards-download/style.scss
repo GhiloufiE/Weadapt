@@ -1,0 +1,85 @@
+@import '__settings/init';
+
+.cards-download {
+	.container {
+		max-width: rem($container-width);
+		padding: 0 rem($container-padding);
+
+		@include media('>=md') {
+			max-width: rem(1176);
+			padding: 0 rem(12);
+		}
+	}
+
+	.row {
+		margin: 0 rem(-$container-padding);
+
+		@include media('>=md') {
+			margin: 0 rem(-12);
+		}
+	}
+
+	[class*='col-'] {
+		padding: rem(32) rem($container-padding) 0;
+
+		@include media('>=md') {
+			padding: rem(24) rem(12) 0;
+		}
+	}
+
+	&__heading {
+		margin-bottom: rem(24);
+
+		@include media('>=md') {
+			margin-bottom: rem(22);
+		}
+	}
+
+	&__description {
+		@include font(16, 22);
+
+		p {
+			margin-bottom: rem(23);
+
+			@include media('>=md') {
+				margin-bottom: rem(32);
+			}
+		}
+	}
+
+	.card-download {
+		background-color: $color--white;
+		box-shadow: 0 rem(4) rem(24) $color--shadow;
+		padding: rem(24);
+		border-radius: rem(5);
+		height: 100%;
+
+		&__icon {
+			margin-bottom: rem(28);
+		}
+
+		&__title {
+			margin-bottom: rem(18);
+		}
+
+		&__content {
+			font-family: $font-family-base;
+			font-weight: $font-weight-content;
+			font-style: normal;
+			@include font(14, 20);
+
+			p {
+				@include font(14, 20);
+				margin-bottom: rem(24);
+			}
+
+			.wp-block-button {
+				margin-top: rem(24);
+			}
+
+			& > *:last-child {
+				margin-bottom: 0;
+			}
+		}
+	}
+}

@@ -1,0 +1,135 @@
+@import '__settings/init';
+
+.networks {
+  background-color: $color--bg;
+
+  &.primary-bg {
+    background-color: $color--primary;
+    color: $static-color--white;
+
+    .theme--dark & {
+      background-color: $color--bg;
+    }
+  }
+
+  $block: &;
+
+  &:not(.block-spacing--pb) {
+    #{$block} {
+      &__content {
+        @include media('>=md') {
+          padding-bottom: rem($spacing);
+        }
+      }
+    }
+  }
+
+  &:not(.block-spacing--pt) {
+    #{$block} {
+      &__content {
+        @include media('>=md') {
+          padding-top: rem($spacing);
+        }
+      }
+    }
+  }
+
+  &.background {
+    &-white {
+      background-color: $color--white;
+      color: $color--black;
+    }
+  }
+
+  &__content {
+    display: flex;
+    gap: rem(40) 0;
+  }
+
+  & .col-12 {
+    position: relative;
+  }
+
+  &__heading {
+    margin-bottom: rem(48);
+    text-align: center;
+    @include font(30, 42);
+    font-weight: 500;
+
+  }
+
+  &__image-container {
+    max-width: rem(174);
+
+    @include media('<md') {
+      max-width: rem(300);
+    }
+  }
+
+  &__image {
+    margin-bottom: rem(26);
+    position: relative;
+    height: 0;
+    padding-bottom: 100%;
+    border-radius: rem(5);
+    overflow: hidden;
+    box-shadow: 0px 4px 24px 0px rgba(0, 0, 0, 0.25);
+
+    .theme--dark & {
+      box-shadow: 0px 4px 24px 0px rgba(255, 255, 255, 0.25);
+    }
+
+    img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+
+    }
+  }
+
+  &__card-heading {
+    @include font(24, 34);
+    margin-bottom: rem(16);
+    font-weight: 500;
+  }
+
+  &__description {
+    margin-bottom: rem(56);
+    @include font(18, 24);
+  }
+
+  &__button {
+    position: absolute;
+    bottom: 0;
+    left: rem(16);
+
+    a {
+      .primary-bg:not(.background-white) & {
+        background-color: $static-color--white;
+        border-color: $static-color--white;
+        color: $color--primary;
+
+        .theme--dark & {
+          color: $static-color--black;
+        }
+
+        &:hover {
+          background-color: $color--primary;
+          color: $static-color--white;
+
+          .theme--dark & {
+            background-color: $static-color--black;
+          }
+        }
+      }
+
+      height: rem(32);
+      padding: rem(8) rem(16);
+      @include font(14, 20);
+    }
+  }
+
+}

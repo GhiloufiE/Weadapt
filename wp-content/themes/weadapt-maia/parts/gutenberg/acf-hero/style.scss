@@ -1,0 +1,30 @@
+@import '../../../../weadapt/parts/gutenberg/acf-hero/style.scss';
+
+.hero {
+	&__heading {
+		color: $static-color--white;
+
+		@include media('>=md') {
+			@include font(45, 63);
+		}
+	}
+
+	&__description {
+		color: $static-color--white;
+	}
+
+	.wp-block-button {
+		&__link {
+			background-color: $static-color--white;
+			color: $static-color--text;
+			border: 0;
+			box-shadow: 0;
+			transition: color $transition, background-color $transition;
+
+			&:hover {
+				color: $static-color--white;
+				background-color: $static-color--text;
+			}
+		}
+	}
+}

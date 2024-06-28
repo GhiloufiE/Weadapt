@@ -1,0 +1,61 @@
+.message-popup {
+	background-color: $color--bg-hero;
+
+	*:focus {
+		outline-color: $color--white !important;
+	}
+
+	@include media('>=md') {
+		padding: rem(24) 0 rem(16) 0;
+	}
+
+	&.hidden {
+		display: none;
+	}
+
+	.container {
+		position: relative;
+		padding-inline: 0;
+
+		@include media('>=md') {
+			padding-inline: rem($container-padding);
+		}
+	}
+
+	&__text {
+		background-color: $color--primary;
+		text-align: center;
+		color: $color--white;
+		padding: rem(9.025) rem(56) rem(9.025) rem(16);
+
+		@include media('>=md') {
+			line-height: rem(22);
+			border-radius: rem(5);
+			padding: rem(17) rem(56) rem(17) rem(16);
+		}
+	}
+
+	&__close {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+
+		width: rem(24);
+		height: rem(24);
+		padding: 0;
+
+		position: absolute;
+		top: 50%;
+		right: rem(16);
+		transform: translateY(-50%);
+
+		border: 0;
+		background: none;
+		box-shadow: none;
+		color: $color--white;
+
+		@include media('>=md') {
+			right: rem(32);
+		}
+	}
+}

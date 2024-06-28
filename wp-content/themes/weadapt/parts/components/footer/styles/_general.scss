@@ -1,0 +1,383 @@
+.main-footer {
+	color: $static-color--white;
+
+	background-color: $color--dark-bg;
+
+	@include font(12, 20);
+
+	*:focus {
+		outline-color: $static-color--white !important;
+	}
+
+	::selection {
+		color: $color--black-to-dark-reverse;
+		background: $color--bg-to-white-reverse;
+	}
+
+	::-moz-selection {
+		color: $color--black-to-dark-reverse;
+		background: $color--bg-to-white-reverse;
+	}
+
+	&__widget {
+		width: 100%;
+		padding-right: rem($container-padding);
+		padding-left: rem($container-padding);
+
+		@include media('>=sm') {
+			flex-grow: 1;
+
+			width: 50%;
+		}
+		@include media('>=md') {
+			width: auto;
+		}
+
+		&__list {
+			display: flex;
+			flex-wrap: wrap;
+
+			padding-bottom: rem(40);
+
+			position: relative;
+			margin-right: rem($container-padding * -1);
+			margin-left: rem($container-padding * -1);
+
+			&:after {
+				content: '';
+
+				height: rem(1);
+
+				position: absolute;
+				right: rem($container-padding);
+				bottom: 0;
+				left: rem($container-padding);
+
+				background: $static-color--white;
+				opacity: 0.2;
+			}
+
+			&:empty {
+				display: none;
+			}
+		}
+
+		.widget {
+			margin-top: rem(40);
+
+			&__title {
+				margin: 0 0 rem(16);
+
+				font-family: $font-family-base;
+				font-weight: $font-weight-content-medium;
+				color: currentColor;
+
+				@include font(20, 26);
+				@include media('>=md') {
+					margin-top: rem(55);
+				}
+			}
+
+			.menu {
+				padding: 0;
+
+				margin: 0;
+
+				list-style: none;
+
+				li {
+					margin-top: rem(16);
+				}
+				a {
+					color: $static-color--bg;
+
+					opacity: 0.75;
+
+					@include link;
+					@include media('>=md') {
+						@include font(14, 20);
+					}
+				}
+				.current-menu-item {
+					a {
+						background-position: 0 100%;
+						background-size: 100% rem(1);
+					}
+				}
+			}
+
+			.wp-block-image {
+				margin-bottom: 0;
+
+				a,
+				img {
+					display: inline-block;
+				}
+			}
+		}
+	}
+
+	&__area {
+		padding-bottom: rem(40);
+
+		.row {
+			@include media('>=md') {
+				flex-direction: row-reverse;
+			}
+		}
+		.col-12 {
+			padding-top: rem(40);
+		}
+	}
+	&__social {
+		display: flex;
+		flex-wrap: wrap;
+
+		padding: 0;
+
+		margin: 0;
+
+		list-style: none;
+
+		li {
+			&:not(:last-child) {
+				margin-right: rem(33);
+				position: relative;
+
+				&:after {
+					position: absolute;
+					top: 50%;
+					right: rem(-19);
+					margin-top: rem(-2);
+					width: rem(5);
+					height: rem(5);
+					background: $static-color--white;
+					border-radius: 100%;
+					content: '';
+				}
+			}
+			a {
+				color: $static-color--white;
+
+				@include font(14, 20);
+				@include link;
+			}
+		}
+	}
+	&__logo {
+		display: flex;
+		align-items: center;
+
+		max-width: rem(356);
+
+		margin-top: rem(24);
+
+		@include media('>=md') {
+			margin-top: rem(40);
+		}
+
+		> a,
+		> img {
+			display: block;
+
+			width: rem(48);
+			min-width: rem(48);
+
+			margin-right: rem(16);
+		}
+
+		&--right {
+			max-width: rem(100);
+			margin: 0 0 rem(16) 0;
+		}
+	}
+	.text {
+		&--right {
+			margin-bottom: rem(16);
+
+			&:last-child {
+				margin-bottom: 0;
+			}
+		}
+	}
+	&__copy {
+		margin-top: rem(24);
+
+		opacity: 0.8;
+
+		@include media('>=md') {
+			margin-top: rem(40);
+		}
+	}
+}
+
+
+.main-footer__newsletter {
+	.mailrelay-form,
+	.mc4wp-form {
+		background-color: $color--link;
+		padding: rem(16);
+		border-radius: rem(5);
+
+		h2 {
+			font-size: rem(24);
+			color: $color--white;
+			font-weight: 500;
+			margin-bottom: rem(16);
+		}
+
+		&__content {
+			display: flex;
+			gap: rem(19);
+
+			.form-group.email {
+				flex-grow: 1;
+			}
+			input[type="email"] {
+				margin: 0;
+				border: rem(1) solid rgba(255,255,255,.2);
+				background-color: transparent;
+				color: $color--white;
+
+				&::placeholder {
+					color: $color--white;
+				}
+
+				.theme--dark & {
+					border: rem(1) solid rgba(0,0,0,.2);
+				}
+			}
+
+			input[type="submit"] {
+				font-size: rem(14);
+				font-weight: $font-weight-content-medium;;
+				color: $color--white;
+				background-color: $color--primary;
+				border: 0;
+				box-shadow: 0;
+				padding: rem(16) rem(40);
+				border-radius: rem(24);
+				height: rem(48);
+				margin: 0;
+
+				.theme--dark & {
+					background-color: $color--white;
+					color: $color--primary;
+				}
+			}
+		}
+	}
+
+	.mc4wp-form {
+		background-color: $static-color--white;
+
+		h2,
+		p {
+			color: $static-color--black !important;
+		}
+
+		p {
+			margin-top: rem(-10);
+
+			small {
+				font-size: rem(10);
+				line-height: 1.4;
+			}
+			a {
+				color: currentColor;
+				@include link-underline();
+			}
+		}
+
+		&__checkbox {
+			display: flex;
+			margin-bottom: rem(16);
+			align-items: center;
+			white-space: break-spaces;
+			color: $static-color--black;
+			cursor: pointer;
+
+			a {
+				color: currentColor;
+				@include link-underline();
+			}
+
+			input[type="checkbox"] {
+				width: rem(16);
+				height: rem(16);
+				min-width: rem(16);
+				margin: 0 rem(10) 0 0;
+				appearance: none;
+				border: rem(1) solid currentColor;
+				border-radius: rem(3);
+				background-color: transparent;
+				background-position: center;
+				background-repeat: no-repeat;
+
+				&:checked {
+					background-image: url("data:image/svg+xml,%3Csvg height='11' width='11' version='1.1' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpolygon fill='%23000000' points='11.941,28.877 0,16.935 5.695,11.24 11.941,17.486 26.305,3.123 32,8.818'/%3E%3C/svg%3E");
+				}
+			}
+		}
+
+		&__content {
+			input[type="email"] {
+				border: rem(1) solid $static-color--black;
+				background-color: transparent;
+				color: $static-color--primary;
+
+				&::placeholder {
+					color: $static-color--primary;
+				}
+			}
+
+			input[type="submit"] {
+				color: $static-color--primary;
+				background-color: $color--tertiary;
+				border: rem(2) solid $color--tertiary;
+				border-radius: rem(5);
+				font-weight: 700;
+				padding: rem(12) rem(16);
+				transition: background-color $transition;
+
+				&:hover {
+					background-color: transparent;
+				}
+
+				.theme--dark & {
+					background-color: $color--tertiary;
+					color: $static-color--primary;
+
+					&:hover {
+						background-color: transparent;
+					}
+				}
+			}
+		}
+
+		.mc4wp-response {
+			margin-top: rem(10);
+			color: $static-color--black;
+
+			p {
+				margin: 0 !important;
+			}
+		}
+	}
+
+	&-custom {
+		background-color: $color--white;
+		padding: rem(16);
+		border-radius: rem(5);
+
+		h2 {
+			font-size: rem(24);
+			font-weight: 500;
+			margin-bottom: rem(16);
+		}
+
+		a {
+			padding: rem(12) rem(16);
+		}
+	}
+}

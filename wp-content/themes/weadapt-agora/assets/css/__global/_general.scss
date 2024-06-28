@@ -1,0 +1,44 @@
+
+body {
+	margin: 0;
+
+	font-size: $font-size-mobile;
+	font-weight: $font-weight-content;
+	line-height: $line-height-mobile;
+	color: $color--text-light;
+	background: $color--body-bg;
+
+	transition: background-color $transition, color $transition;
+
+	@include media('>=md') {
+		font-size: $font-size-base;
+		line-height: $line-height-base;
+	}
+}
+#page {
+	display: flex;
+	flex-direction: column;
+	min-height: auto;
+
+	.admin-bar & {
+		min-height: calc(100vh - 32px);
+
+		@include media('<=782px') {
+			min-height: calc(100vh - 46px);
+		}
+	}
+
+	.page-content {
+		flex-grow: 1;
+	}
+}
+
+.page-content {
+	section {
+		border-bottom: rem(1) solid $color--border-transparent;
+	}
+}
+
+#wpadminbar .quicklinks li img.blavatar {
+	max-width: unset;
+}

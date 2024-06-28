@@ -1,0 +1,99 @@
+@import '../../../../weadapt/parts/components/header/style.scss';
+
+.main-header {
+
+  &__button {
+    color: $static-color--white;
+  }
+
+  &__logo {
+    & img {
+      max-width: rem(150);
+      height: rem(60);
+    }
+
+  }
+
+  &__top-area {
+    background-color: $static-color--white;
+    color: $static-color--black;
+    font-weight: 500;
+
+    & .true-false-button {
+
+      color: $static-color--black;
+      @include media('>=md') {
+        color: $color--black;
+
+      }
+    }
+
+    & .mega-menu--lang select {
+      .theme--dark & {
+        border-color: $static-color--black;
+      }
+    }
+  }
+
+  .main-header__nav .mega-menu__desc .true-false-button .icon {
+    background-color: $color--bg;
+
+    .theme--dark & {
+      background-color: $static-color--white;
+      border-color: $static-color--black;
+
+      &:before {
+        background-color: $static-color--black;
+      }
+    }
+  }
+
+  .main-header__nav .mega-menu__desc .true-false-button input[type=checkbox]:checked + .icon {
+    background-color: $static-color--black;
+
+    &:before {
+      background-color: $static-color--white;
+    }
+  }
+
+  &__main-area {
+    padding: rem(12) 0;
+
+    .menu {
+      color: $static-color--white;
+
+      .sub-menu {
+        color: $static-color--white;
+      }
+
+      @include media('>=md') {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: end;
+
+        .sub-menu {
+          color: $color--black;
+        }
+
+        > .menu-item {
+          margin-left: rem(35);
+        }
+      }
+
+    }
+
+  }
+}
+
+.message-popup {
+
+  &__text {
+    background-color: var(--color--tag);
+    color: $color--black;
+  }
+
+  &__close {
+    color: $color--black;
+
+  }
+}

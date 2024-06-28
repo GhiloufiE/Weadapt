@@ -1,0 +1,70 @@
+@import '../../../../weadapt/parts/components/header/style.scss';
+
+.main-header {
+  $block: &;
+
+  &.transparent-main {
+    & .main-header__main-area {
+      background-color: transparent;
+    }
+  }
+
+  &--desktop {
+
+    #{$block} {
+      &__logo {
+        svg {
+          width: rem(50);
+          min-width: rem(50);
+
+          path {
+            &:first-child {
+              fill: $static-color--white;
+            }
+          }
+        }
+
+        .main-logo {
+          @include media('>=lg') {
+            display: flex;
+
+            span {
+              font-weight: $font-weight-content-medium;
+              max-width: rem(90);
+              @include font(14, 14);
+              font-family: $font-family-base;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  &__main-area {
+    .menu {
+      @include media('<=md') {
+        color: $static-color--white;
+      }
+    }
+  }
+
+
+}
+
+.message-popup {
+  background-color: $color--bg-hero;
+
+  @include media('>=md') {
+    padding: rem(84) 0 rem(16) 0;
+  }
+
+  &__text {
+    background-color: #FDC33A;
+    color: $color--black;
+  }
+
+  &__close {
+    color: $color--black;
+  }
+}
+

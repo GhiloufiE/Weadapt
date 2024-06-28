@@ -1,0 +1,141 @@
+@import '__settings/init';
+
+.cards-guide {
+    padding-top: rem(38);
+    padding-bottom: rem(98);
+    overflow: hidden;
+
+    @include media(">=md") {
+        padding-top: rem(80);
+        padding-bottom: rem(80);
+    }
+
+    @include media(">=lg") {
+        padding-top: rem(150);
+    }
+
+    &__title-wrap {
+        width: auto;
+
+        @include media(">=lg") {
+            width: 90%;
+        }
+    }
+
+    &__heading {
+        font-family: $font-family-base;
+        @include font(24, 32);
+        margin-bottom: rem(24);
+
+        @include media(">=md") {
+            @include font(32, 40);
+            margin-bottom: rem(22);
+        }
+    }
+
+    &__description {
+        @include font(16, 22);
+
+        @include media(">=md") {
+            @include font(18, 24);
+        }
+
+        p {
+            margin-bottom: rem(34) !important;
+
+            @include media(">=md") {
+                margin-bottom: rem(41) !important;
+            }
+        }
+    }
+
+    &__main-row {
+        justify-content: space-between;
+        display: flex;
+        flex-wrap: wrap;
+        margin: 0 rem(-32);
+        align-items: flex-start;
+    }
+
+    &__left, &__right {
+        padding: 0 rem(32);
+    }
+
+    &__left {
+        width: 100%;
+
+        @include media(">=lg") {
+            width: 65%;
+        }
+
+        @include media(">=xl") {
+            width: 64.2%;
+        }
+    }
+
+    &__right {
+        display: flex;
+        flex-wrap: wrap;
+        margin: 0 rem(-20);
+        position: relative;
+
+        @include media(">=lg") {
+            margin: 0;
+            width: 35%;
+            display: block;
+        }
+
+        @include media(">=xl") {
+            width: 31.1%;
+        }
+
+        &::before {
+            display: block;
+            width: rem(1);
+            height: 100%;
+            position: absolute;
+            background-color: $color--black;
+            opacity: 0.1;
+            top: 0;
+            left: 0;
+
+            @include media(">=lg") {
+                content: '';
+            }
+        }
+    }
+
+    &__sub-row {
+        display: flex;
+        margin: 0 rem(-20);
+        flex-wrap: wrap;
+    }
+
+    &__main-card-wrap {
+        width: 100%;
+        padding: rem(32) rem(20) 0;
+
+        @include media('>=md') {
+            width: 50%;
+            padding: rem(40) rem(20) 0;
+        }
+    }
+
+    &__side-card-wrap {
+        width: 100%;
+        padding: rem(81) rem(20) 0;
+
+        @include media(">=md") {
+            width: 50%;
+        }
+
+        @include media(">=lg") {
+            width: 100%;
+            padding: 0 0 rem(80);
+        }
+
+        &:last-child {
+            padding-bottom: 0;
+        }
+    }
+}

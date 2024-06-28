@@ -1,0 +1,29 @@
+@import '__settings/init';
+
+.cta-quote {
+	padding: rem(24);
+	margin: rem(32) 0;
+	border-radius: rem(5);
+	background: $color--bg;
+	box-shadow: 0 rem(4) rem(24) $color--shadow;
+	color: $color--black-dark;
+
+	@include media('>=md') {
+		margin: rem(40) 0;
+	}
+
+	&__blockquote {
+		margin: 0;
+		font-weight: $font-weight-content-medium;
+		@include font(20, 26);
+
+		@include media('>=md') {
+			@include font(24, 32);
+		}
+	}
+
+	.wp-block-button {
+		margin: rem(16) 0 0;
+		text-align: right;
+	}
+}

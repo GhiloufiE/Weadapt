@@ -1,0 +1,43 @@
+@import "__settings/init";
+
+.text-with-sidebar {
+	&__heading {
+		margin-bottom: rem(24);
+	}
+
+	&__row {
+		align-items: center;
+		gap: rem(32) 0;
+
+		&.is-sticky {
+			align-items: initial;
+
+			@include media('>=lg') {
+				.cta-widget--page {
+					position: sticky;
+					left: 0;
+					top: rem(122);
+				}
+			}
+		}
+	}
+
+	&__col {
+		&--widget.has-border .cta-widget--page::before {
+			content: '';
+			height: 100%;
+			width: rem(1);
+			background: $color--border;
+			position: absolute;
+			top: 0;
+			left: rem(-32);
+		}
+
+		.cta-widget--page {
+			@include media('>=lg') {
+				margin-left: auto;
+				position: relative;
+			}
+		}
+	}
+}

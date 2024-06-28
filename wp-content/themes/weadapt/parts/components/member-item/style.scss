@@ -1,0 +1,61 @@
+@import '__settings/init';
+
+.member-item {
+	display: flex;
+	gap: rem(16);
+
+	.cpt-search-query__row & {
+		@include media('>=md') {
+			border-bottom: rem(1) solid $color--border;
+			padding-bottom: rem(15);
+		}
+
+		& + .member-item,
+		& + .results-count + .member-item {
+			@include media('>=md') {
+				margin-top: rem(24);
+			}
+		}
+	}
+
+	@include font(14, 20);
+
+	& + &,
+	& + .results-count + & {
+		margin-top: rem(40);
+	}
+
+	&__content {
+		& > *:last-child {
+			margin-bottom: 0;
+		}
+	}
+
+	&__img {
+		max-width: rem(39);
+
+		&__link {
+			border-radius: 50%;
+			display: block;
+
+			img {
+				height: rem(39);
+				min-width: rem(39);
+				border-radius: inherit;
+				object-fit: cover;
+			}
+		}
+	}
+
+	&__name {
+		margin: 0 0 rem(8);
+		font-weight: $font-weight-content;
+
+		@include font(16, 22);
+
+		&__link {
+			@include link();
+			color: currentColor;
+		}
+	}
+}

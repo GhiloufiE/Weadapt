@@ -1,0 +1,36 @@
+@import '../../../../weadapt/parts/gutenberg/acf-hero/style.scss';
+
+.hero {
+
+  &__subtitle {
+    @include font(22, 24);
+    color: $color--tertiary;
+    text-transform: none;
+  }
+
+  &__heading {
+    color: $static-color--white;
+  }
+
+  &__description {
+    color: $static-color--white;
+  }
+
+  &__image img {
+    border-radius: rem(10);
+  }
+
+  &__row {
+    .wp-block-button__link {
+      background-color: $color--white;
+      color: $color--primary;
+
+      &:hover {
+        background-color: $color--primary;
+        color: $color--white;
+        border-color: $color--white;
+
+      }
+    }
+  }
+}

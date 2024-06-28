@@ -1,0 +1,124 @@
+@import '__settings/init';
+
+/* Headings */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	margin-top: 0;
+	margin-bottom: rem(12);
+
+	font-family: $font-family-headings;
+	font-weight: $font-weight-heading;
+	color: $color--text;
+
+	&:only-child {
+		margin-bottom: 0;
+	}
+}
+
+h1 {
+	@include font(40, 48);
+
+	@include media('>=md') {
+		@include font(56, 72);
+	}
+}
+
+h2 {
+	margin-bottom: rem(16);
+	@include font(28, 40);
+
+	@include media('>=md') {
+		@include font(40, 56);
+	}
+}
+
+h3 {
+	@include font(24, 32);
+	margin: 0 0 rem(40);
+
+	@include media('>=md') {
+		@include font(32, 40);
+	}
+	p + & {
+		margin-top: rem(40);
+	}
+	ul + &,
+	ol + & {
+		margin-top: rem(38);
+	}
+}
+
+h4 {
+	@include font(20, 26);
+	font-weight: $font-weight-content-medium;
+	font-family: $font-family-base;
+
+	@include media('>=md') {
+		@include font(24, 32);
+	}
+}
+
+h5 {
+	font-family: $font-family-base;
+	font-weight: $font-weight-content-medium;
+	@include font(20, 26);
+}
+
+h6 {
+	font-family: $font-family-base;
+	font-weight: $font-weight-content-medium;
+	@include font(16, 19);
+}
+
+.small-title {
+	@include font(20, 26);
+	font-weight: $font-weight-content-medium;
+	position: relative;
+	padding: 0 0 rem(8);
+	margin-bottom: rem(24);
+	max-width: rem(368);
+
+	@include media('>=md') {
+		@include font(24, 32);
+		padding-bottom: rem(24);
+	}
+
+	&:after {
+		border-bottom: rem(1) solid $color--border;
+		content: '';
+		display: block;
+		position: absolute;
+		left: 0;
+		bottom: 0;
+		width: 100%;
+		max-width: rem(368);
+	}
+}
+
+.widget-title {
+	@include font(20, 26);
+	font-weight: $font-weight-content-medium;
+	font-family: $font-family-base;
+	padding-bottom: rem(8);
+	margin-bottom: rem(24);
+	position: relative;
+
+	@include media('>=md') {
+		@include font(24, 32);
+		padding-bottom: rem(24);
+	}
+
+	&:after {
+		content: '';
+		display: block;
+		left: 0;
+		position: absolute;
+		right: 0;
+		bottom: 0;
+		border-bottom: rem(1) solid $color--border;
+	}
+}

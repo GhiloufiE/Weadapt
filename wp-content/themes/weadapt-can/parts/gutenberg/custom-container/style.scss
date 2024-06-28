@@ -1,0 +1,184 @@
+@import '../../../../weadapt/parts/gutenberg/custom-container/style.scss';
+
+.wp-block-custom-container {
+    @include font(16, 21);
+
+    @include media('>=md') {
+        @include font(18, 27);
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        &:not([class]) {
+            font-weight: 600;
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+        }
+    }
+
+    h2:not([class]) {
+        margin-bottom: rem(40);
+    }
+
+    h4:not([class]) {
+        margin: rem(20) 0;
+    }
+
+    h5, h6 {
+        &:not([class]) {
+            @include font(18, 27);
+            margin: rem(20) 0;
+        }
+    }
+
+    p {
+        letter-spacing: rem(-0.09);
+    }
+
+    ul, ol {
+        letter-spacing: rem(-0.09);
+
+        li {
+            margin-bottom: rem(20) !important;
+
+            &:last-child {
+                margin-bottom: 0 !important;
+            }
+        }
+
+        &.has-color {
+            margin: rem(20) 0;
+            font-weight: 600;
+            color: $color--red;
+            padding-left: rem(27) !important;
+        }
+    }
+
+    ol {
+        padding-left: rem(10) !important;
+    }
+
+    .wp-block {
+        &-table {
+            margin: rem(36) 0;
+
+            td {
+                vertical-align: top;
+                border: 0;
+                padding: rem(12) rem(16);
+            }
+
+            tr {
+                &:nth-child(even) {
+                    background: $color--bg;
+                }
+
+                &:nth-child(odd) {
+                    background: $color--dark-bg;
+                }
+            }
+        }
+        &-heading {
+            a {
+                font-weight: 600;
+            }
+        }
+        &-spacer {
+            @include media('<md') {
+                height: rem(40) !important;
+            }
+
+            & + .wp-block-heading {
+                margin-bottom: 0;
+            }
+        }
+        &-custom {
+            &-columns {
+                @include media('<lg') {
+                    gap: rem(40);
+                }
+            }
+            &-column {
+                section {
+                    border: 0;
+                    margin-bottom: rem(36);
+                    &:last-child {
+                        margin-bottom: 0;
+                    }
+                }
+
+                & > *:last-child {
+                    margin-bottom: 0 !important;
+                }
+
+                &.col-lg-8 {
+                    @include media('>=lg') {
+                        flex: 0 0 65%;
+                        max-width: 65%;
+                        padding: 0 rem(2) 0 rem($container-padding);
+                    }
+                }
+
+                &.col-lg-4 {
+                    @include media('>=lg') {
+                        flex: 0 0 35%;
+                        max-width: 35%;
+                        padding-left: rem(32);
+                    }
+                }
+
+                &:first-of-type {
+                    @include media('>=lg') {
+                        padding-right: rem(90);
+                    }
+                }
+
+                &:last-child {
+                    @include media('>=lg') {
+                        border-left: rem(1) solid $color--border;
+                    }
+                }
+            }
+        }
+    }
+
+    &.podcast {
+        background: $color--text;
+
+        .theme--dark & {
+            background: $color--bg;
+        }
+
+        .wp-block-heading {
+            color: $color--white;
+            margin-bottom: rem(40);
+
+            @include media('>=md') {
+                margin-bottom: rem(48);
+            }
+        }
+    }
+
+
+    // ACF-Query block
+    .query {
+        &__container {
+            padding: 0;
+        }
+
+        .row {
+            flex-direction: column;
+            gap: rem(36);
+        }
+
+        .col-12 {
+            flex-basis: 100% !important;
+            max-width: 100% !important;
+        }
+
+        .cpt-list-item {
+            background: $color--dark-bg;
+        }
+    }
+}

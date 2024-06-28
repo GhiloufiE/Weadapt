@@ -1,0 +1,46 @@
+@import '__settings/init';
+
+.archive-main__entry {
+  dt {
+    font-weight: $font-weight-content-medium;
+    margin-bottom: rem(5);
+  }
+
+  dd {
+    margin-left: 0;
+
+    & a.overview-tag {
+      background-image: none;
+      color: $static-color--black;
+
+    }
+
+    &:hover a.overview-tag {
+      color: $static-color--white;
+
+    }
+  }
+
+  .has-logo {
+    list-style: none;
+    width: rem(110);
+    height: rem(110);
+    padding: rem(5);
+    display: inline-block;
+  }
+
+  .heading {
+    + .subheading {
+      margin-top: rem(-25);
+    }
+  }
+
+  .image-captioned {
+    margin-bottom: rem(20);
+
+    figcaption {
+      margin-top: rem(5);
+      font-size: rem(14);
+    }
+  }
+}

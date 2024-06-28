@@ -1,0 +1,83 @@
+@import '__settings/init';
+
+.video-item {
+    background: $color--white;
+    padding: rem(40) 0;
+
+    .background-light & {
+        color: $static-color--white;
+        background: $color--text;
+
+        .theme--dark & {
+            background: $color--bg;
+        }
+    }
+
+    @include media('>=md') {
+        padding: rem(80) 0;
+    }
+
+    .row {
+        align-items: center;
+    }
+
+    .col {
+        &--text {
+            margin-top: rem(22);
+
+            @include media('>=md') {
+                margin-top: 0;
+                padding-left: rem(40);
+            }
+
+            & > *:last-child {
+                margin-bottom: 0;
+            }
+        }
+    }
+
+
+    &__iframe {
+        position: relative; 
+        padding-bottom: 56.25%;
+        overflow: hidden;
+        max-width: 100%;
+        height: auto;
+        border-radius: rem(5);
+
+        iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+    }
+
+    &__title {
+        margin: 0;
+        margin-bottom: rem(22);
+
+        @include media('>=md') {
+            @include font(28, 40);
+        }
+
+        .background-light & {
+            color: $color--primary;
+        }
+    }
+
+    &__description {
+        letter-spacing: rem(-0.09);
+
+        @include media('>=md') {
+            @include font(18, 27);
+        }
+
+        p {
+            &:last-child {
+                margin-bottom: 0;
+            }
+        }
+    }
+}

@@ -1,0 +1,49 @@
+@import '../../../../weadapt/parts/gutenberg/acf-group-filters/style.scss';
+
+.group-filters {
+	.row {
+		display: grid;
+		gap: rem(16);
+		grid-template-columns: 1fr;
+		margin-left: 0;
+		margin-right: 0;
+
+		@include media('>=sm') {
+			grid-template-columns: repeat(2, 1fr);
+		}
+
+		@include media('>=md') {
+			grid-template-columns: repeat(3, 1fr);
+		}
+
+		@include media('>=lg') {
+			gap: rem(28);
+		}
+	}
+	.custom-results-count {
+		grid-column: 1/4;
+		top: 0;
+		@include media('<=md') {
+			grid-column: 1/3;
+		}
+		@include media('<=sm') {
+			grid-column: 1/2;
+		}
+	}
+
+	.cpt-query__heading {
+		@include font(28, 40);
+
+		@include media('>=md') {
+			@include font(40, 56);
+		}
+	}
+
+	.filter-container {
+		.cpt-filters__form__search {
+			margin-bottom: rem(12);
+			height: rem(48);
+		}
+	}
+
+}

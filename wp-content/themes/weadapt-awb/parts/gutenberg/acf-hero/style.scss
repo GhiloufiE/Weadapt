@@ -1,0 +1,32 @@
+@import '../../../../weadapt/parts/gutenberg/acf-hero/style.scss';
+
+.hero {
+  @include bg-lines($color--bg-hero, 0.3);
+
+  .message-popup:not(.hidden) + .page-content & {
+    padding-top: rem(32);
+  }
+
+  & .section-subtitle {
+    @include font(22, 24);
+    text-transform: none;
+  }
+
+  &__row {
+    .wp-block-button__link {
+      background-color: $static-color--black;
+      color: $static-color--white;
+
+      &:hover {
+        background-color: $color--bg-to-white-reverse;
+        color: $static-color--text;
+        border-color: $color--bg-to-white-reverse;
+
+        .theme--dark & {
+          color: $static-color--text;
+          background-color: $static-color--white;
+        }
+      }
+    }
+  }
+}

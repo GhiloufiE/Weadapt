@@ -1,0 +1,45 @@
+@import '__settings/init';
+
+.single-hero {
+	&__row {
+		@include media('>=md') {
+			flex-direction: row-reverse;
+		}
+	}
+	&__left {
+		@include media('<md') {
+			padding-bottom: 0;
+		}
+	}
+	&__right {
+		justify-content: flex-start;
+		padding-bottom: rem(40);
+
+		@include media('>=md') {
+			justify-content: flex-end;
+			padding-bottom: 0;
+		}
+	}
+	&__image {
+		max-width: rem(146);
+
+		@include media('>=sm') {
+			max-width: rem(304);
+		}
+
+		img {
+			border-radius: 100%;
+		}
+	}
+	&__buttons {
+		display: flex;
+		flex-wrap: wrap;
+
+		margin-top: rem(30);
+		gap: rem(24);
+
+		@include media('>=md') {
+			margin-top: rem(42);
+		}
+	}
+}

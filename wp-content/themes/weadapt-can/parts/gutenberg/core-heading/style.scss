@@ -1,0 +1,31 @@
+@import '../../../../weadapt/parts/gutenberg/core-heading/style.scss';
+
+h2, h3 {
+	@include media('>=md') {
+		@include font(28, 40);
+    	margin-bottom: rem(24);
+	}
+}
+
+h4 {
+	font-weight: 600;
+
+	@include media('>=md') {
+		@include font(24, 33);
+	}
+}
+
+h5 {
+	@include font(18, 27);
+}
+
+.widget-title {
+	font-weight: 600;
+	padding-bottom: 0;
+	padding-top: rem(40);
+
+	&::after {
+		bottom: auto;
+		top: 0;
+	}
+}

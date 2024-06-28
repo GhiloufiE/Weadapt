@@ -1,0 +1,174 @@
+@import '__settings/init';
+
+.archive-main {
+	&__row {
+		&--edit-profile {
+			margin-top: rem(40) !important;
+
+			@include media('>=md') {
+				margin-top: rem(80) !important;
+			}
+		}
+	}
+}
+
+.edit-profile {
+	&__title {
+		margin-bottom: rem(28);
+	}
+
+	&__item {
+		margin-bottom: rem(40);
+
+		&:last-child {
+			margin-bottom: 0;
+		}
+
+		label {
+			color: $color--black;
+		}
+
+		input {
+			margin-bottom: 0;
+		}
+
+		select {
+			opacity: 0;
+			visibility: hidden;
+			max-height: 0;
+			max-width: 0;
+			position: absolute;
+			pointer-events: none;
+			overflow: hidden;
+		}
+
+		.theme-select {
+			min-height: rem(48);
+		}
+
+		.row {
+			gap: rem(28) 0;
+		}
+
+		.col {
+			&__description {
+				margin-top: rem(-12);
+
+				span {
+					margin-top: 0;
+				}
+			}
+		}
+
+		.description {
+			display: block;
+			@include font(12, 20);
+			margin-top: rem(8);
+			color: $color--black-dark;
+
+			a {
+				color: currentColor;
+			}
+		}
+
+		.true-false-button {
+			display: flex;
+			align-items: center;
+			position: relative;
+			cursor: pointer;
+			margin-bottom: 0;
+			width: fit-content;
+
+			&:focus {
+				outline: none !important;
+
+				span.icon {
+					outline: $outline !important;
+					outline-offset: $outline-offset;
+
+					body.using-mouse & {
+						outline: none !important;
+					}
+				}
+			}
+
+			.icon {
+				min-width: rem(48);
+				height: rem(24);
+
+				position: relative;
+				margin-right: rem(8);
+
+				border: rem(1) solid $color--border;
+				border-radius: rem(12);
+				background-color: $color--bg;
+
+				transition: background-color $transition, border-color $transition;
+
+				&:before {
+					content: '';
+
+					width: rem(18);
+					height: rem(18);
+
+					position: absolute;
+					top: rem(2);
+					left: rem(2);
+
+					border-radius: 100%;
+					background-color: $static-color--white;
+
+					transition: transform $transition;
+				}
+			}
+
+			input[type='checkbox'] {
+				width: rem(0);
+				height: rem(0);
+				left: rem(-5);
+				top: rem(-5);
+
+				position: absolute;
+
+				opacity: 0;
+				visibility: hidden;
+
+				&:checked {
+					+ .icon {
+						border-color: $color--primary;
+						background-color: $color--primary;
+
+						&:before {
+							transform: translateX(23px);
+							background-color: $color--white;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	&__avatar {
+		margin-top: rem(11);
+		cursor: pointer;
+
+		img {
+			height: rem(98);
+			object-fit: cover;
+			border-radius: 50%;
+			display: block;
+		}
+
+		&__input {
+			display: none;
+		}
+	}
+
+}
+
+[data-profile-save] {
+	&.loading {
+		opacity: 0.5;
+		pointer-events: none;
+	}
+}

@@ -1,0 +1,68 @@
+@import '../../../../weadapt/parts/components/footer/style.scss';
+
+.main-footer {
+	&__widget {
+		.widget {
+			&__title {
+				font-family: var(--alt-secondary-font-family);
+			}
+		}
+	}
+	&__logo > a {
+		width: rem(356);
+	}
+	& * {
+		font-family: var(--alt-secondary-font-family);
+	}
+	&__newsletter {
+		.mailrelay-form,
+		.mc4wp-form {
+			background-color: $color--secondary;
+			* {
+				color: $color--white!important;
+			}
+			h2 {
+				color: $color--white!important;
+				font-family: var(--alt-secondary-font-family);
+			}
+		}
+		.mc4wp-form {
+			&__content {
+				input[type=email] {
+					color: $color--white;
+					border-color: rgba(255,255,255,.2);
+					font-family: var(--alt-header-font-family);
+					&::placeholder {
+						color: $color--white;
+					}
+				}
+				input[type=submit],
+				input[type=submit]:hover {
+					color: $color--white;
+					background-color: $color--primary;
+					border-color: $color--primary;
+					border-radius: rem(100);
+					font-family: var(--alt-secondary-font-family);
+					font-weight: var(--alt-font-weight-base);
+				}
+			}
+		}
+	}
+}
+
+.theme--dark {
+	.main-footer {
+		&__newsletter {
+			.mc4wp-form {
+				&__content {
+					input[type=submit],
+					input[type=submit]:hover {
+						color: $color--primary;
+						background-color: $color--white;
+						border-color: $color--white;
+					}
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,21 @@
+@import '__settings/init';
+
+.video-rows {
+	background: $color--bg;
+
+	&__title {
+		margin-top: rem(60);
+		margin-bottom: rem(36);
+		text-align: center;
+
+		&:first-of-type {
+			margin-top: 0;
+		}
+	}
+
+	&__row {
+		display: flex;
+		flex-direction: column;
+		gap: rem(36);
+	}
+}

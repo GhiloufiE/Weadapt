@@ -1,0 +1,95 @@
+@import '../../../../weadapt/parts/components/single-hero/style.scss';
+
+@import '__settings/init';
+
+.single-hero {
+
+  color: $static-color--white;
+
+  &__subtitle {
+    margin-bottom: 0;
+    color: $color--tertiary;
+    font-weight: 500;
+
+    @include font(20, 30);
+
+    @include media('>=md') {
+      @include font(26, 36);
+    }
+
+    @include media('>=lg') {
+      @include font(30, 42);
+    }
+  }
+
+  &__title {
+    color: $static-color--white;
+
+    @include font(28, 40);
+
+    @include media('>=md') {
+      @include font(34, 48);
+      margin-bottom: rem(27);
+    }
+
+    @include media('>=lg') {
+      @include font(40, 56);
+      margin-bottom: rem(27);
+    }
+  }
+
+  &__left {
+    @include media('>lg') {
+      padding: 0 rem(32) 0 rem($container-padding);
+    }
+
+    @include media('>=lg') {
+      flex: 0 0 50.338%;
+      max-width: 50.338%;
+
+      padding-top: rem(56);
+      padding-bottom: rem(56);
+    }
+
+  }
+
+  &__right {
+
+    @include media('<=lg') {
+      justify-content: center;
+    }
+
+    @include media('>=lg') {
+      flex: 0 0 49.662%;
+      max-width: 49.662%;
+    }
+  }
+
+  &__image {
+    max-width: unset;
+    border-radius: rem(10);
+    max-width: rem(550);
+    height: 0;
+    padding-bottom: 60%;
+    display: block;
+
+    &::before {
+      padding-bottom: 60%;
+    }
+
+    img {
+      border-radius: rem(10);
+    }
+  }
+
+  &__author {
+    color: $static-color--white;
+  }
+
+  & .post-meta {
+    color: $color--tertiary;
+  }
+}
+
+
+

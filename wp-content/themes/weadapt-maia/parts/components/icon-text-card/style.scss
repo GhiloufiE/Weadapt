@@ -1,0 +1,19 @@
+@import '../../../../weadapt/parts/components/icon-text-card/style.scss';
+
+.icon-text-card {
+	border-radius: rem(20);
+	padding: rem(24) rem(32);
+
+	&__num {
+		span:not(.before-text) {
+			border-color: $color--primary;
+			color: $color--primary;
+		}
+	}
+
+	&__links {
+		a:hover {
+			color: $color--link-hover;
+		}
+	}
+}

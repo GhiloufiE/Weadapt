@@ -1,0 +1,83 @@
+@import '__settings/init';
+
+.cta-widget {
+	$block: &;
+
+	margin: rem(80) 0;
+	border-radius: rem(5);
+	background: $color--white;
+	box-shadow: 0 rem(4) rem(24) $color--shadow;
+	@include font(14, 20);
+	padding: rem(24);
+
+	& > *:last-child {
+		margin-bottom: 0;
+	}
+
+	&:last-child {
+		margin-bottom: 0;
+	}
+
+	&__title {
+		@include font(24, 32);
+		font-weight: $font-weight-content-medium;
+		margin: 0 0 rem(5);
+		svg {
+			margin: 0 rem(15) 0 0;
+		}
+	}
+	&__content {
+		margin-bottom: rem(12);
+
+		@include media('>=md') {
+			margin-bottom: rem(24);
+		}
+
+		p {
+			&:last-child {
+				margin-bottom: 0;
+			}
+		}
+	}
+	.wp-block-button {
+		margin-top: rem(12);
+
+		@include media('>=md') {
+			margin-top: rem(24);
+		}
+
+		.wp-block-button__link {
+			@include font(14, 22);
+		}
+	}
+
+	&--alt {
+		background: $color--bg;
+	}
+
+	&--big {
+		.cta-widget {
+			&__title {
+				@include font(32, 40);
+				font-family: $font-family-headings;
+			}
+		}
+	}
+
+	&--page {
+		margin-top: 0;
+		background: $color--white;
+		max-width: rem(368);
+
+		#{$block} {
+			&__title {
+				margin-bottom: rem(8);
+				font-family: $font-family-headings;
+
+				@include media('>=md') {
+					@include font(32, 40);
+				}
+			}
+		}
+	}
+}

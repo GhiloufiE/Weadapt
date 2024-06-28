@@ -1,0 +1,92 @@
+@import '__settings/init';
+
+.single-tabs-nav {
+	position: relative;
+	margin: rem(40) 0;
+	max-width: rem(662);
+
+	@include media('>=md') {
+		margin: rem(56) 0;
+	}
+
+	.swiper {
+		overflow: hidden;
+		margin: 0 rem(-$container-padding);
+		padding: 0 rem($container-padding);
+
+		@include media('>=md') {
+			padding: 0;
+			margin: 0;
+		}
+
+		&-wrapper {
+			z-index: initial;
+		}
+
+		&-slide {
+			width: auto;
+			margin-right: rem(25);
+
+			&:last-child {
+				margin-right: 0;
+			}
+		}
+
+		&::after {
+			content: '';
+			height: rem(2);
+			position: absolute;
+			bottom: 0;
+			right: 0;
+			left: 0;
+			border-radius: rem(20);
+			background: $color--border;
+
+			@include media('<md') {
+				right: rem(-$container-padding);
+				left: rem(-$container-padding);
+			}
+		}
+	}
+
+	*:focus {
+		outline-offset: -2px !important;
+	}
+
+	&__btn {
+		color: $color--text;
+		position: relative;
+		padding: 0 0 rem(8) 0;
+		border: 0;
+		background: transparent;
+		box-shadow: none;
+		opacity: 0.5;
+		transition: opacity $transition;
+		@include font(16, 22);
+
+		&::before {
+			z-index: -1;
+			content: '';
+
+			height: rem(2);
+			border-radius: rem(24);
+
+			position: absolute;
+			right: 0;
+			bottom: 0;
+			left: 0;
+			width: 0;
+			transition: width $transition-speed $transition-timing-function;
+			background: $color--quote;
+		}
+
+		&:hover,
+		&[aria-selected='true'] {
+			opacity: 1;
+
+			&::before {
+				width: 100%;
+			}
+		}
+	}
+}

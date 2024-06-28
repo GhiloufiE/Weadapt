@@ -1,0 +1,37 @@
+@import '../../../../weadapt/parts/gutenberg/acf-hero/style.scss';
+
+.hero {
+	&__row {
+		.section-title,
+		.section-description ,
+		a {
+			color: var(--alt-acf-hero-color);
+		}
+		.section-title {
+			@include media('>=md') {
+				@include font(45, 63);
+			}
+		}
+	}
+
+	.wp-block-button {
+		&__link {
+			background-color: var(--alt-acf-hero-color);
+			border-color: var(--alt-acf-hero-color);
+			color: $color--bg-hero;
+
+			&:hover {
+				background-color: transparent;
+				border-color: var(--alt-acf-hero-color);
+				color: var(--alt-acf-hero-color);
+			}
+		}
+	}
+
+	&__image {
+		svg, img {
+			border-radius: rem(20);
+		}
+	}
+}
+

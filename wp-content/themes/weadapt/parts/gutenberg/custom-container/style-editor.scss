@@ -1,0 +1,12 @@
+@import "style.scss";
+
+.block-content {
+	.wp-block {
+		max-width: 100%;
+	}
+	&:after{
+		clear:both;
+		content:'';
+		display:table;
+	}
+}

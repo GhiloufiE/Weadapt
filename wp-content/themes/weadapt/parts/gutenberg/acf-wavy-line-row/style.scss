@@ -1,0 +1,90 @@
+@import '__settings/init';
+
+.wavy-line-row {
+	background-color: $color--bg;
+	overflow: hidden;
+
+	&.background {
+		&-white {
+			background-color: $color--white;
+		}
+	}
+
+	.container {
+		& > *:last-child {
+			margin-bottom: 0;
+		}
+	}
+
+	&__subtitle-desc {
+		margin-bottom: rem(50);
+
+		& > *:last-child {
+			margin-bottom: 0;
+		}
+	}
+
+	&__row {
+		margin-inline: rem(-30);
+		position: relative;
+
+		&::before {
+			content: "";
+			display: block;
+			position: absolute;
+			top: rem(30);
+			left: -100vw;
+			right: -100vw;
+			height: rem(80);
+			background-image: url("data:image/svg+xml,%3Csvg width='580' height='64' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Cdefs%3E%3Cpath d='M5 35.04c54.53 24.033 158.75 52.437 286.706 1.74C396.159-4.606 511.797 16.262 578 37.589' id='a'/%3E%3C/defs%3E%3Cg transform='rotate(-1 -111.06 36)' fill='none' fill-rule='evenodd'%3E%3Cpath d='M.629.944h579v66h-579z'/%3E%3Cuse stroke='%2300D1A6' stroke-width='8' stroke-linecap='round' stroke-dasharray='0,10.4' transform='rotate(.3 291.5 39)' xlink:href='%23a'/%3E%3C/g%3E%3C/svg%3E");
+			background-repeat: repeat-x;
+			background-size: rem(700);
+			background-position: center 47%;
+		}
+	}
+
+	&__col {
+		padding: rem(30);
+	}
+
+	.item {
+		position: relative;
+
+		& > *:last-child {
+			margin-bottom: 0;
+		}
+
+		&__image {
+			max-width: rem(140);
+		}
+
+		&__title {
+			margin-top: rem(22);
+			margin-bottom: 0;
+			@include font(18);
+			text-transform: uppercase;
+		}
+
+		&__description {
+			margin-top: rem(12);
+		}
+
+		&__link {
+			display: block;
+			margin-top: rem(28);
+
+			&-item {
+				&::before {
+					content: '';
+					display: block;
+					position: absolute;
+					top: 0;
+					left: 0;
+					width: 100%;
+					height: 100%;
+				}
+				@include link-underline;
+			}
+		}
+	}
+}

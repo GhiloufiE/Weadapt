@@ -1,0 +1,107 @@
+@import '../../../../weadapt/parts/components/cpt-query-case-studies/style.scss';
+
+@import '__settings/init';
+
+.cpt-query {
+
+  &__heading {
+    font-size: rem(30);
+    line-height: 1.4;
+    margin-bottom: rem(24);
+    text-align: center;
+  }
+
+  &__description {
+    font-size: rem(18);
+    line-height: 1.5;
+    margin-bottom: rem(24);
+    text-align: center;
+  }
+
+  .cpt-latest {
+    gap: rem(24) 0;
+
+    @include media('>=md') {
+      margin-top: rem(56);
+    }
+
+    .cpt-list-item {
+      background-color: $color--white;
+      border-radius: rem(10);
+      height: fit-content;
+      position: relative;
+      padding: rem(20);
+
+      &__image {
+        margin-left: 0;
+        background-color: $color__tertiary;
+        border-radius: rem(5);
+        position: relative;
+        width: 100%;
+        height: 0;
+        padding-bottom: 54%;
+        margin-bottom: rem(16);
+
+        &-link {
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          padding: 0 0 0;
+          width: 100%;
+          height: 100%;
+          overflow: hidden;
+        }
+
+        img {
+          display: block;
+          object-fit: cover;
+          border-radius: rem(5) rem(5) 0 0;
+          width: 100%;
+          height: 100%;
+        }
+      }
+
+      &__content {
+        margin-bottom: rem(62);
+      }
+
+      &__title {
+        font-size: rem(20);
+        line-height: rem(26);
+        font-weight: 500;
+        margin-bottom: rem(16);
+        color: $color--primary;
+
+        a:hover {
+          color: $color--link-hover;
+        }
+      }
+
+      .wp-block-button {
+        position: absolute;
+        bottom: rem(24);
+        display: flex;
+        align-items: center;
+        width: fit-content;
+
+        &__link {
+          height: unset;
+          padding: rem(8) rem(16);
+          border-radius: rem(5);
+          font-size: rem(14);
+          line-height: 1.4;
+        }
+
+        span {
+          margin-right: rem(8);
+        }
+
+        svg {
+          width: rem(16);
+          height: rem(16);
+        }
+      }
+
+    }
+  }
+}

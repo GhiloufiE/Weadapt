@@ -1,0 +1,77 @@
+@import '../../../../weadapt/parts/components/cpt-cta/style.scss';
+
+.cpt-cta {
+  flex-direction: column;
+  padding: rem(24);
+  border-radius: rem(5);
+  box-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.10);
+
+  .colored-bg & {
+    background-color: $color--bg;
+  }
+
+  .theme--dark & {
+    box-shadow: 0 4px 24px 0 rgba(225, 225, 225, 0.2);
+  }
+
+  &__img {
+    max-width: rem(114);
+
+    a {
+      border-radius: rem(10);
+    }
+
+    img {
+      border-radius: rem(10);
+      height: 100%;
+      width: 100%;
+      object-fit: cover;
+    }
+
+    .members-widget & {
+      a {
+        border-radius: 50%;
+      }
+
+      img {
+        border-radius: 50%;
+      }
+    }
+  }
+
+  &__content {
+    & > *:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  &__title {
+    margin: 0 0 rem(16);
+    @include font(20, 24);
+
+    &__link {
+      @include link();
+      color: $color--primary;
+      font-weight: 500;
+    }
+  }
+
+  &__text {
+    margin: 0 0 rem(24);
+  }
+
+  &__actions {
+    margin-top: rem(24);
+    display: flex;
+    flex-wrap: wrap;
+    gap: rem(16);
+
+    @include media('>=md') {
+      gap: rem(24);
+    }
+  }
+
+  &__members {
+    display: none;
+  }
+}

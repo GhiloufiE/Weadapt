@@ -1,0 +1,27 @@
+@import '../../../../weadapt/parts/components/header/style.scss';
+
+.main-header {
+	&--desktop {
+		.main-header {
+			&__logo {
+				svg {
+					width: rem(120);
+					min-width: rem(120);
+				}
+			}
+		}
+	}
+
+	&__logo {
+		svg {
+			width: rem(100);
+			min-width: rem(100);
+
+			path {
+				.theme--dark & {
+					fill: $static-color--white;
+				}
+			}
+		}
+	}
+}

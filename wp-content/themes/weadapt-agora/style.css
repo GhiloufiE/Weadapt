@@ -1,0 +1,10 @@
+/*
+	Theme Name: weADAPT Agora
+	Template: weadapt
+	Description: Agora weADAPT Child Theme
+	Version: 1.0.0
+*/
+
+body, button, a, input, select, textarea {
+    font-family: 'Poppins', sans-serif';
+}

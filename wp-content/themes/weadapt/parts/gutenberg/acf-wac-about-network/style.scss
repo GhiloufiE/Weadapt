@@ -1,0 +1,138 @@
+@import '__settings/init';
+
+.wac-about-network {
+  background-color: $color--bg;
+
+  &.background {
+    &-white {
+      background-color: $color--white;
+    }
+  }
+
+  &__col {
+    &--text {
+      margin-bottom: rem(50);
+
+      @include media('>md') {
+        padding-right: rem(45);
+        margin-bottom: unset;
+        border-right: 1px solid #DCDCDC;
+      }
+
+      @include media('>lg') {
+        padding-right: rem(90);
+      }
+    }
+  }
+
+  &__heading {
+    @include font(30, 40);
+    margin-bottom: rem(40);
+  }
+
+  &__description {
+    @include font(16, 24);
+    
+    & > *:last-child {
+      margin-bottom: 0;
+    }
+
+    & li {
+      margin-bottom: rem(10);
+    }
+
+    & ul li::marker {
+      font-size: rem(12);
+    }
+
+    & ol {
+      padding-inline-start: rem(30);
+    }
+
+    & a {
+      color: $color--black;
+
+      .background-light.primary-bg & {
+        color: $static-color--white;
+      }
+
+      font-weight: 600;
+    }
+
+    & h3, & h4, & h5, & h6 {
+      @include font(20, 22);
+
+      .background-light.primary-bg & {
+        color: $static-color--white;
+      }
+
+      @include media('>=md') {
+        @include font(24, 34);
+      }
+    }
+
+    & h1, & h2, & h3, & h4, & h5, & h6 {
+      margin-top: 0;
+      margin-bottom: rem(14);
+
+      @include media('>=md') {
+        margin-bottom: rem(22);
+      }
+    }
+  }
+
+  .network {
+    @include media('>md') {
+      padding-left: rem(32);
+    }
+
+    &__image {
+      height: 0;
+      padding-bottom: 56%;
+      position: relative;
+      margin-bottom: rem(16);
+
+      &-container {
+        max-width: rem(360);
+      }
+
+      & img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: rem(10);
+      }
+    }
+
+    &__title {
+      @include font(24, 34);
+      color: $color--primary;
+      font-weight: 500;
+      margin-bottom: rem(8);
+      display: block;
+      @include link;
+    }
+
+    &__caption {
+      @include font(16, 24);
+      font-weight: 600;
+      margin-bottom: rem(16);
+      color: $color--black;
+    }
+
+    &__excerpt {
+      @include font(14, 22);
+      -webkit-line-clamp: 2;
+      display: -webkit-box;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      -webkit-box-orient: vertical;
+      margin-bottom: rem(16);
+    }
+
+  }
+
+}

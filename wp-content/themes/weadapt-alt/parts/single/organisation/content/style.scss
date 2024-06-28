@@ -1,0 +1,18 @@
+@import '__settings/init';
+
+.single-organisation-content {
+	padding-top: rem(40);
+	padding-bottom: rem(40);
+
+	@include media('>=md') {
+		padding-top: rem(80);
+		padding-bottom: rem(80);
+	}
+
+	.section-title {
+		color: $color--black;
+		@include media('>=md') {
+			margin-bottom: rem(32);
+		}
+	}
+}

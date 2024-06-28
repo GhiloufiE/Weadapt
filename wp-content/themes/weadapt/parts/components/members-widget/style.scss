@@ -1,0 +1,19 @@
+@import '__settings/init';
+
+.members-widget {
+	margin: rem(80) 0;
+
+	&__more {
+		margin-top: rem(24);
+
+		@include media('>=md') {
+			margin-top: rem(40);
+		}
+
+		&-link {
+			@include link-underline();
+			text-decoration: none;
+			@include font(16, 19);
+		}
+	}
+}

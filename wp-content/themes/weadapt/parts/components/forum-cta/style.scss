@@ -1,0 +1,31 @@
+@import '__settings/init';
+
+.forum-cta {
+	background: $color--bg;
+	border-radius: rem(5);
+	padding: rem(16);
+	margin-top: rem(56);
+
+	@include media('>=md') {
+		padding: rem(32);
+	}
+
+	&__title {
+		@include font(24,32);
+		font-weight: $font-weight-content-medium;
+		margin-bottom: rem(24);
+
+		svg {
+			width: rem(24);
+			height: rem(24);
+			margin-right: rem(16);
+			position: relative;
+			top: rem(-2);
+		}
+	}
+	.wp-block-button {
+		&:not(:first-child) {
+			margin-top: rem(24);
+		}
+	}
+}

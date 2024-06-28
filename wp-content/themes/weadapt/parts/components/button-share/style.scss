@@ -1,0 +1,77 @@
+@import '__settings/init';
+
+.share {
+	position: relative;
+	display: flex;
+	justify-content: center;
+
+	&__button {
+		&.active + .share__content {
+			transform: translateY(0);
+			pointer-events: auto;
+			opacity: 1;
+			visibility: visible;
+		}
+	}
+
+	&__content {
+		position: absolute;
+		bottom: calc(100% + 16px);
+		background-color: $color--bg;
+		border-radius: rem(5);
+		padding: rem(16) rem(16) rem(16) rem(28);
+		width: rem(240);
+		transform: translateY(25px);
+		opacity: 0;
+		pointer-events: none;
+		transition: $transition;
+		visibility: hidden;
+		box-shadow: 0 rem(4) rem(24) 0 rgba(0, 0, 0, 0.10);
+	}
+	&__close {
+		display: block;
+		margin-left: auto;
+		padding: 0;
+		border: 0;
+		background: none;
+		box-shadow: none;
+		transition: opacity $transition;
+
+		&:hover {
+			opacity: .6;
+		}
+	}
+	&__title {
+		margin: rem(12) 0 0;
+		@include font(16, 22);
+		font-weight: $font-weight-content-medium;
+	}
+
+	&__buttons {
+		display: flex;
+		flex-wrap: wrap;
+		list-style: none;
+		margin: 0;
+		padding: 0;
+
+		li {
+			margin-top: rem(12);
+			margin-right: rem(36);
+			width: rem(36);
+			height: rem(36);
+
+			a {
+				background-image: none !important;
+				transition: opacity $transition !important;
+
+				&:hover {
+					opacity: .6;
+				}
+			}
+
+			&:last-child {
+				margin-right: 0;
+			}
+		}
+	}
+}

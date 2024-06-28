@@ -1,0 +1,18 @@
+@import '__settings/init';
+
+.cpt-search-form {
+	display: flex;
+	flex-wrap: wrap;
+	margin: 0 0 rem(56);
+	gap: rem(24);
+
+	&__input {
+		max-width: rem(343);
+		margin: 0;
+	}
+
+	.wp-block-button__link {
+		height: rem(48);
+		@include font(16, 22);
+	}
+}

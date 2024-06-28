@@ -1,0 +1,52 @@
+@import '__settings/init';
+
+.awb-cards {
+	background-color: $color--bg;
+
+	&.background {
+		&-white {
+			background-color: $color--white;
+		}
+	}
+
+	.section-header {
+		text-align: center;
+
+		.section-subtitle {
+			text-transform: unset;
+		}
+
+		.section-description {
+			max-width: rem(560);
+			margin: 0 auto;
+		}
+
+		@include media('>=lg') {
+				margin-bottom: rem(56);
+		}
+	}
+
+	&__row {
+		& > * {
+			padding: 0 rem(12);
+		}
+	}
+
+	&__col {
+		margin-bottom: rem(22);
+
+		@include media('>=md') {
+			margin-bottom: 0;
+		}
+
+		&:last-child {
+			margin-bottom: 0;
+		}
+
+		&--right {
+			@include media('>=md') {
+				margin-top: rem(55);
+			}
+		}
+	}
+}

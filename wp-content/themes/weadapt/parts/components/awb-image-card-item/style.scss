@@ -1,0 +1,129 @@
+@import '__settings/init';
+
+
+.awb-image-card-item {
+  padding: rem(22);
+  background: $color--white;
+  margin-bottom: rem(22);
+  width: 100%;
+  height: fit-content;
+  border-radius: 5px;
+  box-shadow: 0px 4px 24px 0px rgba(0, 0, 0, 0.10);
+
+  .theme--dark & {
+    background: $static-color--black;
+    box-shadow: 0px 4px 24px 0px rgba(255, 255, 255, 0.10);
+  }
+
+  & > *:last-child {
+    margin-bottom: 0;
+  }
+
+  &__title {
+    margin-bottom: rem(8);
+    color: $color--text-light;
+
+    @include  font(24, 30);
+
+    .title-small & {
+      @include  font(20, 24);
+    }
+  }
+
+  &__description {
+    margin-bottom: rem(24);
+
+    & > *:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  &__image-container {
+    padding: rem(10);
+    border-radius: rem(15);
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.10);
+    margin-bottom: rem(20);
+    width: rem(114);
+    height: rem(114);
+
+    .theme--dark & {
+      background-color: $color--black;
+      box-shadow: 0px 4px 4px 0px rgba(255, 255, 255, 0.10);
+    }
+  }
+
+  &__icon {
+    img {
+      border-radius: rem(10);
+      object-fit: contain;
+      display: block;
+    }
+  }
+
+  &__empty-icon {
+    margin-bottom: rem(32);
+  }
+
+  &__more {
+
+    &-btn,
+    &-link {
+      height: fit-content;
+      width: fit-content;
+      display: flex;
+      align-items: center;
+      gap: rem(5);
+      padding: rem(8) rem(16);
+      @include font(14);
+      line-height: rem(22);
+      font-family: $font-family-headings;
+
+      svg {
+        transition: transform $transition;
+      }
+
+      .active & {
+        svg {
+          transform: rotate(90deg);
+        }
+      }
+    }
+
+    &-content {
+      display: none;
+      padding: rem(12) rem(8) 0;
+
+      & > *:last-child {
+        margin-bottom: 0;
+      }
+
+      .active + & {
+        display: block;
+      }
+    }
+  }
+
+  &__person {
+    margin-top: rem(35);
+    display: flex;
+    gap: rem(10);
+
+    &-image {
+      img {
+        min-width: rem(100);
+        height: rem(100);
+        object-fit: cover;
+      }
+    }
+
+    &-title {
+      margin-bottom: rem(5);
+    }
+
+    &-desc {
+      & > *:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+}

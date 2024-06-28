@@ -1,0 +1,104 @@
+// Container
+$container-width: 1184;
+$container-padding: 16;
+
+// Block
+$spacing-mobile: 40;
+$spacing: 64;
+
+$margin-mobile: 40;
+$margin: 64;
+
+// Media
+$media-margin: 41;
+
+// Transitions
+$transition-speed: var(--transition-speed);
+$transition-timing-function: var(--transition-timing-function);
+$transition: $transition-speed $transition-timing-function;
+
+$animation-speed: var(--animation-speed);
+
+// Fonts
+$font-family-base: var(--font-family-base);
+$font-family-headings: var(--font-family-headings);
+$font-size-base: var(--font-size-base);
+$line-height-base: var(--line-height-base);
+
+$font-size-mobile: var(--font-size-mobile);
+$line-height-mobile: var(--line-height-mobile);
+
+$font-weight-heading: var(--font-weight-heading);
+$font-weight-content: var(--font-weight-content);
+$font-weight-content-medium: var(--font-weight-content-medium);
+$font-weight-content-bold: var(--font-weight-content-bold);
+
+// COLORS
+$color--black-dark: var(--color--black-dark);
+$color--black: var(--color--black);
+$color--black-to-dark-reverse: var(--color--black-to-dark-reverse);
+
+$color--white: var(--color--white);
+$color--white-light: var(--color--white-light);
+$color--red: var(--color--red);
+
+$static-color--black: var(--static-color--black);
+$static-color--white: var(--static-color--white);
+$static-color--black-dark: var(--static-color--black-dark);
+
+// Text Colors
+$color--text: var(--color--text);
+$color--text-light: var(--color--text-light);
+$color--text-desc: var(--color--text-desc);
+$color--link: var(--color--link);
+$color--link-hover: var(--color--link-hover);
+
+$static-color--text: var(--static-color--text);
+
+// Main Colors
+$color--primary: var(--color--primary);
+$color--secondary: var(--color--secondary);
+$color--tertiary: var(--color--tertiary);
+
+$static-color--primary: var(--static-color--primary);
+
+// Theme Colors
+$color--bg: var(--color--bg);
+$color--bg-light: var(--color--bg-light);
+$color--bg-to-white-reverse: var(--color--bg-to-white-reverse);
+$color--dark-bg: var(--color--dark-bg);
+$color--dark-bg-to-white-reverse: var(--color--dark-bg-to-white-reverse);
+$color--body-bg: var(--color--body-bg);
+$color--border: var(--color--border);
+$color--border-transparent: var(--color--border-transparent);
+$color--border-light: var(--color--border-light);
+
+$static-color--bg: var(--static-color--bg);
+
+$color--bg-hero: var(--color--bg-hero);
+$color--bg-mega-menu: var(--color-bg-mega-menu);
+
+$color--bg-dark: var(--color--bg-dark);
+
+// Form Colors
+$color--quote: var(--color--quote);
+$color--success: var(--color--success);
+$color--error: var(--color--error);
+
+// Outline
+$outline: var(--outline);
+$outline-offset: var(--outline-offset);
+
+// Shadows
+$color--shadow: var(--color--shadow);
+
+// Breakpoints
+$breakpoints: (
+	xs: 375px,
+	sm: 576px,
+	md: 768px,
+	lg: 992px,
+	xl: 1200px,
+	xxl: 1440px,
+	max: 1920px,
+);

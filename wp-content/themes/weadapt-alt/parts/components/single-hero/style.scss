@@ -1,0 +1,78 @@
+@import '../../../../weadapt/parts/components/single-hero/style.scss';
+
+.single-hero {
+	a {
+		color: $color--white;
+	}
+
+	&__title {
+		color: $color--white;
+		@include media('>=md') {
+			@include font(45, 63);
+		}
+		.theme--dark & {
+			color: $color--text;
+		}
+	}
+	&__right {
+		.wp-block-button__link {
+			background-color: $color--dark-bg;
+			border-color: $color--dark-bg;
+			.theme--dark & {
+				background-color: $color--text;
+				border-color: $color--text;
+			}
+		}
+		.img-caption__caption {
+			background-color: $color--dark-bg;
+			color: $color--white;
+			.theme--dark & {
+				background-color: $color--text;
+ 			}
+		}
+	}
+	&__excerpt {
+		color: $color--white;
+		.theme--dark & {
+			color: $color--text;
+		}
+	}
+	&__types {
+		.wp-block-button {
+			.wp-block-button__link {
+				&:hover {
+					border-color: $color--white;
+				}
+			}
+		}
+	}
+	.cpt-list-item {
+		&__author {
+			&--multiple {
+				span {
+					@include font(14, 20);
+					color: $color--white;
+					.theme--dark & {
+						color: $color--text;
+					}
+				}
+			}
+			&-info {
+				a,
+				span {
+					@include font(14, 20);
+					color: $color--white;
+					.theme--dark & {
+						color: $color--text;
+					}
+				}
+			}
+		}
+	}
+	.event_date {
+		color: $color--white;
+		.theme--dark & {
+			color: $color--text;
+		}
+	}
+}

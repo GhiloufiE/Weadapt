@@ -1,0 +1,48 @@
+@import '../../../../weadapt/parts/components/info-widget-user/style.scss';
+
+.info-widget-user {
+    &__top {
+        display: flex;
+        gap: rem(24);
+        align-items: center;
+    }
+
+    &__avatar {
+        margin-bottom: 0;
+
+        &__link {
+            border-radius: rem(5);
+            flex: 0 0 rem(114);
+			height: rem(114);
+        }
+
+        img {
+            box-shadow: 0 rem(4) rem(24) 0 rgba(0, 0, 0, 0.25);
+        }
+    }
+
+	&__name {
+		margin-bottom: 0;
+		color: $color--text;
+
+		&__link {
+			font-weight: 600;
+		}
+	}
+
+	&__job {
+		@include font(16, 24);
+		letter-spacing: rem(-0.16);
+		margin-bottom: 0;
+	}
+
+	&__description {
+		color: $color--black-dark;
+		@include font(14, 21);
+	}
+
+
+	&__actions {
+		margin-top: rem(16);
+	}
+}

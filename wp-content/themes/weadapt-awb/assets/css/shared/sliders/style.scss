@@ -1,0 +1,7 @@
+@import '../../../../../weadapt/assets/css/shared/sliders/style.scss';
+
+@import '__settings/init';
+
+.swiper-pagination-bullet-active {
+        background-color: var(--color--accent);
+}

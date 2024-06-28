@@ -1,0 +1,114 @@
+@import '__settings/init';
+
+select[multiple] + .theme-select {
+	.select-pure__select {
+		padding: rem(8);
+	}
+}
+
+.select-pure {
+	&__select {
+		padding: rem(12) rem(16);
+		min-height: rem(48);
+
+		color: $static-color--text;
+
+		border: rem(1) solid $color--border;
+		border-radius: rem(5);
+		background: $static-color--white;
+
+		appearance: none;
+		@include font(16, 22);
+		cursor: pointer;
+		position: relative;
+
+		display: flex;
+		align-items: center;
+		justify-content: left;
+	}
+
+	&__label {
+		display: flex;
+		gap: rem(8);
+		flex-wrap: wrap;
+	}
+
+	&__options {
+		border-radius: rem(5);
+		border: rem(1) solid $color--border;
+		display: none;
+		background: $color--white;
+
+		left: 0;
+		max-height: rem(220);
+		overflow-y: scroll;
+		position: absolute;
+		top: 100%;
+		width: 100%;
+		z-index: 5;
+		cursor: default;
+
+		.select-pure__select--opened & {
+			display: block;
+		}
+	}
+
+	&__autocomplete {
+		border: 0 !important;
+		padding: rem(8) !important;
+		height: auto !important;
+		font-size: rem(14) !important;
+		line-height: rem(22) !important;
+		border-radius: 0 !important;
+
+		& + .select-pure__option:first-of-type {
+			border-top: rem(1) solid $color--border;
+		}
+	}
+
+	&__option {
+		background: $static-color--white;
+		padding: rem(8);
+		cursor: pointer;
+
+		&--hidden {
+			display: none;
+		}
+
+		&--selected {
+			color: $color--text;
+			cursor: initial;
+			pointer-events: none;
+			background-color: $color--bg;
+		}
+
+		&:hover {
+			color: $color--text;
+			background-color: $color--bg;
+		}
+	}
+
+	&__selected-label {
+		background: $color--bg;
+		color: $color--black;
+		border-radius: rem(5);
+		cursor: initial;
+		display: flex;
+		align-items: center;
+		padding: rem(4) rem(8);
+
+		i {
+			background-image: url("data:image/svg+xml,%3Csvg width='14' height='14' viewBox='0 0 14 14' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L13 13M13 1L1 13' stroke='%23141E1B' stroke-linecap='square'/%3E%3C/svg%3E%0A");
+			cursor: pointer;
+			width: rem(10);
+			height: rem(10);
+			display: inline-block;
+			background-position: center;
+			margin-left: rem(8);
+
+			.theme--dark & {
+				background-image: url("data:image/svg+xml,%3Csvg width='14' height='14' viewBox='0 0 14 14' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L13 13M13 1L1 13' stroke='%23ffffff' stroke-linecap='square'/%3E%3C/svg%3E%0A");
+			}
+		}
+	}
+}

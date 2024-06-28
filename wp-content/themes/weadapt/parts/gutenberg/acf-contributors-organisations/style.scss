@@ -1,0 +1,149 @@
+@import '__settings/init';
+
+.contributors-organisations {
+	.has-text-align-center {
+		.cpt-search-form {
+			justify-content: center;
+		}
+	}
+
+	.cpt-search-form {
+		margin-top: rem(16);
+	}
+
+	.cpt-more {
+		display: flex;
+		justify-content: center;
+		margin: 0;
+		margin-top: rem(56);
+
+		&.hidden {
+			display: none;
+		}
+
+		.wp-block-button__link {
+			justify-content: center;
+
+			@include media('>=md') {
+				min-width: rem(128);
+			}
+		}
+
+		&__btn {
+			&.loading {
+				opacity: 0.5;
+				pointer-events: none;
+			}
+		}
+	}
+
+	.row--ajax {
+		transition: opacity $transition;
+
+		&.loading {
+			opacity: 0.5;
+			pointer-events: none;
+		}
+	}
+
+	&__row {
+		gap: rem(33) 0;
+		margin: 0 rem(-12);
+	}
+
+	&__col {
+		padding: 0 rem(12);
+	}
+
+	&__button {
+		margin-top: rem(32);
+		display: flex;
+		justify-content: center;
+
+		@include media('>=md') {
+			margin-top: rem(56);
+		}
+	}
+
+
+
+	.info-widget-user {
+		@include media('<md') {
+			display: flex;
+			gap: rem(16);
+
+			&__content {
+				& > *:last-child {
+					margin-bottom: 0;
+				}
+			}
+
+			&__avatar {
+				flex: 0 0 rem(40);
+				margin: 0;
+
+				&__link {
+					height: rem(40);
+					flex: 0 0 rem(40);
+				}
+			}
+
+			&__name {
+				@include font(16, 22);
+			}
+
+			&__job {
+				@include font(14, 20);
+				margin-bottom: rem(8);
+			}
+
+			&__description {
+				margin: rem(8) 0;
+			}
+
+			&__meta {
+				margin: rem(8) 0 rem(24) 0;
+			}
+		}
+	}
+
+	.info-widget-cpt {
+		@include media('<md') {
+			display: flex;
+			gap: rem(16);
+
+			&__content {
+				& > *:last-child {
+					margin-bottom: 0;
+				}
+			}
+
+			&__image {
+				flex: 0 0 rem(40);
+				margin: 0;
+
+				&__link {
+					height: rem(40);
+					flex: 0 0 rem(40);
+				}
+			}
+
+			&__type {
+				margin-bottom: rem(8);
+			}
+
+			&__title {
+				@include font(16, 22);
+				margin-bottom: rem(8);
+			}
+
+			&__excerpt {
+				margin: rem(8) 0;
+			}
+
+			&__meta {
+				margin: rem(8) 0 rem(24) 0;
+			}
+		}
+	}
+}

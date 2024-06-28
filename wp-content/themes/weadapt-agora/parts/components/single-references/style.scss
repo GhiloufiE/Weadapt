@@ -1,0 +1,29 @@
+@import '../../../../weadapt/parts/components/single-references/style.scss';
+
+.single-references {
+
+  &__actions {
+    & .wp-block-button--like button {
+      background-color: $color--tertiary;
+      border-color: $color--tertiary;
+
+      &:hover {
+        background-color: $color--black;
+        border-color: $color--black;
+        color: $color--white;
+      }
+
+      .theme--dark & {
+        color: $color--black;
+        background-color: $color--white;
+        border-color: $color--black;
+
+        &:hover {
+          color: $color--white;
+          background-color: $color--black;
+        }
+      }
+    }
+  }
+
+}

@@ -1,0 +1,69 @@
+@import '__settings/init';
+
+.contribute {
+	background-color: $color--bg;
+
+	&.background {
+		&-white {
+			background-color: $color--white;
+		}
+	}
+
+	.container {
+		max-width: rem($container-width);
+		padding: 0 rem($container-padding);
+
+		@include media(">=md") {
+			max-width: rem(1176);
+			padding: 0 rem(12);
+		}
+	}
+
+	.row {
+		margin: 0 rem(-$container-padding);
+
+		@include media(">=md") {
+			margin: 0 rem(-12);
+		}
+	}
+
+	[class*=col-] {
+		padding: rem(32) rem($container-padding) 0;
+
+		@include media(">=md") {
+			padding: rem(24) rem(12) 0;
+		}
+	}
+
+	&__heading {
+        margin-bottom: rem(24);
+
+        @include media(">=md") {
+            margin-bottom: rem(22);
+        }
+	}
+
+	&__description {
+		@include font(16, 22);
+
+        p {
+            margin-bottom: rem(23);
+
+            @include media(">=md") {
+                margin-bottom: rem(32);
+            }
+        }
+	}
+
+	&__card-wrap {
+		&.search-hidden {
+			display: none;
+		}
+		&__message {
+			display: none;
+			&.active {
+				display: block;
+			}
+		}
+	}
+}

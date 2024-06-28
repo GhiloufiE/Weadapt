@@ -1,0 +1,21 @@
+@import '../../../../weadapt/parts/gutenberg/acf-contribute/style.scss';
+
+.contribute {
+	.icon-text-card {
+		&__icon {
+			height: rem(71);
+
+			img, svg {
+				height: 100%;
+				width: auto;
+				object-fit: contain;
+			}
+		}
+
+		&__content {
+			.wp-block-button {
+				margin-top: rem(16);
+			}
+		}
+	}
+}

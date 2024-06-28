@@ -1,0 +1,133 @@
+@import '__settings/init';
+
+.cards-with-image-read-more {
+	&__heading {
+		margin-bottom: rem(32);
+
+		@include media('>=md') {
+			margin-bottom: rem(64);
+		}
+	}
+
+	&__row {
+		gap: rem(32) 0;
+		margin: 0 rem(-16);
+
+		@include media('>=xxl') {
+			gap: rem(64) 0;
+			margin: 0 rem(-60);
+		}
+	}
+
+	&__col {
+		padding: 0 rem(16);
+		@include media('>=xxl') {
+			padding: 0 rem(60);
+		}
+	}
+
+	.card-with-image {
+		position: relative;
+
+		&__image {
+			border-radius: rem(5);
+			position: relative;
+			padding-bottom: 43.6%;
+			max-width: 100%;
+			height: auto;
+
+			img,
+			svg {
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				display: block;
+				object-fit: cover;
+				border-radius: rem(5) rem(5) 0 0;
+			}
+		}
+
+		&__content {
+			padding-top: rem(16);
+
+			& > *:last-child {
+				margin-bottom: 0;
+			}
+		}
+
+		&__title {
+			color: $color--text;
+			margin-bottom: rem(16);
+
+			a {
+				color: currentColor;
+				font-weight: $font-weight-content-medium;
+				@include link();
+			}
+		}
+
+		&__description {
+			@include font(16, 22);
+
+			& > *:last-child {
+				margin-bottom: 0;
+			}
+		}
+
+		&__button {
+			&-link {
+				&::before {
+					content: '';
+					display: block;
+					position: absolute;
+					top: 0;
+					left: 0;
+					width: 100%;
+					height: 100%;
+				}
+
+				color: $color--text-light;
+				@include link-underline();
+			}
+		}
+	}
+	&__more {
+		padding-bottom: rem(4);
+
+		&-btn {
+			margin-top: rem(32);
+			svg {
+				transition: transform $transition;
+			}
+
+			.active & {
+				svg {
+					transform: rotate(180deg);
+				}
+			}
+		}
+
+		&-content {
+			display: none;
+			padding-top: rem(22);
+
+			& > *:last-child {
+				margin-bottom: 0;
+			}
+		}
+		.close-label {
+			display: none;
+		}
+		&.active &-content{
+			display: block;
+		}
+		&.active .close-label {
+			display: block;
+		}
+		&.active .open-label {
+			display: none;
+		}
+	}
+}

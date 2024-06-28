@@ -1,0 +1,34 @@
+@import '../../../../weadapt/parts/gutenberg/core-button/style.scss';
+
+.wp-block-button {
+	&__link {
+		font-weight: 500;
+		color: $static-color--text;
+
+		svg {
+			margin-left: rem(10);
+		}
+
+		&:hover {
+			border-color: $color--text;
+		}
+
+		@include media('>=md') {
+			padding: rem(13) rem(20);
+		}
+	}
+
+
+	&.is-style-secondary {
+		.wp-block-button__link {
+			color: $color--white;
+			background-color: $color--text;
+			border-color: $color--text;
+
+			&:hover {
+				background: transparent;
+				color: $color--text;
+			}
+		}
+	}
+}

@@ -1,0 +1,18 @@
+@import '../../../../weadapt/parts/gutenberg/core-heading/style.scss';
+
+/* Headings */
+
+h1 {
+	font-family: 'NeueHaas Display', sans-serif;
+	font-weight: 700;
+
+	@include media('>=md') {
+		@include font(45, 63);
+	}
+}
+
+h2 {
+	@include media('>=md') {
+		@include font(35, 49);
+	}
+}

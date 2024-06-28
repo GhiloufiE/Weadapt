@@ -1,0 +1,31 @@
+@import '__settings/init';
+
+.columns-with-text {
+	&__heading {
+		margin-bottom: rem(24);
+	}
+
+	&__col {
+		margin-bottom: rem(32);
+
+		@include media('>=md') {
+			margin-bottom: 0;
+		}
+
+		&:last-child {
+			margin-bottom: 0;
+		}
+
+		p {
+			@include font(16, 22);
+
+			&:last-child {
+				margin-bottom: 0;
+			}
+		}
+	}
+
+	.cta-widget {
+		margin-top: rem(56);
+	}
+}

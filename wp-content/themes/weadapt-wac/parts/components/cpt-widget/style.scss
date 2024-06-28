@@ -1,0 +1,14 @@
+@import '../../../../weadapt/parts/components/cpt-widget/style.scss';
+
+.cpt-widget {
+  margin: rem(36) 0;
+
+  &__title {
+    padding-bottom: 0;
+
+    &:after {
+      display: none;
+    }
+  }
+  
+}

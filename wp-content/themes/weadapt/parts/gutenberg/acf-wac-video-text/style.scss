@@ -1,0 +1,281 @@
+@import '__settings/init';
+
+.wac-video-text {
+  background-color: $color--bg;
+
+  &.background {
+    &-white {
+      background-color: $color--white;
+    }
+
+    &-light.primary-bg {
+      background-color: $color--primary;
+      color: $static-color--white;
+
+      .theme--dark & {
+        background-color: $color--white;
+      }
+    }
+  }
+
+  &.media-right {
+
+    .wac-video-text__row {
+      flex-direction: row-reverse;
+    }
+  }
+
+  &__row {
+    @include media('>=lg') {
+      align-items: center;
+    }
+  }
+
+  &__col {
+    &--text {
+      & > *:last-child {
+        margin-bottom: 0;
+      }
+
+      & > *:first-child + *, & > *:first-child {
+        padding-top: rem(24);
+
+        @include media('>=lg') {
+          padding-top: 0;
+        }
+      }
+
+      & h2 {
+        .wac-video-text.primary-bg & {
+          color: $static-color--white;
+        }
+
+        @include font(35, 49);
+        @include media('<=md') {
+          @include font(24, 34);
+        }
+
+      }
+
+      h1, h2, h3, h4 {
+        margin-bottom: rem(16);
+      }
+
+      & .richtext {
+        border: none;
+
+        &.background-white,
+        background-light {
+          background-color: inherit;
+
+        }
+
+        & .container {
+          padding: 0;
+        }
+
+        & a {
+          color: $color--black;
+
+          .wac-video-text.primary-bg & {
+            color: $static-color--white;
+          }
+
+          font-weight: 600;
+        }
+
+        &:not(.block-spacing--pt):not(.block-spacing--pb) .richtext__content {
+          padding: 0;
+        }
+      }
+
+      .wp-block-buttons {
+        margin-top: rem(32);
+
+        .wac-video-text.primary-bg & a {
+          border-color: $static-color--white;
+          color: $color--primary;
+          background-color: $static-color--white;
+
+          &:hover {
+            background-color: $color--primary;
+            color: $static-color--white;
+          }
+
+          .theme--dark & {
+            color: $static-color--black;
+
+            &:hover {
+              background-color: $static-color--black;
+              color: $static-color--white;
+            }
+          }
+        }
+      }
+    }
+
+    &--video {
+      @include media('>=lg') {
+        padding-right: rem(56);
+
+        .media-right & {
+          padding-right: rem(16);
+          padding-left: rem(56);
+        }
+      }
+    }
+  }
+
+  &__video {
+    position: relative;
+    padding-bottom: 56.25%;
+    max-width: 100%;
+    height: auto;
+    border-radius: rem(5);
+
+    &-placeholder {
+      z-index: 2;
+      transition: opacity $transition, visibility $transition;
+
+      .playing & {
+        opacity: 0;
+        visibility: hidden;
+      }
+
+      img {
+        width: 100%;
+        height: 100%;
+        display: block;
+        object-fit: cover;
+        border-radius: inherit;
+      }
+    }
+
+    &-button {
+      z-index: 3;
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      .playing & {
+        opacity: 0;
+        visibility: hidden;
+      }
+
+    }
+
+    &-play {
+      cursor: pointer;
+      transition: opacity $transition, visibility $transition;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      border: 0;
+      width: rem(90);
+      height: rem(90);
+
+      @include media('<lg') {
+        width: rem(75);
+        height: rem(75);
+      }
+
+      border-radius: 50%;
+      background-color: #E7EFF8;
+
+      &::before {
+        content: '';
+        display: block;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      svg path {
+        fill: $color--primary;
+      }
+
+      &:hover {
+        svg path {
+          fill: $color--bg;
+
+        }
+      }
+
+      svg {
+        width: rem(20);
+        margin-right: rem(-5);
+
+        path {
+          transition: fill $transition;
+        }
+      }
+    }
+
+    video {
+      cursor: pointer;
+    }
+
+    iframe, video, &-placeholder {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: inherit;
+    }
+  }
+
+  &.columns-1 {
+    text-align: center;
+
+    @include media('>=md') {
+      &.block-spacing--pt {
+        padding-top: rem(80);
+      }
+      &.block-spacing--pb {
+        padding-bottom: rem(80);
+      }
+    }
+
+    .wac-video-text {
+      &__col {
+        flex-basis: 100%;
+        max-width: 100%;
+
+        &--video {
+          padding-right: rem($container-padding);
+          margin-bottom: rem(40);
+
+          @include media('>=md') {
+            margin-bottom: rem(60);
+          }
+        }
+      }
+
+      &__video-play {
+        @include media('>=md') {
+          width: rem(128);
+          height: rem(128);
+
+          svg {
+            width: rem(25);
+          }
+        }
+      }
+    }
+
+    .wp-block-buttons {
+      justify-content: center;
+    }
+
+  }
+}

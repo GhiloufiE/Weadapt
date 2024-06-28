@@ -1,0 +1,138 @@
+@import '../../../../weadapt/parts/gutenberg/acf-newsletter-form/style.scss';
+
+.newsletter-form {
+	background-color: $color--bg-hero;
+
+	.container {
+		@include media('>=md') {
+			display: flex;
+			align-items: flex-start;
+		}
+	}
+
+	.section{
+		&-header {
+			display: flex;
+			flex-direction: column;
+			background: url('/svg/icon-arrow-circle-white.svg') bottom left no-repeat;
+			padding-bottom: rem(146);
+
+			@include media('>=md') {
+				width: 50%;
+				padding-right: rem(50);
+			}
+		}
+
+		&-title {
+			order: -1;
+			margin-bottom: rem(10);
+		}
+		&-subtitle {
+			text-transform: none;
+			opacity: 1;
+			margin-bottom: rem(40);
+
+			@include media('>=md') {
+				@include font(24,33);
+				font-weight: $font-weight-content-medium;
+				padding-right: rem(50);
+			}
+		}
+	}
+	.form {
+		@include media('>=md') {
+			width: 50%;
+		}
+
+		.form-group {
+			margin-bottom: rem(20);
+
+			&.boolean {
+				margin-bottom: 0;
+			}
+		}
+		label {
+			font-weight: 400;
+			font-size: rem(14);
+			color: $color--text;
+			margin-bottom: rem(7);
+			cursor: pointer;
+		}
+
+		input[type="text"],
+		input[type="email"] {
+			margin-bottom: 0;
+			height: rem(40);
+			padding: rem(9) rem(16);
+		}
+
+		.checkbox {
+			label {
+				display: flex;
+				align-items: center;
+				margin-bottom: 0;
+				white-space: break-spaces;
+
+				a {
+					color: currentColor;
+					@include link-underline();
+				}
+
+				.boolean {
+					width: rem(20);
+					height: rem(20);
+					min-width: rem(20);
+					border: 0;
+					border-radius: rem(5);
+					margin-right: rem(20);
+					margin-bottom: 0;
+					appearance: none;
+					background-color: $static-color--white;
+					cursor: pointer;
+
+					&:checked {
+						background-color: $static-color--black-dark;
+						border: rem(7) solid $static-color--white;
+					}
+				}
+			}
+		}
+
+		.custom-text-wrapper {
+			margin-left: rem(40);
+			color: $color--text;
+			@include font(10, 14);
+			margin-bottom: rem(40);
+			margin-top: rem(5);
+
+			a {
+				@include link-underline();
+				color: currentColor;
+			}
+		}
+
+		.submit-wrapper {
+			margin-top: rem(40);
+
+			input {
+				font-size: rem(14);
+				font-weight: $font-weight-content-medium;;
+				background-color: $static-color--white;
+				color: $static-color--text;
+				border: 0;
+				box-shadow: 0;
+				padding: rem(16) rem(40);
+				border-radius: rem(24);
+				height: rem(48);
+				margin: 0;
+				transition: color $transition, background-color $transition;
+				width: auto;
+
+				&:hover {
+					color: $static-color--white;
+					background-color: $static-color--text;
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,36 @@
+@import 'style.scss';
+
+[data-grid-col] {
+	flex: 0 0 auto;
+
+	max-width: 100%;
+
+	position: relative;
+	&:after {
+		content: '';
+		clear: both;
+
+		display: table;
+	}
+	.col--editor {
+		&:after {
+			content: '';
+			clear: both;
+
+			display: table;
+		}
+	}
+}
+.block-editor-block-list__block .row--editor > .block-editor-inner-blocks > .block-editor-block-list__layout {
+	display: flex;
+	flex-wrap: wrap;
+
+	max-width: 100%;
+	.block-list-appender {
+		flex: 0 0 100%;
+
+		max-width: 100%;
+
+		order: 100;
+	}
+}

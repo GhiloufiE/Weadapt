@@ -1,0 +1,166 @@
+@import '__settings/init';
+
+.colored-cards__col--left {
+	.colored-card-item {
+		&:first-child {
+			border-color: #00D1A6;
+
+			.colored-card-item {
+				&__title {
+					color: #00D1A6;
+				}
+				&__more {
+					border-color: #00D1A6;
+				}
+
+				&__person-desc {
+					color: #00D1A6;
+				}
+			}
+		}
+
+		&:nth-child(2) {
+			border-color: #23C6DC;
+
+			.colored-card-item {
+				&__title {
+					color: #23C6DC;
+				}
+
+				&__more {
+					border-color: #23C6DC;
+				}
+
+				&__person-desc {
+					color: #23C6DC;
+				}
+			}
+		}
+	}
+}
+
+.colored-cards__col--right {
+	.colored-card-item {
+		&:first-child {
+			border-color: #FDC33A;
+
+			.colored-card-item {
+				&__title {
+					color: #FDC33A;
+				}
+
+				&__more {
+					border-color: #FDC33A;
+				}
+
+				&__person-desc {
+					color: #FDC33A;
+				}
+			}
+		}
+	}
+}
+
+.colored-card-item {
+	padding: rem(22);
+	border-top: rem(5) solid $color--text;
+	background: $color--white;
+	margin-bottom: rem(22);
+
+	&:last-of-type {
+		margin-bottom: 0;
+	}
+
+	& > *:last-child {
+		margin-bottom: 0;
+	}
+
+	&__title {
+		margin-bottom: rem(12);
+		color: $color--text;
+	}
+
+	&__description {
+		& > *:last-child {
+			margin-bottom: 0;
+		}
+	}
+
+	&__icon {
+		margin-bottom: rem(22);
+
+		img {
+			max-width: rem(65);
+			max-height: rem(65);
+			object-fit: contain;
+			display: block;
+		}
+	}
+
+	&__more {
+		border-bottom: rem(1) dashed;
+		padding-bottom: rem(4);
+		border-color: $color--text;
+
+		&-btn {
+			margin-top: rem(30);
+			display: flex;
+			align-items: center;
+			gap: rem(5);
+			background: transparent;
+			border: 0;
+			color: $color--text;
+			padding: 0;
+			@include font(18);
+			font-family: $font-family-headings;
+			text-transform: uppercase;
+
+			svg {
+				transition: transform $transition;
+			}
+
+			.active & {
+				svg {
+					transform: rotate(90deg);
+				}
+			}
+		}
+
+		&-content {
+			display: none;
+			padding: rem(22) rem(16) 0;
+
+			& > *:last-child {
+				margin-bottom: 0;
+			}
+
+			.active + & {
+				display: block;
+			}
+		}
+	}
+
+	&__person {
+		margin-top: rem(35);
+		display: flex;
+		gap: rem(10);
+
+		&-image {
+			img {
+				min-width: rem(100);
+				height: rem(100);
+				object-fit: cover;
+			}
+		}
+
+		&-title {
+			margin-bottom: rem(5);
+		}
+
+		&-desc {
+			& > *:last-child {
+				margin-bottom: 0;
+			}
+		}
+	}
+}

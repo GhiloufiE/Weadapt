@@ -1,0 +1,119 @@
+@import '../../../../weadapt/parts/components/footer/style.scss';
+
+.main-footer {
+	@include bg-lines(var(--color--bg-footer), 0.07);
+
+	.theme--dark & {
+		@include bg-lines(var(--color--bg-footer), 0.3);
+	}
+}
+
+.main-footer__newsletter {
+	.mailrelay-form,
+	.mc4wp-form {
+		background-color: #fffff;
+
+		h2 {
+			font-size: rem(20);
+			color: $color--white;
+			font-weight: 500;
+			margin-bottom: rem(16);
+		}
+
+		&__content {
+			display: flex;
+			gap: rem(24);
+
+			.form-group.email {
+				flex-grow: 1;
+			}
+			input[type="email"] {
+				margin: 0;
+				
+
+				&::placeholder {
+					color: $color--white;
+				}
+
+				.theme--dark & {
+					border: rem(1) solid rgba(0,0,0,.2);
+				}
+			}
+
+			input[type="submit"] {
+				font-size: rem(14);
+				font-weight: rem(500);
+				color: $color--white;
+				background-color: $color--primary;
+				border: 0;
+				box-shadow: 0;
+				padding: rem(16) rem(40);
+				border-radius: rem(24);
+				height: rem(48);
+				margin: 0;
+
+				.theme--dark & {
+					background-color: $color--white;
+					color: $color--primary;
+				}
+			}
+		}
+	}
+
+	.mc4wp-form {
+		background-color: transparent;
+
+		h2 {
+			color: $static-color--white !important;
+		}
+
+		&__content {
+			input[type="email"] {
+				
+
+				&::placeholder {
+					color: $static-color--white;
+				}
+
+				.theme--dark & {
+					border: rem(1) solid rgba(255,255,255);
+				}
+			}
+
+			input[type="submit"] {
+				color: $static-color--primary;
+				background-color: $color--primary;
+				border: rem(2) solid $color--primary;
+				border-radius: rem(5);
+				font-weight: 700;
+				padding: rem(12) rem(16);
+				transition: background-color $transition;
+
+				&:hover {
+					background-color: transparent;
+					color:  $color--primary;
+				}
+
+				.theme--dark & {
+					background-color: $static-color--white;
+					color: $static-color--black;
+
+					&:hover {
+						background-color: transparent;
+						color: $static-color--white;
+					}
+				}
+			}
+		}
+
+		.mc4wp-response {
+			margin-top: rem(10);
+			color: $static-color--white;
+
+			p {
+				margin: 0 !important;
+			}
+		}
+	}
+}
+

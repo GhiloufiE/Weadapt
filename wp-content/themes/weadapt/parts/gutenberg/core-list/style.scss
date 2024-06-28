@@ -1,0 +1,35 @@
+@import '__settings/init';
+
+.page-content ul:not([class]),
+.acf-block ul:not([class]),
+.editor-rich-text ul,
+ol {
+	margin-top:0;
+	margin-bottom:rem(22);
+	padding:0 0 0 rem(25);
+	color: $color--text;
+
+	li {
+		margin:0;
+	}
+	ul,
+	ol {
+		margin: 0;
+	}
+}
+
+ol:not([class]) {
+	counter-reset: my-counter;
+	list-style-type: none;
+	padding:0;
+
+	> li {
+		margin:0 0 rem(22);
+
+		&::before {
+			counter-increment: my-counter;
+			content: counter(my-counter) ". ";
+			color: inherit;
+		}
+	}
+}

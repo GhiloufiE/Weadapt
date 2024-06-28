@@ -1,0 +1,14 @@
+@import '../../../../weadapt/parts/gutenberg/acf-cards-download/style.scss';
+
+.cards-download {
+	&__title-wrap {
+		@include media('>=md') {
+			margin-bottom: rem(22);
+		}
+	}
+
+	.card-download {
+		border-radius: rem(20);
+		padding: rem(24) rem(32);
+	}
+}

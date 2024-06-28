@@ -1,0 +1,67 @@
+@import '__settings/init';
+
+.featured-resource {
+	margin: rem(80) 0;
+}
+
+.single-resource {
+	display: flex;
+	flex-wrap: wrap;
+	@include font(14, 20);
+	gap: rem(16);
+
+	&__img {
+		border-radius: rem(5);
+		flex: 0 0 rem(149);
+		max-width: rem(149);
+		position: relative;
+		height: fit-content;
+
+		&::before {
+			content: '';
+			display: block;
+			padding-bottom: 100%;
+		}
+
+		img {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			border-radius: rem(5);
+			object-fit: contain;
+
+			border: rem(1) solid $static-color--black;
+			box-shadow: rem(4) rem(4) 0 $static-color--bg;
+		}
+	}
+	&__content {
+		max-width: rem(188);
+	}
+	&__text {
+		margin: 0 0 rem(24);
+		color: $color--text-desc;
+	}
+	&__title {
+		margin: 0 0 rem(8);
+
+		font-weight: $font-weight-content;
+		color: $color--black;
+		@include font(16, 22);
+
+		@include media('>=md') {
+			@include font(18, 24);
+		}
+	}
+	.wp-block-button {
+		margin-top: rem(24);
+
+		&__link {
+			&.loading {
+				pointer-events: none;
+				opacity: .6;
+			}
+		}
+	}
+}

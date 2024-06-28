@@ -1,0 +1,88 @@
+@import '__settings/init';
+
+.user-about {
+	&__header {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: rem(20);
+
+		.wp-block-button {
+			margin-bottom: rem(16);
+
+			.wp-block-button__link {
+				padding: rem(5) rem(16) rem(3);
+				height: rem(32);
+				font-size: rem(14);
+			}
+		}
+	}
+	&__title {
+		font-size: rem(32);
+		margin-right: rem(30);
+	}
+	&__job {
+		font-size: rem(18);
+		margin-bottom: rem(40);
+	}
+	&__info {
+		display: flex;
+		flex-wrap: wrap;
+
+		&__item {
+			margin-right: rem(40);
+			margin-top: rem(18);
+
+			&--organisation {
+				display: flex;
+				align-items: center;
+				margin-right: rem(40);
+
+				.organisation {
+					&__logo {
+						min-width: rem(50);
+						width: rem(50);
+						margin-right: rem(15);
+
+						a {
+							background-image: none !important;
+						}
+					}
+					&__title {
+						a {
+							color: $color--text;
+							@include link;
+						}
+					}
+				}
+			}
+		}
+		&__title {
+			@include font(20, 26);
+			font-weight: $font-weight-content-medium;
+			margin-top: rem(40);
+			margin-bottom: rem(24) !important;
+		}
+	}
+	&__social {
+		display: flex;
+		flex-wrap: wrap;
+		margin-top: rem(16);
+
+		.wp-block-button {
+			margin-right: rem(25);
+			margin-top: rem(25);
+
+			svg {
+				position: relative;
+				&.website {
+					top: rem(-1);
+				}
+				&.linkedin {
+					top: rem(-2);
+				}
+			}
+		}
+	}
+}

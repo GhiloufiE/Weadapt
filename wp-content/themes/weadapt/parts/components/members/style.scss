@@ -1,0 +1,21 @@
+@import '__settings/init';
+
+.members {
+	.member-item {
+		@include media('>=md') {
+			border-bottom: rem(1) solid $color--border;
+			padding-bottom: rem(15);
+		}
+
+		& + .member-item,
+		& + .results-count + .member-item {
+			@include media('>=md') {
+				margin-top: rem(24);
+			}
+		}
+	}
+
+	&__row {
+		margin-top: rem(56);
+	}
+}

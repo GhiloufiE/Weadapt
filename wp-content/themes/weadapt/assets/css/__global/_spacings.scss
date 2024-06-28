@@ -1,0 +1,44 @@
+.block-spacing {
+	&--pt {
+		padding-top: rem($spacing-mobile);
+
+		@include media('>=md') {
+			padding-top: rem($spacing);
+		}
+	}
+	&-double--pt {
+		padding-top: calc(rem($spacing-mobile) * 2);
+
+		@include media('>=md') {
+			padding-top: calc(rem($spacing) * 2);
+		}
+	}
+	&--pb {
+		padding-bottom: rem($spacing-mobile);
+
+		@include media('>=md') {
+			padding-bottom: rem($spacing);
+		}
+	}
+	&-double--pb {
+		padding-bottom: calc(rem($spacing-mobile) * 2);
+
+		@include media('>=md') {
+			padding-bottom: calc(rem($spacing) * 2);
+		}
+	}
+	&--mt {
+		margin-top: rem($margin-mobile);
+
+		@include media('>=md') {
+			margin-top: rem($margin);
+		}
+	}
+	&--mb {
+		margin-bottom: rem($margin-mobile);
+
+		@include media('>=md') {
+			margin-bottom: rem($margin);
+		}
+	}
+}

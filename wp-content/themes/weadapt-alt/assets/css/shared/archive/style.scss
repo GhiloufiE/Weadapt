@@ -1,0 +1,87 @@
+@import '../../../../../weadapt/assets/css/shared/archive/style.scss';
+
+.archive-main {
+ 	&__entry {
+		color: $color--black;
+		@include media('>=md') {
+			@include font(16,24);
+		}
+		h2 {
+			@include media('>=md') {
+				@include font(35,49);
+			}
+		}
+		h3 {
+			@include media('>=md') {
+				@include font(30,42);
+			}
+		}
+	}
+	&__aside {
+		.wp-block-button__link {
+			height: rem(40);
+		}
+	}
+	dl {
+		display: flex;
+		align-items: flex-start;
+		@include font(14, 22);
+
+		dt {
+			flex-grow: 0;
+			flex-shrink: 0;
+			padding: rem(6);
+			margin-right: rem(24);
+			@include media('<=md') {
+				margin-right: rem(16);
+			}
+			@include media('>=md') {
+				padding: rem(7) rem(14);
+			}
+			text-align: right;
+			width: 28%;
+		}
+
+		dd {
+
+			ul {
+				display: flex;
+				gap: rem(16);
+				list-style: unset;
+				padding: 0;
+				margin: 0;
+				flex-wrap: wrap;
+
+				li {
+					display: block;
+					cursor: pointer;
+					padding: rem(6);
+					color: $static-color--text;
+
+					border-radius: rem(5);
+					background-color: $color--bg-to-white-reverse;
+
+					border: rem(2) solid $color--bg-to-white-reverse;
+
+					transition: color $transition, background-color $transition,
+					border $transition;
+
+					&:hover {
+						color: $color--white;
+						background-color: $color--black;
+						border-color: $color--black;
+
+						.theme--dark & {
+							color: $static-color--white;
+							background-color: transparent;
+						}
+					}
+
+					@include media('>=md') {
+						padding: rem(7) rem(14);
+					}
+				}
+			}
+		}
+	}
+}

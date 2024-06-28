@@ -1,0 +1,114 @@
+@import '../../../../weadapt/parts/gutenberg/acf-hero/style.scss';
+
+.hero {
+	position: relative;
+	background: linear-gradient(180deg, #27688F 0%, #154260 100%);
+	overflow: hidden;
+
+	.theme--dark & {
+		background: $color--white;
+	}
+
+	&::before, &::after {
+		@include media('>=lg') {
+			content: "";
+			display: block;
+			position: absolute;
+			z-index: 0;
+			background-repeat: no-repeat;
+			pointer-events: none;
+		}
+	}
+
+	&::before {
+		top: rem(-16);
+		left: rem(-6);
+		width: rem(264);
+		height: rem(271);
+		background-image: url('../../../assets/images/svg/hero-left-lines.png');
+	}
+
+	&::after {
+		background-image: url('../../../assets/images/svg/hero-right-lines.png');
+		width: rem(561);
+		height: rem(561);
+		right: rem(-10);
+		bottom: 0;
+	}
+
+	&__container {
+		position: relative;
+		z-index: 1;
+	}
+	
+	&.block-spacing-double {
+		@include media('>=md') {
+			&--pt {
+				padding-top: rem(105);
+			} 
+
+			&--pb {
+				padding-bottom: rem(105);
+			}
+		}
+	} 
+
+	&__subtitle {
+		color: $static-color--white;
+		@include font(24, 34);
+		font-weight: 600;
+		margin-bottom: 0;
+		text-transform: none;
+	}
+
+	&__heading {
+		color: $static-color--white;
+		margin-top: 0 	;
+		
+		@include media('>=md') {
+			font-size: rem(48) !important;
+			line-height: 1.25 !important;
+		}
+	}
+
+	&__description {
+		color: $static-color--white;
+	}
+
+	&__image {
+		img {
+			max-width: rem(546);
+			width: 100%;
+		}
+	}
+
+	.wp-block-button__link {
+		&::after {
+			content: '';
+			background-image: url("data:image/svg+xml,%3Csvg width='15' height='14' viewBox='0 0 15 14' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M8.36301 1.69727L13.6663 7.0006L8.36301 12.3039M0.333008 7.0006H13.6663H0.333008Z' stroke='currentColor' stroke-linecap='square'/%3E%3C/svg%3E");
+			display: block;
+			background-position: center;
+			background-repeat: no-repeat;
+			background-size: contain;
+			width: rem(15);
+			height: rem(15);
+			margin-left: rem(10);
+			transition: filter $transition;
+		}
+
+		&:hover {
+			background-color: $color--primary;
+			border-color: $color--primary;
+			opacity: 0.75;
+			
+			.theme--dark & {
+				opacity: 1;
+				background: transparent;
+
+				&::after {
+					filter: invert(1);
+				}
+			}
+		}
+	}
+}

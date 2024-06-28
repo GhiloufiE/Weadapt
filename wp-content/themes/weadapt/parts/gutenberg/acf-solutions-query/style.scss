@@ -1,0 +1,89 @@
+@import '__settings/init';
+
+.solutions-query {
+	background-color: $color--white;
+
+	&.background {
+		&-light {
+			background-color: $color--bg;
+		}
+	}
+	& .filter-container {
+		display: flex;
+		align-items: start;
+		width: 100%;
+		gap: 0 rem(32);
+		flex-wrap: wrap;
+
+		& .dropdowns-container {
+			display: flex;
+			gap: 0 rem(32);
+			flex-wrap: wrap;
+
+			@include media('<=md') {
+				justify-content: end;
+			}
+
+			& .cpt-filters__item {
+				margin-bottom: rem(16);
+
+				@include media('>=md') {
+					margin-bottom: rem(24);
+				}
+			}
+		}
+
+		& .cpt-filters__form__search {
+			max-width: rem(460);
+			margin-right: auto;
+			margin-top: 0;
+			margin-bottom: rem(16);
+
+			@include media('>=md') {
+				margin-bottom: rem(24);
+			}
+
+			& svg {
+				padding: 0;
+			}
+
+			& * {
+				@include font(14, 20);
+				padding: rem(6) rem(16);
+			}
+
+			& > input {
+				border-radius: rem(100);
+			}
+		}
+	}
+
+	.breadcrumbs--list {
+		margin: 0;
+	}
+
+	.cta-buttons {
+		display: flex;
+		flex-wrap: wrap;
+		gap: rem(20);
+		padding-top: rem(20);
+		padding-bottom: rem(20);
+
+		@include media('>=md') {
+			padding-top: rem(40);
+			padding-bottom: rem(40);
+			gap: rem(40);
+		}
+	}
+
+	.reset-btn {
+		background-color: $color--text;
+		border-color: $color--text;
+
+		.theme--dark & {
+			background-color: transparent;
+			color: $color--black;
+
+		}
+	}
+}

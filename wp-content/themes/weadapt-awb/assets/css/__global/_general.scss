@@ -1,0 +1,16 @@
+body {
+	margin: 0;
+
+	font-size: $font-size-mobile;
+	font-weight: $font-weight-content;
+	line-height: $line-height-mobile;
+	color: $color--text;
+	background: $color--body-bg;
+
+	transition: background-color $transition, color $transition;
+
+	@include media('>=md') {
+		font-size: $font-size-base;
+		line-height: $line-height-base;
+	}
+}

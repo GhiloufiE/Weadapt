@@ -1,0 +1,43 @@
+@import '__settings/init';
+
+.related-content {
+	&:last-child {
+		margin-bottom: 0;
+	}
+
+	&__heading {
+		margin: 0 0 rem(40);
+
+		@include media('>=md') {
+			border-bottom: rem(1) solid $color--border;
+			padding-bottom: rem(24);
+		}
+	}
+
+	.cpt-content-heading {
+		&__title {
+			@include font(20, 26);
+			font-weight: $font-weight-content-medium;
+			padding-bottom: rem(8);
+			border-bottom: rem(1) solid $color--border;
+			margin-bottom: rem(16);
+
+			@include media('>=md') {
+				font-weight: $font-weight-content-bold;
+				@include font(32, 40);
+				margin-bottom: rem(24);
+				padding-bottom: 0;
+				border-bottom: 0;
+			}
+		}
+
+		&__text {
+			@include font(14, 20);
+			color: $color--text-light;
+
+			@include media('>=md') {
+				@include font(16, 22);
+			}
+		}
+	}
+}

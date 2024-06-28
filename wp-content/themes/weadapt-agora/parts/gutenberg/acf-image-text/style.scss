@@ -1,0 +1,67 @@
+@import '../../../../weadapt/parts/gutenberg/acf-image-text/style.scss';
+
+@import '__settings/init';
+
+.image-text {
+	&.reusable-block {
+		@include bg-lines($color--bg-hero, 0.3);
+
+		.section-image {
+			margin-top: rem(-60);
+			display: flex;
+			justify-content:unset;
+
+			@include media('<=md') {
+				margin-top: rem(50);
+				justify-content: center;
+			}
+
+		}
+	}
+
+	&__content {
+		display: flex;
+		flex-direction: column;
+		align-items: end;
+
+		.section-title {
+			margin-bottom: rem(32);
+			text-align: end;
+		}
+
+		.section-description {
+			max-width: rem(500);
+			text-align: end;
+		}
+
+		@include media('<=md') {
+			margin-top: rem(30);
+			align-items: center;
+
+			.section-title,
+			.section-description {
+				text-align: center;
+			}
+
+		}
+
+		.wp-block-button {
+
+			&__link {
+				background-color: $static-color--black;
+				color: $static-color--white;
+
+				&:hover {
+					background-color: $color--bg-to-white-reverse;
+					color: $static-color--text;
+					border-color: $color--bg-to-white-reverse;
+
+					.theme--dark & {
+						color: $static-color--text;
+						background-color: $static-color--white;
+					}
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,78 @@
+@import '__settings/init';
+
+.contributors-list {
+	background-color: $color--bg;
+
+	&.background {
+		&-white {
+			background-color: $color--white;
+		}
+	}
+
+	.smaller-container {
+		max-width: rem(954);
+	}
+
+	.load-more-contributors {
+		justify-content: flex-start;
+		margin-top: rem(24);
+
+		@include media('>=md') {
+			margin-top: rem(56);
+		}
+	}
+
+	&__content {
+		max-width: rem(788);
+		padding-bottom: rem(16);
+
+		@include media('>=md') {
+			padding-bottom: rem(24);
+		}
+
+		.section-title,
+		.section-description {
+			color: $color--black;
+		}
+	}
+
+	&__contributors {
+		&-list {
+			display: grid;
+			grid-template-columns: 1fr;
+			row-gap: rem(16);
+			column-gap: rem(16);
+
+			@include media('>=md') {
+				row-gap: rem(24);
+				column-gap: rem(30);
+			}
+
+			@include media('>=sm') {
+				grid-template-columns: repeat(2, 1fr);
+			}
+		}
+	}
+
+	.cpt-more {
+		&.hidden {
+			display: none;
+		}
+		&__btn {
+			&.loading {
+				opacity: 0.5;
+				pointer-events: none;
+			}
+		}
+	}
+
+	.row--ajax {
+		transition: opacity $transition;
+
+		&.loading {
+			opacity: 0.5;
+			pointer-events: none;
+		}
+	}
+
+}

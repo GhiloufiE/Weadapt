@@ -1,0 +1,113 @@
+.wp-caption {
+	width: auto !important;
+	figure {
+		width: auto !important;
+
+		margin: 0;
+	}
+}
+
+.alignleft,
+.wp-block-image .alignleft {
+	float: left;
+	margin: 0 rem($media-margin) rem($media-margin) 0;
+}
+
+.alignright,
+.wp-block-image .alignright {
+	float: right;
+	margin: 0 0 rem($media-margin) rem($media-margin);
+}
+
+.alignnone,
+.wp-block-image .alignnone {
+	display: inline-block;
+
+	max-width: 100%;
+}
+
+.aligncenter,
+.wp-block-image .aligncenter {
+	clear: both;
+
+	margin: rem($media-margin) auto;
+
+	text-align: center;
+}
+
+.has-text-uppercase {
+	text-transform: uppercase;
+}
+
+.has-text-align-left {
+	text-align: left;
+}
+
+.has-text-align-right {
+	text-align: right;
+}
+
+.has-text-align-center {
+	text-align: center;
+}
+
+.has-large-font-size {
+	@include font(20, 26);
+}
+
+.has-normal-font-size,
+.has-regular-font-size {
+	font-weight: $font-weight-content;
+
+	font-size: $font-size-base;
+	line-height: $line-height-base;
+}
+
+.is-style-subheading {
+	margin-bottom: rem(24);
+
+	font-weight: $font-weight-content-bold;
+	letter-spacing: rem(1.2);
+	text-transform: uppercase;
+
+	@include font(16, 22.4);
+}
+
+.is-content-justification {
+	&-top-center {
+		align-items: flex-start;
+		justify-content: center;
+	}
+	&-top-left {
+		align-items: flex-start;
+		justify-content: flex-start;
+	}
+	&-top-right {
+		align-items: flex-start;
+		justify-content: flex-end;
+	}
+	&-center-center {
+		align-items: center;
+		justify-content: center;
+	}
+	&-center-left {
+		align-items: center;
+		justify-content: flex-start;
+	}
+	&-center-right {
+		align-items: center;
+		justify-content: flex-end;
+	}
+	&-bottom-center {
+		align-items: flex-end;
+		justify-content: center;
+	}
+	&-bottom-left {
+		align-items: flex-end;
+		justify-content: flex-start;
+	}
+	&-bottom-right {
+		align-items: flex-end;
+		justify-content: flex-end;
+	}
+}

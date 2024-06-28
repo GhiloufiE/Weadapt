@@ -1,0 +1,19 @@
+@import '../../../../weadapt/parts/components/sign-up/style.scss';
+
+@import '__settings/init';
+
+.ajax-form {
+
+	&__url {
+		a {
+			color: $color--secondary;
+		}
+
+		.theme--dark & {
+			a {
+				color: $color--black
+			}
+		}
+	}
+
+}

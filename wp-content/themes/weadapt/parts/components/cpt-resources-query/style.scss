@@ -1,0 +1,55 @@
+@import '__settings/init';
+
+.single-organisation__resources {
+
+	&-list {
+		display: grid;
+		gap: rem(16);
+		grid-template-columns: 1fr;
+
+		@include media('>=sm') {
+			grid-template-columns: repeat(2, 1fr);
+		}
+
+		@include media('>=md') {
+			grid-template-columns: repeat(3, 1fr);
+		}
+
+		@include media('>=lg') {
+			gap: rem(28);
+		}
+	}
+
+	.load-more-resources.wp-block-button {
+		display: flex;
+		justify-content: center;
+	}
+
+	.cpt-more {
+		margin-top: rem(24);
+
+		&.hidden {
+			display: none;
+		}
+
+		&__btn {
+			&.loading {
+				opacity: 0.5;
+				pointer-events: none;
+			}
+		}
+
+		@include media('>=md') {
+			margin-top: rem(40);
+		}
+	}
+
+	.row--ajax {
+		transition: opacity $transition;
+
+		&.loading {
+			opacity: 0.5;
+			pointer-events: none;
+		}
+	}
+}

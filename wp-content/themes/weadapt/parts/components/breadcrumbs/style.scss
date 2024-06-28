@@ -1,0 +1,48 @@
+@import '__settings/init';
+
+.breadcrumbs {
+	margin: rem(40) 0 rem(24) 0;
+	@include font(12, 20);
+
+	@include media('>=md') {
+		margin-bottom: rem(56);
+		@include font(14, 20);
+	}
+
+	&__list {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		color: $color--text;
+
+		li {
+			margin: 0;
+			padding: 0;
+			&:not(:last-child) {
+				margin-right: rem(7);
+
+				@include media('>=md') {
+					margin-right: rem(9);
+				}
+			}
+			&:not(:last-child) {
+				&::after {
+					content: '/';
+					margin-left: rem(3);
+				}
+			}
+			a {
+				color: $color--text;
+				text-decoration: none;
+				@include link();
+			}
+		}
+	}
+
+	&__label {
+		color: $color--primary;
+	}
+}

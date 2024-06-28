@@ -1,0 +1,10 @@
+@import '../../../../weadapt/parts/components/breadcrumbs/style.scss';
+
+@import '__settings/init';
+
+.breadcrumbs {
+
+  &__label {
+    color: var(--color--accent);
+  }
+}

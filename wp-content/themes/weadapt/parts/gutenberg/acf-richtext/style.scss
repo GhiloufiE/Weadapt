@@ -1,0 +1,49 @@
+@import '__settings/init';
+
+.richtext {
+	background-color: $color--bg;
+	$block: &;
+
+	&:not(.block-spacing--pb) {
+		#{$block} {
+			&__content {
+				@include media('>=md') {
+					padding-bottom: rem($spacing);
+				}
+			}
+		}
+	}
+
+	&:not(.block-spacing--pt) {
+		#{$block} {
+			&__content {
+				@include media('>=md') {
+					padding-top: rem($spacing);
+				}
+			}
+		}
+	}
+
+	&.background {
+		&-white {
+			background-color: $color--white;
+		}
+	}
+
+	&__description {
+		h1, h2, h3, h4, h5, h6 {
+			font-family: $font-family-base;
+		}
+
+		h3 {
+			@include media('>=md') {
+				@include font(35, 49);
+				margin-bottom: rem(24);
+			}
+		}
+
+		ul {
+			padding-left: revert;
+		}
+	}
+}

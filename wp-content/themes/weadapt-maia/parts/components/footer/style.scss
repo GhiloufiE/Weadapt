@@ -1,0 +1,77 @@
+@import '../../../../weadapt/parts/components/footer/style.scss';
+
+.main-footer {
+	&__logo {
+		> a {
+			width: rem(249);
+		}
+
+		&--right {
+			max-width: rem(150);
+		}
+	}
+
+	&__newsletter {
+		.mc4wp-form {
+			background-color: $color--link;
+
+			h2 {
+				color: $color--white !important;
+			}
+
+			&__checkbox {
+				color: $color--white;
+
+				input[type="checkbox"] {
+					&:checked {
+						background-image: url("data:image/svg+xml,%3Csvg height='11' width='11' version='1.1' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpolygon fill='%23FFFFFF' points='11.941,28.877 0,16.935 5.695,11.24 11.941,17.486 26.305,3.123 32,8.818'/%3E%3C/svg%3E");
+
+						.theme--dark & {
+							background-image: url("data:image/svg+xml,%3Csvg height='11' width='11' version='1.1' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpolygon fill='%23000000' points='11.941,28.877 0,16.935 5.695,11.24 11.941,17.486 26.305,3.123 32,8.818'/%3E%3C/svg%3E");
+						}
+					}
+				}
+			}
+
+			&__content {
+				input[type="email"] {
+					border: rem(1) solid rgba(255,255,255,.2);
+					background-color: transparent;
+					color: $color--white;
+
+					&::placeholder {
+						color: $color--white;
+					}
+
+					.theme--dark & {
+						border: rem(1) solid rgba(0,0,0,.2);
+					}
+				}
+
+				input[type="submit"] {
+					color: $color--white;
+					background-color: $color--primary;
+					border: 0;
+					box-shadow: 0;
+					padding: rem(16) rem(40);
+					border-radius: rem(24);
+					height: rem(48);
+					margin: 0;
+
+					&:hover {
+						background-color: transparent;
+					}
+
+					.theme--dark & {
+						background-color: $color--white;
+						color: $color--primary;
+					}
+				}
+			}
+
+			.mc4wp-response {
+				color: $static-color--white;
+			}
+		}
+	}
+}

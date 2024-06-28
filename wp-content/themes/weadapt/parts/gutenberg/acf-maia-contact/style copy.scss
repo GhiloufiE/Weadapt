@@ -1,0 +1,72 @@
+@import '__settings/init';
+
+.icon-text-card {
+	background-color: $color--white;
+	box-shadow: 0 rem(4) rem(24) $color--shadow;
+	padding: rem(24);
+	border-radius: rem(5);
+	height: 100%;
+
+	&__num {
+		margin-bottom: rem(18);
+
+		span:not(.before-text) {
+			padding: rem(4);
+			text-transform: uppercase;
+			color: $color--text;
+			border: rem(2) solid $color--text;
+			height: rem(50);
+			display: inline-flex;
+			justify-content: center;
+			align-items: center;
+			min-width: rem(50);
+			border-radius: rem(50);
+			@include font(30);
+			font-family: $font-family-headings;
+		}
+
+		&.has-before-text {
+			span:not(.before-text) {
+				padding: rem(4) rem(22);
+			}
+		}
+	}
+
+	&__icon {
+		margin-bottom: rem(8);
+	}
+
+	&__title {
+		margin-bottom: rem(8);
+	}
+
+	&__content {
+		font-family: $font-family-base;
+		font-weight: $font-weight-content;
+		font-style: normal;
+		@include font(14, 20);
+
+		p {
+			@include font(14, 20);
+			margin-bottom: rem(24);
+		}
+
+		.wp-block-button {
+			margin-top: rem(24);
+		}
+
+		& > *:last-child {
+			margin-bottom: 0;
+		}
+	}
+
+	&__links {
+		color: $color--text;
+		padding-left: rem(22);
+
+		a {
+			color: currentColor;
+			@include link;
+		}
+	}
+}

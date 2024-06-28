@@ -1,0 +1,31 @@
+@import '../../../../weadapt/parts/components/single-hero/style.scss';
+
+.single-hero {
+  background-color: $color--tertiary;
+
+  padding-top: calc(rem($spacing-mobile) * 2);
+  @include media('>=md') {
+    padding-top: rem($spacing);
+  }
+
+  &__type.wp-block-button.is-style-outline-small .wp-block-button__link {
+    background-color: var(--color--tag);
+    border-color: var(--color--tag);
+
+    .theme--dark & {
+      border-color: $color--black;
+    }
+
+    &:hover {
+      background-color: $color--primary;
+      border-color: $color--primary;
+    }
+  }
+
+  &__image .img-caption {
+    &__caption a {
+      color: $color--black;
+      font-weight: 500;
+    }
+  }
+}

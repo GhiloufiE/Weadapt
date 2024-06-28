@@ -1,0 +1,78 @@
+@import '__settings/init';
+
+.awb-feature-downloads {
+	background-color: $color--bg;
+
+	&.background {
+		&-white {
+			background-color: $color--white;
+		}
+	}
+
+	&__row {
+		gap: rem(24) 0;
+
+		& .title {
+			text-align: center;
+			font-weight: 500;
+			margin: 0;
+			@include font(24, 34);
+		}
+
+		& .card-container {
+			padding: 0 rem(8);
+		}
+
+	}
+
+	&__file {
+		display: flex;
+		flex-direction: column;
+		gap: rem(16);
+		height: 100%;
+		border: 1px solid #4E7E77;
+		border-radius: rem(10);
+		padding: rem(10) rem(12) rem(36);
+
+		&-header {
+			flex: 1;
+
+			& > *:last-child {
+				margin-bottom: 0;
+			}
+		}
+
+		& .image-container {
+			width: 100%;
+			height: 0;
+			padding-bottom: 56.25% ;
+			position: relative;
+			border-radius: rem(10);
+			overflow: hidden;
+		}
+
+		&-image {
+			position: absolute;
+			top: 0;
+			left: 0;
+			height: 100%;
+			width: 100%;
+		}
+
+		&-title {
+			@include font(20, 24);
+			padding-bottom: rem(5);
+			border-bottom: rem(1) solid $color--border;
+		}
+
+		&-content {
+
+			& .wp-block-button__link {
+				padding: rem(8) rem(16);
+				@include font(14, 20);
+				height: rem(32)!important;
+			}
+		}
+	}
+
+}

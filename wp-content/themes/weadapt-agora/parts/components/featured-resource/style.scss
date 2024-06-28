@@ -1,0 +1,17 @@
+@import '../../../../weadapt/parts/components/featured-resource/style.scss';
+
+@import '__settings/init';
+
+
+.single-resource {
+
+  &__svg svg {
+    width: rem(24);
+    height: rem(24);
+  }
+
+  &__content {
+    max-width: rem(260);
+  }
+
+}

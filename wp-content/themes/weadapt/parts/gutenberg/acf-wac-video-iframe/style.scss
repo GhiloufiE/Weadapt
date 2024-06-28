@@ -1,0 +1,140 @@
+@import '__settings/init';
+
+.wac-video-iframe {
+
+  background-color: $color--bg;
+
+  &.background {
+    &-white {
+      background-color: $color--white;
+    }
+
+    &-light.primary-bg {
+      background-color: $color--primary;
+
+      .theme--dark & {
+        background-color: $color--white;
+      }
+    }
+  }
+
+  .theme--dark & {
+    background-color: $color--white;
+  }
+
+  &__video {
+    margin-bottom: rem(64);
+    position: relative;
+
+    &-button {
+      //width: fit-content;
+      //height: fit-content;
+      z-index: 3;
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      //transform: translate(-50%, -50%);
+      bottom: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      .playing & {
+        opacity: 0;
+        visibility: hidden;
+      }
+    }
+
+    &-play {
+      cursor: pointer;
+      transition: opacity $transition, visibility $transition;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      border: 0;
+      width: rem(90);
+      height: rem(90);
+
+      @include media('<lg') {
+        width: rem(75);
+        height: rem(75);
+      }
+
+      border-radius: 50%;
+      background-color: #E7EFF8;
+
+      &::before {
+        content: '';
+        display: block;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      svg path {
+        fill: $color--primary;
+      }
+
+      &:hover {
+        svg path {
+          fill: $color--bg;
+
+        }
+      }
+
+      svg {
+        width: rem(20);
+        margin-right: rem(-5);
+
+        path {
+          transition: fill $transition;
+        }
+      }
+    }
+
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    &__container {
+      position: relative;
+      padding-bottom: 56.25%;
+      overflow: hidden;
+      max-width: 100%;
+      height: auto;
+
+      iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+    }
+
+    &__title {
+      text-transform: unset;
+      @include font(30, 42);
+      font-weight: 500;
+      color: $color--black;
+      margin-bottom: rem(48);
+      text-align: center;
+
+      @include media('<md') {
+        @include font(20, 32);
+        margin-bottom: rem(28);
+      }
+
+      .background-light.primary-bg & {
+        color: $static-color--white;
+      }
+
+    }
+  }
+}

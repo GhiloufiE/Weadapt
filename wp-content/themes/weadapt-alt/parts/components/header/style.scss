@@ -1,0 +1,45 @@
+@import '../../../../weadapt/parts/components/header/style.scss';
+
+.main-header {
+	&__logo {
+		svg {
+			width: rem(164);
+			min-width: rem(164);
+		}
+	}
+	&__main-area {
+		background-color: $color--white;
+		@include media('>=md') {
+			padding-top: rem(14);
+			padding-bottom: rem(14);
+		}
+		.mega-menu {
+			@include media('>=md') {
+				background-color: $color--white;
+			}
+		}
+	}
+	&__button {
+		&--search {
+			display: none;
+		}
+	}
+	* {
+		font-family: var(--alt-header-font-family);
+	}
+}
+
+.search-form {
+	display: none;
+}
+
+.main-header--desktop {
+	.main-header {
+		&__logo {
+			svg {
+				width: rem(184);
+				min-width: rem(184);
+			}
+		}
+	}
+}

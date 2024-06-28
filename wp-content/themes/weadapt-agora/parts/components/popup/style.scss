@@ -1,0 +1,31 @@
+@import '../../../../weadapt/parts/components/popup/style.scss';
+
+@import '__settings/init';
+
+.popup {
+	h2 {
+		font-weight: 900;
+	}
+
+	.wp-block-button {
+		& .create-account {
+			color: $color--white;
+			background-color: $color--secondary;
+			border-color: $color--secondary;
+
+			.theme--dark & {
+				background-color: $color--black;
+				border-color: $color--black;
+			}
+
+			&:hover {
+				color: $color--black;
+				border-color: $color--black;
+				background-color: transparent;
+			}
+
+
+		}
+
+	}
+}

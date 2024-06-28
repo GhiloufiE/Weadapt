@@ -1,0 +1,49 @@
+.main-header {
+	&__logo {
+		flex-grow: 1;
+
+		svg {
+			width: rem(38);
+			min-width: rem(38);
+
+			@include media('>=lg') {
+				margin-right: rem(15);
+			}
+		}
+
+		.main-logo {
+			font-size: 0;
+			color: $color--black;
+		}
+	}
+
+	&--desktop {
+		.main-header {
+			&__logo {
+				display: none;
+
+				@include media('>=md') {
+					display: flex;
+					align-items: center;
+				}
+
+				svg {
+					width: rem(43);
+					min-width: rem(43);
+				}
+
+				.main-logo {
+					@include media('>=lg') {
+						display: inline-flex;
+						align-items: center;
+
+						font-family: $font-family-headings;
+						font-weight: $font-weight-heading;
+
+						@include font(22, 26);
+					}
+				}
+			}
+		}
+	}
+}

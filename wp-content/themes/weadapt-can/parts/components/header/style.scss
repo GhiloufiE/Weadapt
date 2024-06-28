@@ -1,0 +1,155 @@
+@import '../../../../weadapt/parts/components/header/style.scss';
+
+.main-header {
+	z-index: 2;
+
+	&__logo {
+		@include media('>=md') {
+			flex-grow: initial;
+		}
+
+		@include media('>=lg') {
+			margin-right: rem(20);
+		}
+
+		.main-logo {
+			display: block;
+			width: rem(53);
+
+			@include media('>=xl') {
+				width: rem(72);
+			}
+		}
+	}
+
+	&__top-area {
+		.menu-item .menu-item__wrap > a,
+		.menu-item--lang {
+			font-weight: 500;
+		}
+	}
+
+	&__main-area {
+		@include media('>=md') {
+			padding-top: rem(10);
+		}
+
+		@include media('>=lg') {
+			padding-top: 0;
+		}
+
+		&.sticky {
+			transform: translateY(-120px);
+		}
+
+		> .container {
+			@include media('>=md') {
+				flex-wrap: wrap;
+			}
+
+			@include media('>=lg') {
+				flex-wrap: nowrap;
+			}
+		}
+
+		.main-header__nav {
+			@include media('>=md') {
+				flex: 0 1 100%;
+			}
+
+			@include media('>=lg') {
+				margin: 0;
+			}
+		}
+
+		.menu {
+			@include media('>=md') {
+				gap: rem(5) rem(20);
+				margin-left: 0;
+				flex-wrap: wrap;
+				justify-content: space-between;
+
+				.menu-item__wrap {
+					padding: 0;
+
+					@include media('>=md') {
+						padding: rem(10) 0;
+					}
+
+					@include media('>=lg') {
+						padding-top: rem(25);
+						padding-bottom: rem(25);
+					}
+
+					@include media('>=xl') {
+						padding-top: rem(38.5);
+						padding-bottom: rem(38.5);
+					}
+				}
+			}
+
+			@include media('>=lg') {
+				flex-wrap: nowrap;
+				justify-content: center;
+			}
+
+			@include media('>=xl') {
+				gap: rem(27);
+			}
+
+			> .menu-item {
+				a {
+					font-weight: 500;
+				}
+
+				@include media('>=md') {
+					margin-left: 0;
+				}
+
+				@include media('>=xl') {
+					@include font(18, 27);
+				}
+			}
+		}
+	}
+
+	&__nav {
+		.menu {
+			.menu-item {
+				&__dropdown {
+					@include media('>=md') {
+						margin-left: rem(6);
+					}
+				}
+			}
+		}
+	}
+}
+
+.search-form {
+	@include media('>=md') {
+		max-width: rem(200);
+		margin-left: auto;
+	}
+
+	@include media('>=lg') {
+		order: 1;
+		margin-left: rem(20);
+	}
+
+	input[type='search'] {
+		background: $color--dark-bg;
+		color: $static-color--text;
+		font-weight: 500;
+
+		.theme--dark & {
+			background: $color--black;
+		}
+	}
+
+	&__submit,
+	&__reset,
+	&__loader {
+		color: $static-color--text;
+	}
+}

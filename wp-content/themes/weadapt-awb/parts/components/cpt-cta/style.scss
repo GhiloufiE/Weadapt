@@ -1,0 +1,28 @@
+@import '../../../../weadapt/parts/components/cpt-cta/style.scss';
+
+.cpt-cta {
+
+  &__img {
+    & img {
+      border-radius: rem(5);
+    }
+  }
+
+  &__actions {
+    & .is-style-outline-small .button-join {
+      background-color: $color--tertiary;
+      border-color: $color--tertiary;
+
+      .theme--dark & {
+        border-color: $color--black;
+
+        &:hover {
+          background-color: $color--white;
+        }
+      }
+    }
+
+
+  }
+
+}

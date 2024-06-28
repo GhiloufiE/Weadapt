@@ -1,0 +1,19 @@
+@import '../../../../weadapt/parts/components/user-hero/style.scss';
+
+.single-hero {
+	background-color: $color--bg-mega-menu;
+	&__excerpt,
+	&__title,
+	* a:not(.wp-block-button__link) {
+		color: $color--black;
+	}
+	&__buttons {
+		.wp-block-button {
+			.wp-block-button__link {
+				@include media('>=md') {
+					height: rem(40);
+				}
+			}
+		}
+	}
+}

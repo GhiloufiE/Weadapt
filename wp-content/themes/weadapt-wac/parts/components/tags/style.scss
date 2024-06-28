@@ -1,0 +1,39 @@
+@import '../../../../weadapt/parts/components/tags/style.scss';
+
+.single-tags {
+  margin: rem(36) 0;
+
+  &__list {
+    gap: rem(20);
+  }
+
+  &__title {
+    padding-bottom: 0;
+
+    &:after {
+      display: none;
+    }
+  }
+
+  &__link {
+
+    color: $color--white;
+    background-color: $color--secondary;
+
+    @include font(14, 22);
+    border: rem(2) solid $color--secondary;
+
+    .theme--dark & {
+      background-color: $static-color--white;
+      border-color: $static-color--white;
+    }
+
+    &:hover {
+      color: $color--white;
+      background-color: $color--primary;
+      border-color: $color--primary;
+
+    }
+
+  }
+}

@@ -1,0 +1,41 @@
+@import '__settings/init';
+.cpt-search {
+	display: flex;
+	flex-wrap: wrap;
+	gap: rem(20);
+	margin: 0 0 rem(56);
+
+	@include media('>=md') {
+		gap: rem(16);
+	}
+
+	&__input {
+		&[type='text'] {
+			margin: 0;
+			flex: 0 0 100%;
+
+			max-width: rem(343);
+
+			border: rem(1) solid $color--link;
+			border-radius: rem(5);
+
+			@include font(14, 20);
+
+			&::placeholder {
+				color: $color--black-dark;
+			}
+
+			&::-webkit-input-placeholder {
+				color: $color--black-dark;
+			}
+		}
+	}
+	&__button {
+		flex: 0 0 auto;
+	}
+
+	.wp-block-button__link {
+		height: rem(48);
+		@include font(16, 22);
+	}
+}

@@ -1,0 +1,31 @@
+@import '../../../../weadapt/parts/gutenberg/acf-case-studies-map-wac/style.scss';
+
+.case-studies-map-wac {
+  & .map {
+    &__controls {
+      background-color: transparent;
+    }
+
+    &__header.container {
+      margin-top: rem(32);
+      margin-left: 10%;
+      text-align: left;
+      max-width: rem(648);
+
+      & .title {
+        margin-top: 0;
+        @include font(18, 26);
+      }
+
+      & .subtitle {
+        margin-bottom: rem(8);
+        @include font(14, 24);
+      }
+
+      & .description {
+        @include font(16, 24);
+      }
+
+    }
+  }
+}

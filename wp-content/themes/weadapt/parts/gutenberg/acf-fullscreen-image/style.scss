@@ -1,0 +1,14 @@
+@import '__settings/init';
+
+.fullscreen-image {
+    &__title {
+        text-align: center;
+        margin-bottom: 0;
+    }
+
+    &__image {
+        img {
+            width: 100%;
+        }
+    }
+}

@@ -1,0 +1,21 @@
+@import '../../../../weadapt/parts/components/info-widget-user/style.scss';
+
+.info-widget-user {
+  &__actions {
+    & .is-style-outline .button-join.wp-block-button__link {
+      background-color: $color--tertiary;
+
+      &:hover {
+        background-color: $color--primary;
+      }
+    }
+
+    & .wp-block-button__link.button-join {
+      border-color: $color--tertiary;
+
+      .theme--dark & {
+        border-color: $color--black;
+      }
+    }
+  }
+}

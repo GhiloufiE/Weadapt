@@ -1,0 +1,58 @@
+@import '__settings/init';
+
+.image-captioned {
+	margin: rem(32) 0 ;
+
+	@include media('>=md') {
+		margin: rem(40) 0;
+	}
+
+	.wp-block-image {
+		margin: 0;
+	}
+
+	figcaption {
+		margin: rem(10) 0;
+		text-align: left;
+		@include font(14, 20);
+		color: $color--text;
+
+		@include media('>=md') {
+			margin: rem(16) 0;
+		}
+	}
+}
+
+.wp-block-image {
+	margin: rem(32) 0;
+
+	@include media('>=md') {
+		margin: rem(40) 0;
+	}
+
+	&__custom-wrap {
+		position:relative;
+
+		img {
+			border-radius: rem(5);
+		}
+
+		.alert-box {
+			padding: rem(8);
+			position:absolute;
+			bottom: rem(8);
+			left: rem(8);
+			right: rem(8);
+
+			@include media('>=md') {
+				padding: rem(16);
+				bottom: rem(32);
+				left: rem(32);
+				right: rem(32);
+			}
+		}
+	}
+	> a {
+		background-image: none !important;
+	}
+}

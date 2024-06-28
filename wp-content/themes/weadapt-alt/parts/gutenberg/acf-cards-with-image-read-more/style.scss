@@ -1,0 +1,22 @@
+@import '../../../../weadapt/parts/gutenberg/acf-cards-with-image-read-more/style.scss';
+
+.cards-with-image-read-more {
+	&__heading {
+		font-family: var(--alt-secondary-font-family);
+		margin-bottom: rem(24);
+		@include media('>=md') {
+			@include font(35, 49);
+		}
+	}
+	.card-with-image {
+		&__title {
+			color: $color--black;
+		}
+		&__description {
+			color: $color--text;
+			a {
+				color: $color--text;
+			}
+		}
+	}
+}

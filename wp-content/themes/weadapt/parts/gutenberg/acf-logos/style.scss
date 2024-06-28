@@ -1,0 +1,17 @@
+@import '__settings/init';
+
+.logos {
+	&__row {
+		max-width: rem(967);
+		justify-content: center;
+		margin: 0 auto;
+	}
+
+	&__col {
+		span {
+			display: block;
+			margin: 0 auto;
+			max-width: rem(172);
+		}
+	}
+}

@@ -1,0 +1,71 @@
+@import '../../../../weadapt/parts/components/single-hero/style.scss';
+
+.single-hero {
+  color: $static-color--white;
+
+  &__title {
+    color: $static-color--white;
+  }
+
+  &__author {
+    color: $static-color--white;
+  }
+
+  &__buttons {
+    .wp-block-button {
+      .wp-block-button__link {
+        border-color: $static-color--white;
+        color: $static-color--black;
+        background: $static-color--white;
+
+        &:hover {
+          background: transparent;
+          color: $static-color--white;
+        }
+
+      }
+
+      &.is-style-outline {
+        .wp-block-button__link {
+          color: $static-color--white;
+
+          &:hover {
+            background: $static-color--white;
+            color: $static-color--black;
+            border-color: $static-color--white;
+          }
+        }
+      }
+    }
+  }
+
+  &__action-btn {
+
+    .wp-block-button__link {
+      background-color: $color--dark-bg;
+      border-color: $color--dark-bg;
+
+      .theme--dark & {
+        color: $static-color--white;
+      }
+
+      &:hover {
+        background: $static-color--white;
+        border-color: $static-color--white;
+        color: $static-color--black;
+      }
+
+      &:not(.is-joined) {
+        .icon-delete {
+          display: none;
+        }
+      }
+
+      &.is-joined {
+        .icon-add {
+          display: none;
+        }
+      }
+    }
+  }
+}

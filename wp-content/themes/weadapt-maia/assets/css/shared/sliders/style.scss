@@ -1,0 +1,10 @@
+@import '../../../../../weadapt/assets/css/shared/sliders/style.scss';
+
+
+.swiper {
+	&-pagination {
+		&-bullet:not(.swiper-pagination-bullet-active) {
+			background: $static-color--white;
+		}
+	}
+}

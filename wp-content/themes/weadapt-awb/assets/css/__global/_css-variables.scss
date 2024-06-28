@@ -1,0 +1,22 @@
+body {
+  --color--primary: #00d1a6;
+  --color--secondary: #002D75;
+  --color--tertiary: #F1F1F1;
+  --color--accent: #002D75;
+  --color--tag: #DCDCDC;
+
+  --color--bg: #f5f5f5;
+  --color--bg-hero: #00d1a6;
+  --color--bg-footer: #002D75;
+  --color-bg-mega-menu: #ffffff;
+
+  --color--link: #00d1a6;
+  --color--link-hover: #00d1a6;
+
+  &.theme--dark {
+    --color--bg-footer: #000000;
+    --color--accent: #fff;
+    --color--tertiary: #000000;
+    --color--tag: #000000;
+  }
+}

@@ -1,0 +1,38 @@
+@import '__settings/init';
+
+.discussions-widget {
+	margin: rem(80) 0;
+
+	.cpt-list-item {
+		margin: 0 0 rem(40);
+
+		&:last-child {
+			margin-bottom: 0;
+		}
+	}
+
+	&__more {
+		margin-top: rem(24);
+
+		@include media('>=md') {
+			margin-top: rem(40);
+		}
+	}
+
+	&__more-link {
+		@include font(16, 19);
+		text-decoration: none;
+		@include link-underline();
+	}
+
+	.cpt-list-item__author-image {
+		flex-wrap: nowrap;
+
+		> a {
+			min-width: rem(39);
+		}
+	}
+	.post-meta__item:nth-child(2) {
+		display: none;
+	}
+}

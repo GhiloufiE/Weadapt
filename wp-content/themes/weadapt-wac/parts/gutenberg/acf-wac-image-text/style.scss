@@ -1,0 +1,111 @@
+@import '../../../../weadapt/parts/gutenberg/acf-wac-image-text/style.scss';
+
+.wac-image-text {
+  background-color: $color--bg;
+
+  &.background {
+    &-white {
+      background-color: $color--white;
+    }
+
+    &-light.primary-bg {
+      background-color: $color--primary;
+      color: $static-color--white;
+
+      .theme--dark & {
+        background-color: $color--white;
+      }
+    }
+  }
+
+  &__heading {
+    .background-light.primary-bg & {
+      color: $static-color--white;
+    }
+
+    @include media('>=md') {
+      @include font(30, 42);
+    }
+  }
+
+  &__description {
+    & > *:last-child {
+      margin-bottom: 0;
+    }
+
+    & li {
+      margin-bottom: rem(10);
+    }
+
+    & ul li::marker {
+      font-size: rem(12);
+    }
+
+    & ol {
+      padding-inline-start: rem(30);
+    }
+
+    & a {
+      color: $color--black;
+
+      .background-light.primary-bg & {
+        color: $static-color--white;
+      }
+
+      font-weight: 600;
+    }
+
+    & h3, & h4, & h5, & h6 {
+      @include font(20, 22);
+
+      .background-light.primary-bg & {
+        color: $static-color--white;
+      }
+
+      @include media('>=md') {
+        @include font(24, 34);
+      }
+    }
+
+    & h1, & h2, & h3, & h4, & h5, & h6 {
+      margin-top: 0;
+      margin-bottom: rem(14);
+
+      @include media('>=md') {
+        margin-bottom: rem(22);
+      }
+    }
+  }
+
+  &__image {
+    img {
+      border-radius: rem(10);
+    }
+  }
+
+  &__button {
+    & .wp-block-button__link {
+      .background-light.primary-bg & {
+        background-color: $static-color--white;
+        color: $color--primary;
+
+        &:hover {
+          background-color: $color--primary;
+          color: $static-color--white;
+          border-color: $static-color--white;
+        }
+
+        .theme--dark & {
+          color: $static-color--black;
+
+          &:hover {
+            background-color: $static-color--black;
+            color: $static-color--white;
+          }
+        }
+
+      }
+    }
+  }
+
+}
