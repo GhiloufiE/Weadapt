@@ -17,6 +17,10 @@
 /wp-*.php
 /xmlrpc.php
 /sql
+<<<<<<< HEAD
+=======
+
+>>>>>>> 0a98601 (changed gitignore)
 
 # Configuration
 wp-config.php
