@@ -473,6 +473,6 @@ function notify_admins_of_pending_posts($post_id, $post_type)
     $headers = array('Content-Type: text/html; charset=UTF-8');
     foreach ($admins as $admin) {
         $admin_email = $admin->user_email;
-        wp_mail($admin_email, $subject, $message, $headers);
+        //wp_mail($admin_email, $subject, $message, $headers);
     }
 }
