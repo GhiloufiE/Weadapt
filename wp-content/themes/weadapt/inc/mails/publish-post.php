@@ -130,6 +130,7 @@ function theme_publish_post($post)
 			$subject,
 			$message
 		);
+		send_email_immediately($users, $subject, $message);
 	}
 
 	// Docx comment #6: goes to Editors of themes/networks ticked as ‘related’ when content is submitted.
