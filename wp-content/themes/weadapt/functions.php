@@ -476,3 +476,74 @@ function notify_admins_of_pending_posts($post_id, $post_type)
         //wp_mail($admin_email, $subject, $message, $headers);
     }
 }
+function notify_admin_on_edit( $new_status, $old_status, $post ) {
+    // Ignore intermediate statuses
+    if ( $new_status === 'auto-draft' || $new_status === 'inherit' ) {
+        return;
+    }
+
+    // Only notify if the post is submitted for review and was not already in review status
+    if ( ( $new_status === 'pending' || $new_status === 'draft' ) && ( $old_status === 'publish' || $old_status === 'pending' ) ) {
+        // Check if the notification has already been sent
+        if ( get_post_meta( $post->ID, '_notify_admin_on_edit_sent', true ) ) {
+            error_log('Duplicate email prevented for post ID: ' . $post->ID);
+            return;
+        }
+
+        error_log('Post status changed from publish or pending to pending or draft, preparing to send email.'); // Debugging
+
+        $admin_email = get_option( 'admin_email' );
+        $revisions = wp_get_post_revisions( $post->ID );
+        $latest_revision = reset( $revisions );
+        $changes = '';
+
+        if ( $latest_revision ) {
+            if ( $latest_revision->post_title !== $post->post_title ) {
+                $changes .= sprintf( __( 'Title changed from "%s" to "%s"', 'your-text-domain' ), $latest_revision->post_title, $post->post_title ) . '<br>';
+            }
+            if ( $latest_revision->post_content !== $post->post_content ) {
+                $changes .= __( 'Content changed', 'your-text-domain' ) . '<br>';
+                $changes .= __( 'Old Content:', 'your-text-domain' ) . '<br>';
+                $changes .= nl2br( esc_html( $latest_revision->post_content ) ) . '<br><br>';
+                $changes .= __( 'New Content:', 'your-text-domain' ) . '<br>';
+                $changes .= nl2br( esc_html( $post->post_content ) ) . '<br><br>';
+            }
+            if ( $latest_revision->post_excerpt !== $post->post_excerpt ) {
+                $changes .= sprintf( __( 'Excerpt changed from "%s" to "%s"', 'your-text-domain' ), $latest_revision->post_excerpt, $post->post_excerpt ) . '<br>';
+            }
+        }
+
+        $subject = sprintf( __( 'A post has been edited: %s', 'your-text-domain' ), get_the_title( $post->ID ) );
+        $message = sprintf( __( 'The post "%s" has been edited by the user.', 'your-text-domain' ), get_the_title( $post->ID ) ) . '<br>';
+        
+        if ( empty( $changes ) ) {
+            $changes = __( 'No significant changes detected', 'your-text-domain' );
+        }
+        
+        $message .= __( 'Changes:', 'your-text-domain' ) . '<br>' . $changes;
+
+        // Debugging
+        error_log('Admin email: ' . $admin_email);
+        error_log('Email subject: ' . $subject);
+        error_log('Email message: ' . $message);
+
+        // Send the email
+        if ( wp_mail( $admin_email, $subject, $message ) ) {
+            error_log('Email sent successfully.');
+            // Set a post meta to avoid duplicate emails for this post ID
+            update_post_meta( $post->ID, '_notify_admin_on_edit_sent', true );
+        } else {
+            error_log('Failed to send email.');
+        }
+    } else {
+        error_log('Post status did not meet conditions for sending email.');
+        error_log('Old status: ' . $old_status . ', New status: ' . $new_status);
+    }
+}
+add_action( 'transition_post_status', 'notify_admin_on_edit', 10, 3 );
+
+function reset_notify_admin_on_edit( $post_id ) {
+    // Reset the notification meta when the post is updated
+    delete_post_meta( $post_id, '_notify_admin_on_edit_sent' );
+}
+add_action( 'save_post', 'reset_notify_admin_on_edit' );
