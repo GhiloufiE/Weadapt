@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "browser-sync": "^3.0.2",
+    "dotenv": "^16.4.5",
+    "gulp": "4.0",
+    "gulp-sass": "^5.1.0",
+    "gulp-sourcemaps": "^3.0.0",
+    "gulp-wait": "^0.0.2",
+    "sass": "^1.77.6",
+    "webpack": "^5.92.1"
+  }
+}
