@@ -18,9 +18,10 @@
 /xmlrpc.php
 /sql
 /php
-
+/node_modules/
 # Configuration
 wp-config.php
+gulpfiles.js
 
 # Example themes
 /wp-content/themes/twenty*/
