@@ -442,6 +442,7 @@ function notify_admins_of_pending_posts($post_id, $post_type)
         <a href='$post_link'>$post_title</a><br><br>
         Best Regards,<br>
         $site_name,<br>";
+        
     } elseif ($post_type == 'theme') {
         $theme_id = get_field('relevant_main_theme_network', $post_id);
         $theme_name = get_the_title($theme_id);
@@ -483,24 +484,29 @@ function notify_admins_of_pending_posts($post_id, $post_type)
     }
 }
 function notify_admin_on_edit( $new_status, $old_status, $post ) {
-    // Ignore intermediate statuses
-    if ( $new_status === 'auto-draft' || $new_status === 'inherit' ) {
+    // Ignore intermediate statuses and post creation
+    if ( $new_status === 'auto-draft' || $new_status === 'inherit' || $old_status === 'auto-draft' || $old_status === 'new' || $old_status === 'draft' ) {
         return;
     }
 
-    // Only notify if the post is submitted for review and was not already in review status
+    $transient_key = 'notify_admin_on_edit_' . $post->ID;
+
     if ( ( $new_status === 'pending' || $new_status === 'draft' ) && ( $old_status === 'publish' || $old_status === 'pending' ) ) {
-        // Check if the notification has already been sent
-        if ( get_post_meta( $post->ID, '_notify_admin_on_edit_sent', true ) ) {
+        if ( get_post_meta( $post->ID, '_notify_admin_on_edit_sent', true ) || get_transient( $transient_key ) ) {
             error_log('Duplicate email prevented for post ID: ' . $post->ID);
             return;
         }
 
-        error_log('Post status changed from publish or pending to pending or draft, preparing to send email.'); // Debugging
+        error_log('Post status changed from publish or pending to pending or draft, preparing to send email.');
 
-        $admin_email = get_option( 'admin_email' );
-        $revisions = wp_get_post_revisions( $post->ID );
-        $latest_revision = reset( $revisions );
+        global $wpdb;
+        $admin_emails = $wpdb->get_col("SELECT user_email FROM $wpdb->users WHERE ID IN (SELECT user_id FROM $wpdb->usermeta WHERE meta_key = '{$wpdb->prefix}capabilities' AND meta_value LIKE '%\"administrator\"%')");
+
+        $admin_emails = array_unique($admin_emails);
+
+        error_log('Admin emails: ' . implode(', ', $admin_emails));
+        $revisions = wp_get_post_revisions($post->ID, array('numberposts' => 1));
+        $latest_revision = reset($revisions);
         $changes = '';
 
         if ( $latest_revision ) {
@@ -528,19 +534,19 @@ function notify_admin_on_edit( $new_status, $old_status, $post ) {
         
         $message .= __( 'Changes:', 'your-text-domain' ) . '<br>' . $changes;
 
-        // Debugging
-        error_log('Admin email: ' . $admin_email);
         error_log('Email subject: ' . $subject);
         error_log('Email message: ' . $message);
 
-        // Send the email
-        if ( wp_mail( $admin_email, $subject, $message ) ) {
-            error_log('Email sent successfully.');
-            // Set a post meta to avoid duplicate emails for this post ID
-            update_post_meta( $post->ID, '_notify_admin_on_edit_sent', true );
-        } else {
-            error_log('Failed to send email.');
+        foreach ( $admin_emails as $admin_email ) {
+            if ( wp_mail( $admin_email, $subject, $message ) ) {
+                error_log('Email sent successfully to ' . $admin_email);
+            } else {
+                error_log('Failed to send email to ' . $admin_email);
+            }
         }
+
+        set_transient( $transient_key, true, 10 );
+        update_post_meta( $post->ID, '_notify_admin_on_edit_sent', true );
     } else {
         error_log('Post status did not meet conditions for sending email.');
         error_log('Old status: ' . $old_status . ', New status: ' . $new_status);
