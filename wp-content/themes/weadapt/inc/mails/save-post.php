@@ -9,6 +9,7 @@ function theme_save_post( $post_ID, $post, $update ) {
         delete_transient( 'map_locations' );
     }
 
+    // Notify about 'forum' post type with pending status
     if ( 'forum' === $post->post_type && in_array( $post->post_status, ['pending'] ) ) {
         $users = get_blog_administrators( false, 1 );
 
@@ -21,28 +22,28 @@ function theme_save_post( $post_ID, $post, $update ) {
         $users = array_unique( $users );
 
         if ( ! empty( $users ) ) {
-            $subject = sprintf( __( 'A new Forum Topic has been added on [%s]', 'weadapt' ), get_bloginfo( 'name' ) );
+            $subject = sprintf( __( 'Content has been submitted for review on [%s]', 'weadapt' ), get_bloginfo( 'name' ) );
 
             $message = sprintf( __( 'Dear %s,', 'weadapt' ), 'User' ) . '<br><br>';
 
             if ( ! empty( $theme_network_ID ) ) {
-                $message .= sprintf( __( 'A new forum topic has been created on <a href="%s">%s</a> in the Theme/Network name <a href="%s">%s</a>: ', 'weadapt' ),
+                $message .= sprintf( __( 'A forum topic has been submitted for review on <a href="%s">%s</a> in the Theme/Network name <a href="%s">%s</a>: ', 'weadapt' ),
                     get_bloginfo( 'url' ),
                     get_bloginfo( 'name' ),
                     get_permalink( $theme_network_ID ),
                     get_the_title( $theme_network_ID )
                 ) . '<br><br>';
             } else {
-                $message .= sprintf( __( 'A new forum topic has been created on <a href="%s">%s</a>: ', 'weadapt' ),
+                $message .= sprintf( __( 'A forum topic has been submitted for review on <a href="%s">%s</a>: ', 'weadapt' ),
                     get_bloginfo( 'url' ),
                     get_bloginfo( 'name' )
                 ) . '<br><br>';
             }
 
             $message .= sprintf('<a href="%s">%s</a><br>',
-   			 get_edit_post_link($post->ID),
-    		esc_html($post->post_title)
-			);
+                get_edit_post_link($post->ID),
+                esc_html($post->post_title)
+            );
 
             if ( ! empty( $post_author_IDs = get_field( 'people_creator', $post_ID ) ) ) {
                 $post_author_ID = $post_author_IDs[0];
@@ -61,16 +62,16 @@ function theme_save_post( $post_ID, $post, $update ) {
                 }
             }
 
-            //theme_mail_save_to_db( $users, $subject, $message );
-			//send_email_immediately($users, $subject, $message);
+            theme_mail_save_to_db( $users, $subject, $message );
+            send_email_immediately($users, $subject, $message);
+
+            // Prevent further notifications for this post type and status
+            return;
         }
     }
 
-    if ( ! is_mailed_post_type( $post->post_type ) ) {
-        return;
-    }
-
-    if ( in_array( $post->post_status, ['pending'] ) ) {
+    // General content submission review notification
+    if ( is_mailed_post_type( $post->post_type ) && in_array( $post->post_status, ['pending'] ) ) {
         $current_user = wp_get_current_user();
 
         $users = array_merge( get_blog_administrators( false, 1 ), get_blog_editors() );
@@ -113,8 +114,8 @@ function theme_save_post( $post_ID, $post, $update ) {
                 }
             }
 
-            //theme_mail_save_to_db( $users, $subject, $message );
-			//send_email_immediately($users, $subject, $message);
+            theme_mail_save_to_db( $users, $subject, $message );
+            send_email_immediately($users, $subject, $message);
         }
     }
 }
@@ -175,7 +176,7 @@ function on_pending_organisation( $ID, $post ) {
         $message .= sprintf( '<a href="%s">%s</a>', get_permalink( $ID ), __( 'Go to the organisation', 'weadapt' ) );
 
         theme_mail_save_to_db( $users, $subject, $message );
-		//send_email_immediately($users, $subject, $message);
+		send_email_immediately($users, $subject, $message);
     }
 }
 

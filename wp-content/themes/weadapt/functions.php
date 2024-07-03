@@ -365,6 +365,7 @@ function forum_new_post_notification($post_id)
 
                     $headers = array('Content-Type: text/html; charset=UTF-8');
                     wp_mail($recipient_email, $subject, $message, $headers);
+                    
                 }
             }
         }
@@ -375,27 +376,37 @@ function forum_new_post_notification($post_id)
 add_action('acf/save_post', 'forum_new_post_notification', 10, 1);
 
 
-function handle_create_post()
-{
+
+function handle_create_post() {
     global $wpdb;
+
+    // Nonce verification
     if (!isset($_POST['_wpnonce']) || !wp_verify_nonce($_POST['_wpnonce'], 'create_post_nonce')) {
+        error_log('Nonce verification failed');
         wp_send_json_error('Nonce verification failed');
         return;
     }
 
+    // Check required fields
     if (isset($_POST['post_title']) && isset($_POST['post_description']) && isset($_POST['post_type'])) {
         $post_title = sanitize_text_field($_POST['post_title']);
         $post_description = sanitize_textarea_field($_POST['post_description']);
         $post_type = sanitize_text_field($_POST['post_type']);
 
+        error_log('Post type: ' . $post_type);
+        error_log('Post title: ' . $post_title);
+        error_log('Post description: ' . $post_description);
+
+        // Prepare post data
         $post_data = array(
-            'post_title' => $post_title,
-            'post_content' => $post_description,
-            'post_status' => 'pending',
-            'post_author' => get_current_user_id(),
-            'post_type' => ($post_type === 'theme') ? 'article' : $post_type,
+            'post_title'    => $post_title,
+            'post_content'  => $post_description,
+            'post_status'   => 'pending',
+            'post_author'   => get_current_user_id(),
+            'post_type'     => ($post_type === 'theme') ? 'article' : $post_type,
         );
 
+        // Add meta input if necessary
         if ($post_type == 'forum' && isset($_POST['forum'])) {
             $forum_id = intval($_POST['forum']);
             $forum_true_id = $wpdb->get_var($wpdb->prepare("SELECT forum_id FROM {$wpdb->prefix}theme_forum_relationship WHERE theme_id = %d", $forum_id));
@@ -408,43 +419,49 @@ function handle_create_post()
             $forum_true_id = $wpdb->get_var($wpdb->prepare("SELECT forum_id FROM {$wpdb->prefix}theme_forum_relationship WHERE theme_id = %d", $forum_id));
             $post_data['meta_input'] = array('relevant_main_theme_network' => $forum_true_id);
             error_log('Forum ID: ' . $forum_true_id);
-
         }
 
+        // Insert the post
         $post_id = wp_insert_post($post_data);
 
         if (is_wp_error($post_id)) {
+            error_log('Error creating post: ' . $post_id->get_error_message());
             wp_send_json_error('Error creating post: ' . $post_id->get_error_message());
         } else {
-            if (in_array($post_type, ['forum', 'theme'])) {
+            // Notify admins if the post type matches
+            if (in_array($post_type, ['forum', 'theme', 'article'])) {
                 notify_admins_of_pending_posts($post_id, $post_type);
             }
             wp_send_json_success('Post created successfully');
         }
     } else {
+        error_log('Missing required POST fields');
         wp_send_json_error('Missing required POST fields');
     }
 }
 
 add_action('admin_post_nopriv_create_post', 'handle_create_post');
 add_action('admin_post_create_post', 'handle_create_post');
-function notify_admins_of_pending_posts($post_id, $post_type)
-{
+
+function notify_admins_of_pending_posts($post_id, $post_type) {
+    global $wpdb; // Add this line to ensure $wpdb is available in the function
+    
+    error_log('Notifying admins of pending post');
+    error_log('Post ID: ' . $post_id);
+    
     $post_title = get_the_title($post_id);
     $post_link = get_edit_post_link($post_id);
     $site_name = get_bloginfo('name');
+    $subject = '';
+    $message = '';
 
-    if ($post_type == 'forum') {
-        $forum_id = get_field('forum', $post_id);
-        $forum_name = get_the_title($forum_id);
-        $subject = "New forum topic pending review";
-        $message = "A new forum topic titled <b>$post_title</b> in the forum <b>$forum_name</b> is pending review.<br><br>
-        <a href='$post_link'>$post_title</a><br><br>
-        Best Regards,<br>
-        $site_name,<br>";
-        
-    } elseif ($post_type == 'theme') {
+    // Construct the email based on post type
+    if ($post_type == 'theme') {
         $theme_id = get_field('relevant_main_theme_network', $post_id);
+        if (!$theme_id) {
+            error_log('Theme ID not found for post ID: ' . $post_id);
+            return;
+        }
         $theme_name = get_the_title($theme_id);
         $subject = "New forum post pending review";
         $message = "A new Forum post titled <b>$post_title</b> in the theme <b>$theme_name</b> is pending review.<br><br>
@@ -452,40 +469,45 @@ function notify_admins_of_pending_posts($post_id, $post_type)
         Best Regards,<br>
         $site_name,<br>";
     } else {
+        error_log('Invalid post type: ' . $post_type);
         return;
     }
 
-    $offset = 0;
-    $limit = 100;
-    $admins = [];
-    $args = array(
-        'role' => 'administrator',
-        'orderby' => 'ID',
-        'order' => 'ASC',
-        'number' => $limit,
-        'offset' => $offset,
-    );
+    // Query the database for administrators
+    $admin_emails = $wpdb->get_col("
+        SELECT user_email 
+        FROM {$wpdb->users} u
+        INNER JOIN {$wpdb->usermeta} um ON u.ID = um.user_id
+        WHERE um.meta_key = '{$wpdb->prefix}capabilities'
+        AND um.meta_value LIKE '%administrator%'
+    ");
 
-    do {
-        $batch_admins = get_users($args);
-        foreach ($batch_admins as $admin) {
-            if (in_array('administrator', $admin->roles)) {
-                $admins[] = $admin;
-            }
-        }
-        $offset += $limit;
-        $args['offset'] = $offset;
-    } while (count($batch_admins) == $limit);
+    if (empty($admin_emails)) {
+        error_log('No administrators found.');
+        return;
+    }
 
     $headers = array('Content-Type: text/html; charset=UTF-8');
-    foreach ($admins as $admin) {
-        $admin_email = $admin->user_email;
-        //wp_mail($admin_email, $subject, $message, $headers);
+    foreach ($admin_emails as $admin_email) {
+        $mail_sent = wp_mail($admin_email, $subject, $message, $headers);
+        if ($mail_sent) {
+            theme_mail_save_to_db($admin_email, $subject, $message);
+            error_log('Email sent to: ' . $admin_email);
+        } else {
+            error_log('Failed to send email to: ' . $admin_email);
+        }
     }
 }
+
+
 function notify_admin_on_edit( $new_status, $old_status, $post ) {
     // Ignore intermediate statuses and post creation
     if ( $new_status === 'auto-draft' || $new_status === 'inherit' || $old_status === 'auto-draft' || $old_status === 'new' || $old_status === 'draft' ) {
+        return;
+    }
+
+    // Exclude notification on post creation
+    if ( $old_status === 'new' || $old_status === 'auto-draft' || $old_status === 'draft' || $old_status === 'future' || $old_status === 'pending' || $old_status === 'trash' ) {
         return;
     }
 
