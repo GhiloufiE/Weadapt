@@ -377,6 +377,7 @@ add_action('acf/save_post', 'forum_new_post_notification', 10, 1);
 
 function handle_create_post()
 {
+    global $wpdb;
     if (!isset($_POST['_wpnonce']) || !wp_verify_nonce($_POST['_wpnonce'], 'create_post_nonce')) {
         wp_send_json_error('Nonce verification failed');
         return;
@@ -397,12 +398,17 @@ function handle_create_post()
 
         if ($post_type == 'forum' && isset($_POST['forum'])) {
             $forum_id = intval($_POST['forum']);
-            $post_data['meta_input'] = array('forum' => $forum_id);
+            $forum_true_id = $wpdb->get_var($wpdb->prepare("SELECT forum_id FROM {$wpdb->prefix}theme_forum_relationship WHERE theme_id = %d", $forum_id));
+            $post_data['meta_input'] = array('forum' => $forum_true_id);
+            error_log('Forum ID: ' . $forum_true_id);
         }
 
         if ($post_type == 'theme' && isset($_POST['forum'])) {
             $forum_id = intval($_POST['forum']);
-            $post_data['meta_input'] = array('relevant_main_theme_network' => $forum_id);
+            $forum_true_id = $wpdb->get_var($wpdb->prepare("SELECT forum_id FROM {$wpdb->prefix}theme_forum_relationship WHERE theme_id = %d", $forum_id));
+            $post_data['meta_input'] = array('relevant_main_theme_network' => $forum_true_id);
+            error_log('Forum ID: ' . $forum_true_id);
+
         }
 
         $post_id = wp_insert_post($post_data);
@@ -547,3 +553,89 @@ function reset_notify_admin_on_edit( $post_id ) {
     delete_post_meta( $post_id, '_notify_admin_on_edit_sent' );
 }
 add_action( 'save_post', 'reset_notify_admin_on_edit' );
+
+function create_forum_post_on_theme_creation($new_status, $old_status, $post) {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'theme_forum_relationship';
+
+    if ($post->post_type == 'theme' && $old_status == 'auto-draft' && $new_status == 'publish') {
+        error_log("Creating forum post for theme ID: {$post->ID}");
+
+        $forum_post = array(
+            'post_title'    => $post->post_title,
+            'post_content'  => 'This is a forum linked to the theme: ' . $post->post_title,
+            'post_status'   => 'publish',
+            'post_type'     => 'forums'
+        );
+        $forum_post_id = wp_insert_post($forum_post);
+        if ($forum_post_id != 0) {
+            $wpdb->insert(
+                $table_name,
+                array(
+                    'theme_id' => $post->ID,
+                    'forum_id' => $forum_post_id
+                ),
+                array(
+                    '%d',
+                    '%d'
+                )
+            );
+        }
+        error_log("Forum post created with ID: {$forum_post_id}");
+    } else {
+        error_log("No action taken. Old status: {$old_status}, New status: {$new_status}");
+    }
+}
+
+add_action('transition_post_status', 'create_forum_post_on_theme_creation', 10, 3);
+
+/* function insert_theme_forum_relationship() {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'theme_forum_relationship';
+
+    // Retrieve all published themes
+    $themes = get_posts(array(
+        'post_type' => 'theme',
+        'posts_per_page' => -1,
+        'post_status' => 'publish'
+    ));
+    error_log('Themes: ' . count($themes)); // Logging the count of themes
+
+    foreach ($themes as $theme) {
+        // Retrieve all forums related to the current theme by its ID
+        $forums = get_posts(array(
+            'post_type' => 'forums',
+            'posts_per_page' => -1,
+            'meta_query' => array(
+                array(
+                    'key' => 'relevant_main_theme_network',
+                    'value' => $theme->ID,
+                    'compare' => '='
+                )
+            )
+        ));
+
+        // Log for debugging
+        error_log('Processing Theme ID: ' . $theme->ID . ', Found ' . count($forums) . ' forums');
+
+        // Insert each forum found into the database table
+        foreach ($forums as $forum) {
+            $wpdb->insert(
+                $table_name,
+                array(
+                    'theme_id' => $theme->ID,
+                    'forum_id' => $forum->ID
+                ),
+                array(
+                    '%d',
+                    '%d'
+                )
+            );
+            // Logging each insert for debugging
+            error_log('Inserted relationship for Theme ID: ' . $theme->ID . ' and Forum ID: ' . $forum->ID);
+        }
+    }
+}
+
+// Adding the function to the 'init' action hook
+add_action('init', 'insert_theme_forum_relationship'); */

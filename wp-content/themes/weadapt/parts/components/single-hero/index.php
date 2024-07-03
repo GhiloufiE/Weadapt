@@ -297,7 +297,7 @@ switch ($type) {
 							<?php
 							if ($type === 'theme') : ?>
 								<div class="wp-block-button">
-									<button class="wp-block-button__link has-background" data-post-id="<?php echo esc_attr($post_ID); ?>" data-post-type="theme" data-popup="post-creation" onclick="setPostDetails(this)">
+									<button class="wp-block-button__link has-background" data-post-id="<?php echo esc_attr($post_ID); ?>" data-post-type="forum" data-popup="post-creation" onclick="setPostDetails(this)">
 										<?php echo sprintf("<span>%s</span>", esc_html__("Start a conversation", "weadapt")); ?>
 									</button>
 								</div>
