@@ -12,116 +12,133 @@ function theme_save_post( $post_ID, $post, $update ) {
     // Get the previous post status
     $previous_status = get_post_meta( $post_ID, '_previous_status', true );
 
+    // Transient key for preventing duplicate emails
+    $transient_key = 'email_sent_' . $post_ID;
+
     // Notify about 'forum' post type with pending status
     if ( 'forum' === $post->post_type && 'pending' === $post->post_status && ( !$update || 'pending' !== $previous_status ) ) {
-        $users = get_blog_administrators( false, 1 );
+        // Check if the transient exists
+        if ( ! get_transient( $transient_key ) ) {
+            $users = get_blog_administrators( false, 1 );
 
-        if ( ! empty( $forum_ID = get_field( 'forum', $post_ID ) ) &&
-            ! empty( $theme_network_ID = get_field( 'relevant_main_theme_network', $forum_ID ) ) &&
-            ! empty( $theme_network_editors = get_field( 'people_editors', $theme_network_ID ) ) ) {
-            $users = array_merge( $users, $theme_network_editors );
-        }
-
-        $users = array_unique( $users );
-
-        if ( ! empty( $users ) ) {
-            $subject = sprintf( __( 'Content has been submitted for review on [%s]', 'weadapt' ), get_bloginfo( 'name' ) );
-
-            $message = sprintf( __( 'Dear %s,', 'weadapt' ), 'User' ) . '<br><br>';
-
-            if ( ! empty( $theme_network_ID ) ) {
-                $message .= sprintf( __( 'A forum topic has been submitted for review on <a href="%s">%s</a> in the Theme/Network name <a href="%s">%s</a>: ', 'weadapt' ),
-                    get_bloginfo( 'url' ),
-                    get_bloginfo( 'name' ),
-                    get_permalink( $theme_network_ID ),
-                    get_the_title( $theme_network_ID )
-                ) . '<br><br>';
-            } else {
-                $message .= sprintf( __( 'A forum topic has been submitted for review on <a href="%s">%s</a>: ', 'weadapt' ),
-                    get_bloginfo( 'url' ),
-                    get_bloginfo( 'name' )
-                ) . '<br><br>';
+            if ( ! empty( $forum_ID = get_field( 'forum', $post_ID ) ) &&
+                ! empty( $theme_network_ID = get_field( 'relevant_main_theme_network', $forum_ID ) ) &&
+                ! empty( $theme_network_editors = get_field( 'people_editors', $theme_network_ID ) ) ) {
+                $users = array_merge( $users, $theme_network_editors );
             }
 
-            $message .= sprintf('<a href="%s">%s</a><br>',
-                get_edit_post_link($post->ID),
-                esc_html($post->post_title)
-            );
+            $users = array_unique( $users );
 
-            if ( ! empty( $post_author_IDs = get_field( 'people_creator', $post_ID ) ) ) {
-                $post_author_ID = $post_author_IDs[0];
-                $post_author = new WP_User( $post_author_ID );
-                $author_organisations = get_field( 'organisations', $post_author );
+            if ( ! empty( $users ) ) {
+                $subject = sprintf( __( 'Content has been submitted for review on [%s]', 'weadapt' ), get_bloginfo( 'name' ) );
 
-                if ( ! empty( $author_organisations ) ) {
-                    $message .= sprintf( 'by %s from %s',
-                        $post_author->display_name,
-                        get_the_title( $author_organisations[0] )
-                    );
+                $message = sprintf( __( 'Dear %s,', 'weadapt' ), 'User' ) . '<br><br>';
+
+                if ( ! empty( $theme_network_ID ) ) {
+                    $message .= sprintf( __( 'A forum topic has been submitted for review on <a href="%s">%s</a> in the Theme/Network name <a href="%s">%s</a>: ', 'weadapt' ),
+                        get_bloginfo( 'url' ),
+                        get_bloginfo( 'name' ),
+                        get_permalink( $theme_network_ID ),
+                        get_the_title( $theme_network_ID )
+                    ) . '<br><br>';
                 } else {
-                    $message .= sprintf( 'by %s',
-                        $post_author->display_name
-                    );
+                    $message .= sprintf( __( 'A forum topic has been submitted for review on <a href="%s">%s</a>: ', 'weadapt' ),
+                        get_bloginfo( 'url' ),
+                        get_bloginfo( 'name' )
+                    ) . '<br><br>';
                 }
-            }
 
-            theme_mail_save_to_db( $users, $subject, $message );
-            send_email_immediately($users, $subject, $message);
+                $message .= sprintf('<a href="%s">%s</a><br>',
+                    get_edit_post_link($post->ID),
+                    esc_html($post->post_title)
+                );
+
+                if ( ! empty( $post_author_IDs = get_field( 'people_creator', $post_ID ) ) ) {
+                    $post_author_ID = $post_author_IDs[0];
+                    $post_author = new WP_User( $post_author_ID );
+                    $author_organisations = get_field( 'organisations', $post_author );
+
+                    if ( ! empty( $author_organisations ) ) {
+                        $message .= sprintf( 'by %s from %s',
+                            $post_author->display_name,
+                            get_the_title( $author_organisations[0] )
+                        );
+                    } else {
+                        $message .= sprintf( 'by %s',
+                            $post_author->display_name
+                        );
+                    }
+                }
+
+                theme_mail_save_to_db( $users, $subject, $message );
+                send_email_immediately($users, $subject, $message);
+
+                // Set the transient to prevent duplicate emails
+                set_transient( $transient_key, true, HOUR_IN_SECONDS );
+            }
         }
     }
 
     // General content submission review notification
     if ( is_mailed_post_type( $post->post_type ) && 'pending' === $post->post_status && ( !$update || 'pending' !== $previous_status ) ) {
-        $current_user = wp_get_current_user();
+        // Check if the transient exists
+        if ( ! get_transient( $transient_key ) ) {
+            $current_user = wp_get_current_user();
 
-        $users = array_merge( get_blog_administrators( false, 1 ), get_blog_editors() );
-        $users = array_unique( $users );
+            $users = array_merge( get_blog_administrators( false, 1 ), get_blog_editors() );
+            $users = array_unique( $users );
 
-        if ( ! empty( $users ) ) {
-            $subject = sprintf( __( 'Content has been submitted for review on [%s]', 'weadapt' ), get_bloginfo( 'name' ) );
+            if ( ! empty( $users ) ) {
+                $subject = sprintf( __( 'Content has been submitted for review on [%s]', 'weadapt' ), get_bloginfo( 'name' ) );
 
-            $message = sprintf( __( '%s %s (<a href="%s">%s</a>) has sent you content for review.', 'weadapt' ),
-                esc_attr( $current_user->user_firstname ),
-                esc_attr( $current_user->user_lastname ),
-                get_author_posts_url($current_user->ID),
-                esc_attr( $current_user->user_login )
-            ) . '<br><br>';
+                $message = sprintf( __( '%s %s (<a href="%s">%s</a>) has sent you content for review.', 'weadapt' ),
+                    esc_attr( $current_user->user_firstname ),
+                    esc_attr( $current_user->user_lastname ),
+                    get_author_posts_url($current_user->ID),
+                    esc_attr( $current_user->user_login )
+                ) . '<br><br>';
 
-            $message .= sprintf( __( 'Content: %s', 'weadapt' ), esc_html( $post->post_title ) ) . '<br>';
-            $message .= sprintf( __( 'Summary: %s', 'weadapt' ), esc_html( $post->post_excerpt ) ) . '<br><br>';
-            $message .= sprintf( '<a href="%s">%s</a>', get_permalink( $post_ID ), __( 'Go to the content', 'weadapt' ) );
+                $message .= sprintf( __( 'Content: %s', 'weadapt' ), esc_html( $post->post_title ) ) . '<br>';
+                $message .= sprintf( __( 'Summary: %s', 'weadapt' ), esc_html( $post->post_excerpt ) ) . '<br><br>';
+                $message .= sprintf( '<a href="%s">%s</a>', get_permalink( $post_ID ), __( 'Go to the content', 'weadapt' ) );
 
-            $draft_tags = wp_get_post_terms( $post_ID, 'tags', ['hide_empty' => false] );
+                $draft_tags = wp_get_post_terms( $post_ID, 'tags', ['hide_empty' => false] );
 
-            if ( ! empty( $draft_tags ) ) {
-                $message_tags = [];
+                if ( ! empty( $draft_tags ) ) {
+                    $message_tags = [];
 
-                foreach ( $draft_tags as $term ) {
-                    if ( false === get_field( 'status', $term ) ) {
-                        $message_tags[] = sprintf( __( '<a href="%s">%s</a> (ID %s)', 'weadapt' ),
-                            add_query_arg( array(
-                                'taxonomy' => $term->taxonomy,
-                                'tag_ID' => $term->term_id,
-                            ), admin_url( 'term.php' ) ),
-                            esc_html( $term->name ),
-                            intval( $term->term_id )
-                        );
+                    foreach ( $draft_tags as $term ) {
+                        if ( false === get_field( 'status', $term ) ) {
+                            $message_tags[] = sprintf( __( '<a href="%s">%s</a> (ID %s)', 'weadapt' ),
+                                add_query_arg( array(
+                                    'taxonomy' => $term->taxonomy,
+                                    'tag_ID' => $term->term_id,
+                                ), admin_url( 'term.php' ) ),
+                                esc_html( $term->name ),
+                                intval( $term->term_id )
+                            );
+                        }
+                    }
+
+                    if ( ! empty( $message_tags ) ) {
+                        $message .= '<br><br>' . __( 'Draft Tags:', 'weadapt' ) . '<br>' . implode( '<br>', $message_tags );
                     }
                 }
 
-                if ( ! empty( $message_tags ) ) {
-                    $message .= '<br><br>' . __( 'Draft Tags:', 'weadapt' ) . '<br>' . implode( '<br>', $message_tags );
-                }
-            }
+                theme_mail_save_to_db( $users, $subject, $message );
+                send_email_immediately($users, $subject, $message);
 
-            theme_mail_save_to_db( $users, $subject, $message );
-            send_email_immediately($users, $subject, $message);
+                // Set the transient to prevent duplicate emails
+                set_transient( $transient_key, true, HOUR_IN_SECONDS );
+            }
         }
     }
 
     // Update the previous post status
     update_post_meta( $post_ID, '_previous_status', $post->post_status );
 }
+add_action( 'save_post', 'theme_save_post', 50, 3 );
+
 add_action( 'save_post', 'theme_save_post', 50, 3 );
 function send_email_immediately($user_ids, $subject, $message) {
     foreach ($user_ids as $user_id) {

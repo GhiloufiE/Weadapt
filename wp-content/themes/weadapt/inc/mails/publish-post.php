@@ -12,6 +12,12 @@ function theme_publish_post($post) {
     $post_ID = $post->ID;
     $author_id = $post->post_author;
     $contributors = get_field('people_contributors', $post_ID);
+    
+    // Check if the notification has already been sent
+    $notification_sent = get_post_meta($post_ID, '_notification_sent', true);
+    if ($notification_sent) {
+        return;
+    }
 
     // Exclude administrators from the contributors list
     $valid_contributors = array();
@@ -80,6 +86,9 @@ function theme_publish_post($post) {
             $message
         );
         send_email_immediately($valid_contributors, $subject, $message);
+
+        // Update the custom field to mark the notification as sent
+        update_post_meta($post_ID, '_notification_sent', true);
     }
 
     // Notify Editors of theme/network/microsite and weADAPT Admin
@@ -205,6 +214,7 @@ function theme_publish_post($post) {
         }
     }
 }
+
 
 add_action('new_to_publish', 'theme_publish_post', 50);
 add_action('pending_to_publish', 'theme_publish_post', 50);
