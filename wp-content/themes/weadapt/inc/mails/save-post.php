@@ -9,8 +9,11 @@ function theme_save_post( $post_ID, $post, $update ) {
         delete_transient( 'map_locations' );
     }
 
+    // Get the previous post status
+    $previous_status = get_post_meta( $post_ID, '_previous_status', true );
+
     // Notify about 'forum' post type with pending status
-    if ( 'forum' === $post->post_type && in_array( $post->post_status, ['pending'] ) ) {
+    if ( 'forum' === $post->post_type && 'pending' === $post->post_status && ( !$update || 'pending' !== $previous_status ) ) {
         $users = get_blog_administrators( false, 1 );
 
         if ( ! empty( $forum_ID = get_field( 'forum', $post_ID ) ) &&
@@ -64,14 +67,11 @@ function theme_save_post( $post_ID, $post, $update ) {
 
             theme_mail_save_to_db( $users, $subject, $message );
             send_email_immediately($users, $subject, $message);
-
-            // Prevent further notifications for this post type and status
-            return;
         }
     }
 
     // General content submission review notification
-    if ( is_mailed_post_type( $post->post_type ) && in_array( $post->post_status, ['pending'] ) ) {
+    if ( is_mailed_post_type( $post->post_type ) && 'pending' === $post->post_status && ( !$update || 'pending' !== $previous_status ) ) {
         $current_user = wp_get_current_user();
 
         $users = array_merge( get_blog_administrators( false, 1 ), get_blog_editors() );
@@ -118,8 +118,10 @@ function theme_save_post( $post_ID, $post, $update ) {
             send_email_immediately($users, $subject, $message);
         }
     }
-}
 
+    // Update the previous post status
+    update_post_meta( $post_ID, '_previous_status', $post->post_status );
+}
 add_action( 'save_post', 'theme_save_post', 50, 3 );
 function send_email_immediately($user_ids, $subject, $message) {
     foreach ($user_ids as $user_id) {

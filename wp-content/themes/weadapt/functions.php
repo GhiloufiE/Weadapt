@@ -456,7 +456,52 @@ function notify_admins_of_pending_posts($post_id, $post_type) {
     $message = '';
 
     // Construct the email based on post type
-    if ($post_type == 'theme') {
+    if ($post_type == 'forum') {
+        $forum_id = get_field('forum', $post_id);
+        if (!$forum_id) {
+            error_log('Forum ID not found for post ID: ' . $post_id);
+            return;
+        }
+        $forum_name = get_the_title($forum_id);
+        $subject = sprintf( __( 'Content has been submitted for review on [%s]', 'weadapt' ), get_bloginfo( 'name' ) );
+        $message = sprintf( __( 'Dear %s,', 'weadapt' ), 'User' ) . '<br><br>';
+        if ( ! empty( $theme_network_ID ) ) {
+            $message .= sprintf( __( 'A forum topic has been submitted for review on <a href="%s">%s</a> in the Theme/Network name <a href="%s">%s</a>: ', 'weadapt' ),
+                get_bloginfo( 'url' ),
+                get_bloginfo( 'name' ),
+                get_permalink( $theme_network_ID ),
+                get_the_title( $theme_network_ID )
+            ) . '<br><br>';
+        } else {
+            $message .= sprintf( __( 'A forum topic has been submitted for review on <a href="%s">%s</a>: ', 'weadapt' ),
+                get_bloginfo( 'url' ),
+                get_bloginfo( 'name' )
+            ) . '<br><br>';
+        }
+
+        $message .= sprintf('<a href="%s">%s</a><br>',
+            get_edit_post_link($post->ID),
+            esc_html($post->post_title)
+        );
+
+        if ( ! empty( $post_author_IDs = get_field( 'people_creator', $post_ID ) ) ) {
+            $post_author_ID = $post_author_IDs[0];
+            $post_author = new WP_User( $post_author_ID );
+            $author_organisations = get_field( 'organisations', $post_author );
+
+            if ( ! empty( $author_organisations ) ) {
+                $message .= sprintf( 'by %s from %s',
+                    $post_author->display_name,
+                    get_the_title( $author_organisations[0] )
+                );
+            } else {
+                $message .= sprintf( 'by %s',
+                    $post_author->display_name
+                );
+            }
+        }
+
+    } elseif ($post_type == 'theme') {
         $theme_id = get_field('relevant_main_theme_network', $post_id);
         if (!$theme_id) {
             error_log('Theme ID not found for post ID: ' . $post_id);

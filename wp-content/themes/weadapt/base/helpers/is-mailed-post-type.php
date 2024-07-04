@@ -10,6 +10,7 @@ function is_mailed_post_type( $post_type ) {
 		'theme',
 		'network',
 		'blog',
+		'forum',
 		'article',
 		'course',
 		'event',
