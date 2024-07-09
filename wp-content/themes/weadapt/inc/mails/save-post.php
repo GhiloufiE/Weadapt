@@ -138,8 +138,6 @@ function theme_save_post( $post_ID, $post, $update ) {
     update_post_meta( $post_ID, '_previous_status', $post->post_status );
 }
 add_action( 'save_post', 'theme_save_post', 50, 3 );
-
-add_action( 'save_post', 'theme_save_post', 50, 3 );
 function send_email_immediately($user_ids, $subject, $message) {
     foreach ($user_ids as $user_id) {
         $user_info = get_userdata($user_id);
