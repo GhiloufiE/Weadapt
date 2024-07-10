@@ -1,31 +1,260 @@
-@import '../../../../weadapt/parts/components/single-hero/style.scss';
+@import '__settings/init';
 
 .single-hero {
-  background-color: $color--tertiary;
+	padding: rem(40) 0;
+	background-color: $color--bg-hero;
 
-  padding-top: calc(rem($spacing-mobile) * 2);
-  @include media('>=md') {
-    padding-top: rem($spacing);
-  }
+	@include font(16, 22);
 
-  &__type.wp-block-button.is-style-outline-small .wp-block-button__link {
-    background-color: var(--color--tag);
-    border-color: var(--color--tag);
+	@include media('>=md') {
+		padding: rem(24) 0;
+	}
 
-    .theme--dark & {
-      border-color: $color--black;
-    }
+	&__row {
+		align-items: center;
+		&_top {
+			align-items: flex-start;
+		}
+	}
 
-    &:hover {
-      background-color: $color--primary;
-      border-color: $color--primary;
-    }
-  }
+	&__title {
+		margin: 0 0 rem(18);
 
-  &__image .img-caption {
-    &__caption a {
-      color: $color--black;
-      font-weight: 500;
-    }
-  }
+		@include font(28, 40);
+
+		@include media('>=md') {
+			@include font(40, 56);
+			margin-bottom: rem(27);
+		}
+	}
+	&__left,
+	&__right {
+		flex: 0 0 100%;
+
+		max-width: 100%;
+		padding: 0 rem($container-padding);
+	}
+	&__left {
+		padding-bottom: rem(40);
+		display: flex;
+		align-items: center;
+
+		@include media('>=md') {
+			flex: 0 0 50.338%;
+			max-width: 50.338%;
+
+			padding-top: rem(56);
+			padding-bottom: rem(56);
+		}
+
+		&-inner {
+			flex: 0 0 100%;
+			max-width: 100%;
+
+			& > *:last-child {
+				margin-bottom: 0;
+			}
+		}
+	}
+	&__right {
+		display: flex;
+		justify-content: flex-end;
+		position: relative;
+
+		.single-hero__row_top & {
+			@include media('<md') {
+				justify-content: flex-start;
+			}
+		}
+
+		@include media('>=md') {
+			flex: 0 0 49.662%;
+			max-width: 49.662%;
+		}
+	}
+	&__excerpt {
+		margin-bottom: rem(18);
+
+		@include media('>=md') {
+			margin-bottom: rem(25);
+		}
+	}
+	&__action-btn {
+		position: absolute;
+		top: rem(18);
+		right: rem(32);
+
+		.single-hero__row_top & {
+			position: relative;
+			top: auto;
+			right: auto;
+		}
+
+		@include media('>=md') {
+			top: rem(24);
+		}
+
+		@include media('>=1216px') {
+			right: 0;
+		}
+
+		.wp-block-button__link {
+			&:hover {
+				background: $static-color--white;
+				border-color: $static-color--white;
+				color: $static-color--black;
+			}
+
+			&:not(.is-joined) {
+				.icon-delete {
+					display: none;
+				}
+			}
+
+			&.is-joined {
+				.icon-add {
+					display: none;
+				}
+			}
+		}
+	}
+	&__image {
+		max-width: rem(466);
+		border-radius: rem(5);
+		position: relative;
+		width: 100%;
+		height: 100%;
+		display: block;
+
+		&::before {
+			content: '';
+			display: block;
+			padding-bottom: 100%;
+		}
+
+		img {
+			border-radius: rem(5);
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+
+			.single-organisation & {
+				object-fit: contain;
+			}
+		}
+	}
+	&__type {
+		&.wp-block-button.is-style-outline-small .wp-block-button__link {
+			min-height: rem(26);
+			padding-top: rem(1);
+			padding-bottom: rem(1);
+			height: auto;
+
+			@include font(12, 20);
+		}
+	}
+	&__types {
+		margin: 0 0 rem(12);
+
+		@include media('>=md') {
+			margin-bottom: rem(20);
+		}
+
+		span {
+			display: inline-flex;
+			justify-content: center;
+			align-items: center;
+
+			min-height: rem(26);
+			height: auto;
+			padding: rem(1) rem(15);
+
+			@include font(12, 20);
+			color: $color--text;
+			background-color: transparent;
+			font-weight: $font-weight-heading;
+			font-family: $font-family-headings;
+
+			border: rem(2) solid $color--black;
+			border-radius: rem(5);
+		}
+	}
+	&__author {
+		display: inline-flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: rem(16);
+		margin: 0 0 rem(18);
+		color: $color--text;
+		position: relative;
+
+		@include media('>=md') {
+			margin-bottom: rem(26);
+		}
+	}
+}
+
+.post-meta {
+	display: flex;
+	flex-wrap: wrap;
+	gap: rem(20) rem(16);
+
+	max-width: 100%;
+	padding: 0;
+
+	margin: 0;
+
+	list-style: none;
+
+	@include font(14, 14);
+
+	@include media('>=md') {
+		gap: rem(32);
+	}
+
+	&__item {
+		display: flex;
+		align-items: center;
+
+		.icon {
+			margin-right: rem(8);
+
+			svg path {
+				stroke: currentColor;
+				color: currentColor;
+			}
+		}
+	}
+}
+
+.img-caption {
+	position: relative;
+
+	&__caption {
+		max-height: 75%;
+		overflow-y: scroll;
+		padding: rem(8);
+
+		position: absolute;
+		right: rem(8);
+		bottom: rem(8);
+		left: rem(8);
+
+		@include scrollbar-hidden;
+
+		border-radius: rem(5);
+		background: $color--quote;
+		color: $color--text;
+
+		@include font(14, 20);
+
+		@include media('>=md') {
+			right: rem(16);
+			bottom: rem(16);
+			left: rem(16);
+		}
+	}
 }

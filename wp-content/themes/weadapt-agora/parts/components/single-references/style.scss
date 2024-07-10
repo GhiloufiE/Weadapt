@@ -1,29 +1,46 @@
-@import '../../../../weadapt/parts/components/single-references/style.scss';
+@import '__settings/init';
 
 .single-references {
+	margin: rem(32) 0;
 
-  &__actions {
-    & .wp-block-button--like button {
-      background-color: $color--tertiary;
-      border-color: $color--tertiary;
+	@include media('>=md') {
+		margin: rem(40) 0;
+	}
 
-      &:hover {
-        background-color: $color--black;
-        border-color: $color--black;
-        color: $color--white;
-      }
+	&__list {
+		padding: 0;
+		margin: rem(24) 0 rem(32);
+		list-style: none;
 
-      .theme--dark & {
-        color: $color--black;
-        background-color: $color--white;
-        border-color: $color--black;
+		@include media('>=md') {
+			margin-bottom: rem(40);
+		}
+	}
+	&__actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: rem(24) rem(20);
 
-        &:hover {
-          color: $color--white;
-          background-color: $color--black;
-        }
-      }
-    }
-  }
+		@include media('>=md') {
+			gap: rem(24);
+		}
+	}
+	&__item {
+		margin: 0 0 rem(24);
+		@include font(14, 20);
 
+		@include media('>=md') {
+			@include font(18, 24);
+		}
+
+		&:last-child {
+			margin-bottom: 0;
+		}
+
+		&-text {
+			color: $color--black-dark;
+			text-decoration: none;
+			@include link-underline();
+		}
+	}
 }

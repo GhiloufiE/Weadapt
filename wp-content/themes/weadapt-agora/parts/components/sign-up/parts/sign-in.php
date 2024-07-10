@@ -17,7 +17,7 @@
 <input type="hidden" name="action" value="theme_ajax_login">
 
 <div class="wp-block-buttons">
-	<div class="wp-block-button">
+	<div class="wp-block-button is-style-outline">
 		<button class="wp-block-button__link" type="submit"><?php esc_html_e( 'Login', 'weadapt' ); ?></button>
 	</div>
 </div>

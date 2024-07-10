@@ -1,19 +1,107 @@
-@import '../../../../weadapt/parts/components/sign-up/style.scss';
-
 @import '__settings/init';
 
 .ajax-form {
+	text-align: left;
 
-	&__url {
-		a {
-			color: $color--secondary;
-		}
-
-		.theme--dark & {
-			a {
-				color: $color--black
-			}
+	&.loading {
+		* {
+			opacity: .65;
+			pointer-events: none;
 		}
 	}
 
+	&__field {
+		display: block;
+
+		+ .ajax-form__field {
+			@include media('>=md') {
+				margin-top: rem(-24);
+			}
+		}
+
+		.description {
+			display: block;
+			color: $color--text-desc;
+			@include font(14,20);
+		}
+	}
+	&__field {
+		max-width: rem(320);
+		margin-left: auto;
+		margin-right: auto;
+	}
+	&__url {
+		text-align: center;
+		font-size: rem(16);
+
+		a {
+			@include link-underline;
+		}
+	}
+
+	&__description {
+		@include font(12,20);
+		display: block;
+
+		max-width: rem(320);
+		margin-left: auto;
+		margin-right: auto;
+
+
+		@include media('>=md') {
+			padding-top: rem(36);
+		}
+	}
+	&__pass-strength {
+		display: flex;
+		align-items: center;
+		margin-bottom: rem(16);
+
+		@include media('>=md') {
+			margin-bottom: 0;
+		}
+
+		&__line {
+			width: rem(115);
+			margin-right: rem(44);
+
+			span {
+				display: block;
+				height: rem(4);
+				border-radius: rem(2);
+				background: $static-color--bg;
+				position: relative;
+				margin-top: rem(9);
+
+				&:after {
+					position: absolute;
+					top: 0;
+					left: 0;
+					width: 0%;
+					height: 4px;
+					border-radius: rem(2);
+					background: $color--error;
+					content: '';
+					transition: width $transition;
+				}
+				&[data-strength="1"]:after {
+					width: 25%;
+				}
+				&[data-strength="2"]:after {
+					width: 50%;
+				}
+				&[data-strength="3"]:after {
+					width: 75%;
+					background-color: $color--success;
+				}
+				&[data-strength="4"]:after {
+					width: 100%;
+					background-color: $color--success;
+				}
+				&[data-strength="5"]:after {
+					width: 100%;
+				}
+			}
+		}
+	}
 }

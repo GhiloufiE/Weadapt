@@ -1,28 +1,80 @@
-@import '../../../../weadapt/parts/components/cpt-cta/style.scss';
+@import '__settings/init';
 
 .cpt-cta {
+	display: flex;
+	gap: rem(16);
 
-  &__img {
-    & img {
-      border-radius: rem(5);
-    }
-  }
+	&.is-draft {
+		opacity: .6;
+		filter: grayscale(1.0);
+	}
 
-  &__actions {
-    & .is-style-outline-small .button-join {
-      background-color: $color--tertiary;
-      border-color: $color--tertiary;
+	@include font(14, 20);
+	& + & {
+		margin-top: rem(40);
+	}
+	&__img {
+		max-width: rem(39);
 
-      .theme--dark & {
-        border-color: $color--black;
+		a {
+			border-radius: rem(5);
+			display: block;
+		}
 
-        &:hover {
-          background-color: $color--white;
-        }
-      }
-    }
+		img {
+			border-radius: rem(5);
+			height: rem(39);
+			min-width: rem(39);
+			object-fit: contain;
+		}
 
+		.members-widget & {
+			a {
+				border-radius: 50%;
+			}
 
-  }
+			img {
+				border-radius: 50%;
+			}
+		}
+	}
+	&__content {
+		& > *:last-child {
+			margin-bottom: 0;
+		}
+	}
+	&__title {
+		margin: 0 0 rem(8);
 
+		font-weight: $font-weight-content;
+
+		@include font(16, 22);
+
+		&__link {
+			@include link();
+			color: currentColor;
+		}
+	}
+	&__text {
+		margin: 0 0 rem(8);
+	}
+	&__actions {
+		margin-top: rem(24);
+		display: flex;
+		flex-wrap: wrap;
+		gap: rem(16);
+
+		@include media('>=md') {
+			gap: rem(24);
+		}
+	}
+	&__members {
+		margin: 0 0 rem(24);
+		display: flex;
+		align-items: center;
+
+		.icon {
+			margin-right: rem(8);
+		}
+	}
 }

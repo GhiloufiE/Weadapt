@@ -18,6 +18,19 @@
 /xmlrpc.php
 /sql
 /php
+# CSS files
+*.css
+*.scss
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.svg
+*.webp
+*/assets/
+# Minified JavaScript files
+*.min.js
+
 
 node_modules/
 # Configuration
@@ -32,6 +45,7 @@ gulpfiles.js
 
 # Uploads
 /wp-content/uploads/
+/assets/
 
 # Log files
 *.log

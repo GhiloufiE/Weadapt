@@ -8,18 +8,15 @@
 $cpt_ID  = ! empty( $args['cpt_ID'] )  ? $args['cpt_ID']  : 0;
 $buttons = ! empty( $args['buttons'] ) ? $args['buttons'] : [];
 
-$type = get_post_type($cpt_ID);
-
 if ( ! empty( $cpt_ID ) && ! empty( get_post($cpt_ID) ) ) :
 	$link_url  = get_the_permalink( $cpt_ID );
-	$members   = get_members_count( $cpt_ID );
 	$add_class = ( 'organisation' === get_post_type( $cpt_ID ) && 'draft' === get_post_status( $cpt_ID ) ) ? ' is-draft' : '';
 ?>
 
 <div class="cpt-cta<?php echo esc_attr( $add_class ); ?>">
 	<?php load_inline_styles( __DIR__, 'cpt-cta' ); ?>
 
-	<?php if ( ! empty( $image = get_the_post_thumbnail( $cpt_ID, $type === 'organisation' ? 'full' : 'thumbnail' ) ) ) : ?>
+	<?php if ( ! empty( $image = get_the_post_thumbnail( $cpt_ID, 'medium' ) ) ) : ?>
 		<div class="cpt-cta__img">
 			<a href="<?php echo $link_url; ?>" class="cpt-cta__img-link"><?php echo $image; ?></a>
 		</div>
@@ -37,12 +34,14 @@ if ( ! empty( $cpt_ID ) && ! empty( get_post($cpt_ID) ) ) :
 			<div class="cpt-cta__text"><?php echo get_the_excerpt( $cpt_ID ); ?></div>
 		<?php endif; ?>
 
-		<div class="cpt-cta__members">
-			<span class="icon"><?php echo get_img('icon-user'); ?></span>
-			<span class="text">
-				<?php echo $members; ?>
-			</span>
-		</div>
+		<?php if ( get_members_count( $cpt_ID, '', true ) ) : ?>
+			<div class="cpt-cta__members">
+				<span class="icon"><?php echo get_img('icon-user'); ?></span>
+				<span class="text">
+					<?php echo get_members_count( $cpt_ID ); ?>
+				</span>
+			</div>
+		<?php endif; ?>
 
 		<?php if ( ! empty( $buttons ) ) : ?>
 			<div class="cpt-cta__actions">
@@ -97,6 +96,13 @@ if ( ! empty( $cpt_ID ) && ! empty( get_post($cpt_ID) ) ) :
 								];
 								$class = 'outline-small';
 							}
+
+						case 'permalink':
+							$link = [
+								'url'   => get_the_permalink( $cpt_ID ),
+								'title'  => __( 'Find out more', 'weadapt' ),
+								'target' => '_blank',
+							];
 
 							break;
 					}

@@ -10,32 +10,13 @@
 
 	if ( $footer_newsletter || $footer_social || $logo_image || $logo_url || $logo_text || $logo_image_right || $logo_text_right ) :
 ?>
-<style>#joincomm {
-	  width: max-content;
-    margin-top: 0;
-    display: inline-block !important;
-    background-color: #FF9829;
-    border: 1px solid #FF9829;
-    border-radius: 25px;
-    font-weight: bold;
-    padding-top: 10px;
-    padding-left: 15px;
-    padding-right: 15px;
-    padding-bottom: 10px;
-    margin-left: 0;
-    color: #fff !Important;
-    text-align: center;
-    position: relative;
-    font-size: 12px;
-    line-height: 15px;
-}
-#joincomm a{ color: white; font-weight: 700}</style>
 <div class="main-footer__area">
 	<?php load_inline_dependencies( '/parts/gutenberg/core-heading/', 'core-heading'); ?>
 	<?php load_inline_dependencies( '/parts/gutenberg/core-paragraph/', 'core-paragraph'); ?>
 	<?php load_inline_dependencies( '/parts/gutenberg/core-button/', 'core-button'); ?>
-	<div class="row" style="padding-top: 2.5rem;">
-		<div class="col-12 col-md-5 " style="padding-top: 0;">
+
+	<div class="row">
+		<div class="col-12 col-md-5">
 			<?php if ( ! empty( $logo_image_right ) ) : ?>
 				<div class="main-footer__logo main-footer__logo--right">
 					<?php echo get_img( $logo_image_right ); ?>
@@ -56,8 +37,7 @@
 				</div>
 			<?php endif; ?>
 		</div>
-		<div class="col-12 col-md-7" style="padding-top: 0">
-        <h5 style="margin-bottom: 2.5rem;color:white;">#ADAPTATIONAGORA</h5>
+		<div class="col-12 col-md-7">
 		<?php
 
 			// Social
@@ -90,10 +70,7 @@
 					if ( ! empty( $logo_text ) ) {
 						?><div class="text"><?php echo $logo_text; ?></div><?php
 					}
-				?><span id="joincomm"><a href="https://adaptationagora.eu/join-our-community/" target="_blank">JOIN OUR COMMUNITY</a></span>
-                </div>
-                
-                <?php
+				?></div><?php
 			}
 
 			// Copy

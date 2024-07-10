@@ -1,7 +1,7 @@
 /* global vars, googleMapsVars, markerData, google, markerClusterer */
 
 import Cookies from 'js-cookie';
-import runPopups from '../../components/popup/index';
+import runPopups from '../../../../weadapt/parts/components/popup/index';
 
 /**
  * Global Debounce
@@ -267,6 +267,7 @@ const initMap = function (mapBlockNode, mapNode, markerNodes, markerOrgNodes, ma
 	}
 	if (markerOrgNodes) {
 		markerOrgNodes.forEach(markerNode => {
+			// Create SVG marker image
 			const markerSvg = [
 				'<svg width="30" height="30" viewBox="0 0 144 144" fill="none" xmlns="http://www.w3.org/2000/svg">',
 				'<circle cx="72" cy="72" r="72" fill="#091968"/>',
@@ -279,14 +280,15 @@ const initMap = function (mapBlockNode, mapNode, markerNodes, markerOrgNodes, ma
 				'</clipPath>',
 				'</defs>',
 				'</svg>',
-				,
 			].join('\n');
 			const markerImage = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(markerSvg)}`;
-
+	
+			// Extract latitude and longitude
 			const lat = parseFloat(markerNode.dataset.lat);
 			const lng = parseFloat(markerNode.dataset.lng);
 			const latLng = { lat, lng };
-
+	
+			// Create Google Maps marker
 			const marker = new google.maps.Marker({
 				position: latLng,
 				title: markerNode.dataset.title,
@@ -295,64 +297,115 @@ const initMap = function (mapBlockNode, mapNode, markerNodes, markerOrgNodes, ma
 					url: markerImage,
 				},
 			});
-
+	
+			// Add click event listener to marker
 			marker.addListener('click', () => {
 				mapBlockNode.classList.add('has-overlay');
-
+	
 				// Update URL
 				window.history.pushState({}, '', `${markerData.currentUrl}view/organisation/${markerNode.dataset.slug}/`);
-
-				// Set Active Marker
+	
+				// Set active marker
 				activeMarker = marker;
-
-				// Update Marker Info
+	
+				// Update marker info
 				infoTitleNode.innerHTML = markerNode.dataset.title;
 				infoLatNode.innerHTML = lat;
 				infoLngNode.innerHTML = lng;
-
-				// Centered By Marker
+	
+				// Center map by marker
 				mapCenterByMarker(mapBlockNode, mapNode, map, marker);
-
-				// Update Content
-				contentNode.innerHTML = '';
-
-				// Fetch Data
+	
+				// Fetch additional data
 				const formData = new FormData();
 				formData.append('post_id', markerNode.dataset.id);
-				formData.append('post_type', 'case-study');
+				formData.append('post_type', 'organisation');
 				formData.append('action', 'load_post_content');
-
 				contentNode.classList.add('loading');
-
+	
 				fetch(vars.ajaxUrl, {
 					method: 'POST',
 					body: formData,
 				})
-					.then(response => response.text())
-					.then(data => {
-						try {
-							const response = JSON.parse(data);
-
-							if (response.output_html) {
-								contentNode.innerHTML = response.output_html;
-
-								runPopups();
+				.then(response => response.text())
+				.then(data => {
+					console.log('Data received:', data);
+					try {
+						const response = JSON.parse(data);
+						console.log('Parsed response:', response);
+	
+						if (response.output_html) {
+							contentNode.innerHTML = response.output_html;
+	
+							// Ensure the correct section is visible
+							const sections = ['tab-about-panel', 'tab-latest-panel', 'tab-members-panel'];
+							sections.forEach(sectionId => {
+								const sectionNode = document.getElementById(sectionId);
+								if (sectionNode) {
+									if (response.active_tab === sectionId) {
+										sectionNode.removeAttribute('hidden');
+										sectionNode.setAttribute('aria-hidden', 'false');
+									} else {
+										sectionNode.setAttribute('hidden', '');
+										sectionNode.setAttribute('aria-hidden', 'true');
+									}
+								}
+							});
+	
+							runPopups();
+	
+							// Tab functionality
+							const tabButtons = document.querySelectorAll('.single-tabs-nav__btn');
+							const tabPanels = document.querySelectorAll('section[role="tabpanel"]');
+	
+							tabButtons.forEach(button => {
+								button.addEventListener('click', () => {
+									const targetPanelId = button.getAttribute('aria-controls');
+									const targetPanel = document.getElementById(targetPanelId);
+	
+									// Update ARIA-selected attributes
+									tabButtons.forEach(btn => {
+										btn.setAttribute('aria-selected', 'false');
+									});
+									button.setAttribute('aria-selected', 'true');
+	
+									// Show/Hide tab panels
+									tabPanels.forEach(panel => {
+										panel.classList.remove('active');
+										panel.setAttribute('aria-hidden', 'true');
+										panel.setAttribute('hidden', '');
+									});
+									targetPanel.classList.add('active');
+									targetPanel.setAttribute('aria-hidden', 'false');
+									targetPanel.removeAttribute('hidden');
+								});
+							});
+	
+							// Optionally, activate the first tab by default
+							if (tabButtons.length > 0) {
+								tabButtons[0].click();
 							}
-
-							contentNode.classList.remove('loading');
-						} catch (error) {
-							contentNode.classList.remove('loading');
+						} else {
+							console.error('No output_html in response:', response);
 						}
-					})
-					.catch(() => {
+	
 						contentNode.classList.remove('loading');
-					});
+					} catch (error) {
+						console.error('Error parsing response:', error);
+						contentNode.classList.remove('loading');
+					}
+				})
+				.catch(error => {
+					console.error('Fetch error:', error);
+					contentNode.classList.remove('loading');
+				});
 			});
-
+	
 			markers.push(marker);
 			bounds.extend(latLng);
 		});
 	}
+	
 	if (markerStakeholdersNodes) {
 		markerStakeholdersNodes.forEach(markerNode => {
 			const markerSvg = [
@@ -399,7 +452,7 @@ const initMap = function (mapBlockNode, mapNode, markerNodes, markerOrgNodes, ma
 				// Fetch Data
 				const formData = new FormData();
 				formData.append('post_id', markerNode.dataset.id);
-				formData.append('post_type', 'case-study');
+				formData.append('post_type', 'stakeholders');
 				formData.append('action', 'load_post_content');
 
 				contentNode.classList.add('loading');
@@ -486,7 +539,7 @@ const initMap = function (mapBlockNode, mapNode, markerNodes, markerOrgNodes, ma
 				// Fetch Data
 				const formData = new FormData();
 				formData.append('post_id', markerNode.dataset.id);
-				formData.append('post_type', 'case-study');
+				formData.append('post_type', 'members');
 				formData.append('action', 'load_post_content');
 
 				contentNode.classList.add('loading');
@@ -563,7 +616,7 @@ const initMap = function (mapBlockNode, mapNode, markerNodes, markerOrgNodes, ma
 				// Fetch Data
 				const formData = new FormData();
 				formData.append('post_id', markerNode.dataset.id);
-				formData.append('post_type', 'case-study');
+				formData.append('post_type', 'solution');
 				formData.append('action', 'load_post_content');
 
 				contentNode.classList.add('loading');

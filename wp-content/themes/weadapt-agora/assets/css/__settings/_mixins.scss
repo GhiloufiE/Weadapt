@@ -1,23 +1,125 @@
-@mixin bg-lines($bgColor: $color--bg-hero, $opacity: 0.45) {
-	position: relative;
-	background-color: $bgColor;
-
-	&::before {
+//
+// MIXINS
+//
+@mixin cf {
+	&:before,
+	&:after {
 		content: '';
-		display: block;
-		position: absolute;
-		top: 0;
-		right: 0;
-		bottom: 0;
-		left: 0;
-		background-size: cover;
-		opacity: $opacity;
-		z-index: 0;
-		pointer-events: none;
+
+		display: table;
 	}
 
-	.container {
-		position: relative;
-		z-index: 0;
+	&:after {
+		clear: both;
+	}
+}
+
+@function vw-size($s, $w: 1440) {
+	@return ($s / $w) * 100 + vw;
+}
+
+@function rem($sizeValue: 16) {
+	@return calc($sizeValue / 16) + rem;
+}
+
+@function rel($size, $rel) {
+	@return calc($size / $rel);
+}
+
+@function em($size, $rel) {
+	@return rel($size, $rel) * 1em;
+}
+
+@mixin object-fit-cover() {
+	width: 100%;
+	height: 100%;
+
+	position: absolute;
+	top: 0;
+	left: 0;
+
+	object-fit: cover;
+}
+
+@mixin line-height($font-size, $line-height: 0) {
+	@if $line-height != 0 {
+		@if $line-height < 10 {
+			line-height: $line-height;
+		}
+		@else {
+			line-height: calc($line-height / $font-size);
+		}
+	}
+}
+
+@mixin letter-spacing($font-size, $letter-spacing: 0) {
+	@if $letter-spacing != 0 {
+		@if $letter-spacing < 10 {
+			letter-spacing: rem($letter-spacing);
+		}
+		@else {
+			letter-spacing: rem(($font-size * $letter-spacing) / 1000);
+		}
+	}
+}
+
+@mixin font($font-size-map, $line-height: 0, $letter-spacing: 0) {
+	@if type-of($font-size-map) == 'map' {
+		@each $breakpoint, $font-size in $font-size-map {
+			@if $breakpoint == null {
+				font-size: rem($font-size);
+
+				@include line-height(map-get($font-size-map, nth(map-keys($font-size-map), -1)), $line-height);
+				@include letter-spacing(map-get($font-size-map, nth(map-keys($font-size-map), -1)), $letter-spacing);
+			}
+			@else {
+				@media screen and (min-width: map-get($breakpoints, $breakpoint)) {
+					font-size: rem($font-size);
+				}
+			}
+		}
+	}
+	@else {
+		font-size: rem($font-size-map);
+
+		@include line-height($font-size-map, $line-height);
+		@include letter-spacing($font-size-map, $letter-spacing);
+	}
+}
+
+@mixin link($height: 1) {
+	transition: background-size $transition-speed ease, color $transition-speed ease;
+	background-image: linear-gradient(currentColor, currentColor);
+	background-repeat: no-repeat;
+	background-position: 100% 100%;
+	background-size: 0% rem($height);
+
+	&:hover {
+		background-size: 100% rem($height);
+		background-position: 0 100%;
+	}
+}
+
+@mixin link-underline($height: 1) {
+	transition: background-size $transition-speed ease, color $transition-speed ease;
+	background-image: linear-gradient(currentColor, currentColor);
+	background-repeat: no-repeat;
+	background-position: 0 100%;
+	background-size: 100% rem($height);
+
+	&:hover {
+		background-size: 0% rem($height);
+		background-position: 100% 100%;
+	}
+}
+
+@mixin scrollbar-hidden() {
+	overflow-y: auto;
+
+	scrollbar-width: none;
+
+	&::-webkit-scrollbar {
+		width: 0;
+		display: none;
 	}
 }

@@ -1,25 +1,47 @@
-@import '../../../../weadapt/parts/components/tags/style.scss';
-
 @import '__settings/init';
 
 .single-tags {
+	margin: rem(80) 0;
 
-  &__list {
-    gap: rem(12);
-    @include media('>=md') {
-      gap: rem(24);
-    }
+	&__list {
+		display: flex;
+		flex-wrap: wrap;
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		gap: rem(8);
+	}
 
-  }
+	&__link {
+		display: block;
+		padding: rem(6);
 
-  &__link {
-    background-color: $color--tertiary;
-    border-color: $color--tertiary;
+		font-family: $font-family-headings;
+		font-weight: $font-weight-heading;
+		color: $static-color--text;
 
-    .theme--dark & {
-      background-color: $color--black;
-      border-color: $color--black;
-    }
-  }
+		border-radius: rem(5);
+		background-color: $color--bg-to-white-reverse;
 
+		@include font(14, 22);
+		border: rem(2) solid $color--bg-to-white-reverse;
+
+		transition: color $transition, background-color $transition,
+			border $transition;
+
+		&:hover {
+			color: $color--white;
+			background-color: $color--black;
+			border-color: $color--black;
+
+			.theme--dark & {
+				color: $static-color--white;
+				background-color: transparent;
+			}
+		}
+
+		@include media('>=md') {
+			padding: rem(7) rem(14);
+		}
+	}
 }
