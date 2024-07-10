@@ -1032,109 +1032,84 @@ const initMap = function (mapBlockNode, mapNode, markerNodes, markerOrgNodes, ma
 /**
  * Filtered Map Markers
  */
-const mapFilter = function (formNode, map, markers, markerClusters) {
-	const formData = new FormData(formNode);
+
+const buildUrlParams = (formData, params) => {
+    return params
+        .map(param => formData.get(param) ? `${encodeURIComponent(param)}=${encodeURIComponent(formData.get(param))}` : '')
+        .filter(param => param)
+        .join('&');
+};
 
 
-	const searchParam = formData.get('search') ? `search=${formData.get('search')}` : '';
-	const themeParam = formData.get('theme_network') ? `theme_network=${formData.get('theme_network')}` : '';
-	const countryParam = formData.get('select_country') ? `select_country=${formData.get('select_country')}` : '';
+const getFetchUrl = (formData) => {
+    const contentType = formData.get('select_content');
+    if (contentType) {
+        switch (contentType) {
+            case 'case_study':
+                return vars.restSearchCaseStudyMarkerstUrl;
+            case 'organisation':
+                return vars.restSearchOrganisationMarkerstUrl;
+            case 'members':
+                return vars.restSearchMembersMarkerstUrl;
+            case 'solution':
+                return vars.restSearchSolutionMarkerstUrl;
+            case 'stakeholders':
+                return vars.restSearchStakeholdersMarkerstUrl;
+            default:
+                return null;
+        }
+    }
+    if (formData.get('select_country')) return vars.restSearchCountryMarkerstUrl;
+    if (formData.get('theme_network')) return vars.restSearchThemeMarkerstUrl;
+    if (formData.get('search')) return vars.restSearchMarkerstUrl;
+    return null;
+};
 
-	const urlParamsString = [searchParam, themeParam, countryParam].filter(param => param).join('&');
-	const url = `${markerData.currentUrl}${urlParamsString ? `?${urlParamsString}` : ''}`;
 
-	window.history.pushState({}, '', url);
+const mapFilter = async function (formNode, map, markers, markerClusters) {
+    const formData = new FormData(formNode);
 
-	formNode.classList.add('loading');
+    const urlParams = buildUrlParams(formData, ['search', 'theme_network', 'select_country', 'select_content']);
+    const url = `${markerData.currentUrl}${urlParams ? `?${urlParams}` : ''}`;
 
-	let fetchUrl;
+    // Update the browser URL without reloading the page
+    window.history.pushState({}, '', url);
+    formNode.classList.add('loading');
 
+    const fetchUrl = getFetchUrl(formData);
 
+    if (fetchUrl) {
+        try {
+            const response = await fetch(fetchUrl, {
+			
+                method: 'POST',
+                body: formData,
+            });
+			console.log(response);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
 
+            const data = await response.json();
 
+            if (data.ids) {
+                const filteredMarkers = markers.filter(marker => data.ids.includes(parseInt(marker.id)));
 
-	
-	if (formData.get('select_content')) {
-		switch (formData.get('select_content')) {
-			case 'case_study':
-				fetchUrl = vars.restSearchCaseStudyMarkerstUrl; 
-				console.log(fetchUrl)
-				break;
-			case 'organisation':
-				fetchUrl = vars.restSearchOrganisationMarkerstUrl;
-				break;
-			case 'members':
-				fetchUrl = vars.restSearchMembersMarkerstUrl;
-				break;
-			case 'solution':
-				fetchUrl = vars.restSearchSolutionMarkerstUrl;
-				break;
-			case 'stakeholders':
-				fetchUrl = vars.restSearchStakeholdersMarkerstUrl;
-				break;
-			default:
-				fetchUrl = vars.null
-		}
-	} else if(formData.get('select_country'))
-		  {
-			fetchUrl = vars.restSearchCountryMarkerstUrl;
-		}
-		else if (formData.get('theme_network')){
+                markers.forEach(marker => marker.setMap(null));
+                markerClusters.clearMarkers();
 
-			fetchUrl = vars.restSearchThemeMarkerstUrl;
-
-		}
-		else if (formData.get('search')){
-			fetchUrl = vars.restSearchMarkerstUrl;
-
-		}
-		else {
-			fetchUrl = vars.null
-		}
-	
-	if (fetchUrl) {
-		fetch(fetchUrl, {
-			method: 'POST',
-			body: formData,
-		})
-			.then(response => response.text())
-			.then(data => {
-				try {
-					const response = JSON.parse(data);
-
-					if (response.ids !== undefined) {
-						const filteredMarkers = markers.filter(marker => {
-							return response.ids.includes(parseInt(marker.id));
-						});
-
-						// Hide All
-						markers.forEach(marker => {
-							marker.setMap(null);
-						});
-						markerClusters.clearMarkers();
-
-						// Show Filtered
-						filteredMarkers.forEach(marker => {
-							marker.setMap(map);
-						});
-						markerClusters.addMarkers(filteredMarkers);
-					}
-
-					formNode.classList.remove('loading');
-				} catch (error) {
-					console.error('Error: ', error);
-					formNode.classList.remove('loading');
-				}
-			})
-			.catch(() => {
-				formNode.classList.remove('loading');
-			});
-	} else {
-		// Handle other cases or fallback
-		// In this example, we're simply showing all markers if content type is not recognized
-		markerClusters.addMarkers(markers);
-		formNode.classList.remove('loading');
-	}
+                filteredMarkers.forEach(marker => marker.setMap(map));
+                markerClusters.addMarkers(filteredMarkers);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        } finally {
+            formNode.classList.remove('loading');
+        }
+    } else {
+        markerClusters.addMarkers(markers);
+        formNode.classList.remove('loading');
+    }
 };
 
 
