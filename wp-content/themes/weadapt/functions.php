@@ -750,7 +750,7 @@ function notify_editors_after_publish($post_id, $new_theme) {
     // Custom condition: skip notification if $send_notification is false
     $notification_sent = get_post_meta($post_id, '_notification_sent', true);
     if ($notification_sent) return; // Exit if notification has already been sent
-
+        $published_for_the_first_time = (strtotime($post->post_date) >= (time() - 300));
         // Notify editors of the new theme
         notify_editors_of_new_theme($post_id, $new_theme);
 
@@ -760,8 +760,13 @@ function notify_editors_after_publish($post_id, $new_theme) {
         // Adding main theme network editors
         if ($main_theme_network = get_field('relevant_main_theme_network', $post_id)) {
             if ($main_theme_network_editors = get_field('people_editors', $main_theme_network)) {
+               if ($published_for_the_first_time) { 
+                    $admins=get_blog_administrators( false, 1 );
+                    $users = array_merge($users, $main_theme_network_editors,$admins);
                 
-                $users = array_merge($users, $main_theme_network_editors,get_blog_administrators( false, 1 ));
+                }else{
+                    $users = array_merge($users, $main_theme_network_editors);
+                }
             } 
         }
         
@@ -823,7 +828,7 @@ function notify_editors_after_publish($post_id, $new_theme) {
         // Remove duplicate user IDs to ensure each user only gets one email
         $users = array_unique($users);
 
-        if (!empty($users)) {
+        if (!empty($users)) { 
             if ( $post->post_type == 'article' || $post->post_type == 'event'  || $post->post_type == 'organisation' ) {
                 $subject = sprintf( __( 'An %s has been published on %s', 'weadapt' ),
                     ucfirst( $post->post_type ),

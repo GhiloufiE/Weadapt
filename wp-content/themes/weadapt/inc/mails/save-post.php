@@ -84,8 +84,15 @@ function theme_save_post( $post_ID, $post, $update ) {
         // Check if the transient exists
         if ( ! get_transient( $transient_key ) ) {
             $current_user = wp_get_current_user();
+            $current_blog = get_current_blog_id();
+            error_log("current_blog: " . $current_blog);
+            if ( $current_blog === 1 ) {
+                $users = array_merge( get_blog_administrators( false, 1 ), get_blog_editors() );
 
-            $users = array_merge( get_blog_administrators( false, 1 ), get_blog_editors() );
+            } else {
+                $users = get_blog_administrators( false, 1 );
+            }
+            
             $users = array_unique( $users );
 
             if ( ! empty( $users ) ) {
