@@ -742,118 +742,69 @@ function get_editors_by_theme($theme)
 
 	return $editors;
 }
-
 // Function to notify editors after the post is published
-function notify_editors_after_publish($post_id, $new_theme)
-{
-	// Custom condition: skip notification if $send_notification is false
-	$send_notification = get_post_meta($post_id, 'send_notification', true);
-	if ($send_notification === '') {
-		$send_notification = true; // Default to true if not set
-	}
+function notify_editors_after_publish($post_id, $new_theme) {
+    // Custom condition: skip notification if $send_notification is false
+    $send_notification = get_post_meta($post_id, 'send_notification', true);
+    if ($send_notification === '') {
+        $send_notification = true; // Default to true if not set
+    }
 
+    if ($send_notification) {
+        // Notify editors of the new theme
+        notify_editors_of_new_theme($post_id, $new_theme);
 
-	// Notify editors of the new theme
-	notify_editors_of_new_theme($post_id, $new_theme);
+        // Gather the users to notify
+      
+        if (!empty($main_theme_network = get_field('relevant_main_theme_network', $post_id))) {
+            if (!empty($main_theme_network_editors = get_field('people_editors', $main_theme_network))) {
+                $users = array_merge( $main_theme_network_editors);
+            }
+        }
+        $users = array_unique($users);
 
-	// Gather the users to notify
-	$users = array_merge(get_blog_administrators(false, 1), get_blog_editors());
+        if (!empty($users)) {
+            $post = get_post($post_id);
+            $subject = sprintf(
+                __('%s has been published on %s', 'weadapt'),
+                ucfirst($post->post_type),
+                get_bloginfo('name')
+            );
 
-	if (!empty($main_theme_network = get_field('relevant_main_theme_network', $post_id))) {
-		if (!empty($main_theme_network_editors = get_field('people_editors', $main_theme_network))) {
-			$users = array_merge($users, $main_theme_network_editors);
-		}
-	}
-	$users = array_unique($users);
-    if (!empty($users)) {
-        $subject = sprintf(
-            __('An %s has been published on %s', 'weadapt'),
-            ucfirst($post->post_type),
-            get_bloginfo('name')
-        );
+            $message = esc_html($post->post_title) . '<br>' . esc_html($post->post_excerpt) . '<br><br>';
 
-        $message = esc_html($post->post_title) . '<br>';
-        $message .= esc_html($post->post_excerpt) . '<br><br>';
+            if (!empty($post_author_IDs = get_field('people_creator', $post_id))) {
+                $post_author_ID = $post_author_IDs[0];
+                $post_author = new WP_User($post_author_ID);
+                $author_organisations = get_field('organisations', $post_author);
 
-        if (!empty($post_author_IDs = get_field('people_creator', $post_ID))) {
-            $post_author_ID = $post_author_IDs[0];
-            $post_author = new WP_User($post_author_ID);
-            $author_organisations = get_field('organisations', $post_author);
-
-            if (!empty($author_organisations)) {
-                $message .= sprintf(
-                    'by %s from %s',
-                    $post_author->display_name,
-                    get_the_title($author_organisations[0])
-                );
-            } else {
-                $message .= sprintf(
-                    'by %s',
-                    $post_author->display_name
-                );
+                if (!empty($author_organisations)) {
+                    $message .= sprintf('by %s from %s', $post_author->display_name, get_the_title($author_organisations[0]));
+                } else {
+                    $message .= sprintf('by %s', $post_author->display_name);
+                }
+                $message .= '<br>';
             }
 
-            $message .= '<br>';
+            $message .= sprintf(' — <a href="%s">%s</a>', get_permalink($post_id), __('See it', 'weadapt')) . '<br>';
+            $message .= sprintf(' — <a href="%s">%s</a>', get_edit_post_link($post_id), __('Publish / Edit / Delete it', 'weadapt'));
+
+            // Save to database and send email immediately
+            theme_mail_save_to_db($users, $subject, $message);
+            send_email_immediately($users, $subject, $message);
         }
 
-        $message .= sprintf(
-            ' — <a href="%s">%s</a>',
-            get_permalink($post_ID),
-            __('See it', 'weadapt')
-        ) . '<br>';
-        $message .= sprintf(
-            ' — <a href="%s">%s</a>',
-            get_edit_post_link($post_ID),
-            __('Publish / Edit / Delete it', 'weadapt')
-        );
+        // Set transient to mark notification as sent
+        set_transient('notified_post_' . $post_id, true, 60);
 
-        theme_mail_save_to_db(
-            $users,
-            $subject,
-            $message
-        );
+        // Update post meta to mark notification as sent
+        update_post_meta($post_id, 'send_notification', true);
     }
-	if (!empty($users)) {
-		$post = get_post($post_id);
-		$subject = sprintf(
-			__('%s has been published on %s', 'weadapt'),
-			ucfirst($post->post_type),
-			get_bloginfo('name')
-		);
-
-		$message = esc_html($post->post_title) . '<br>' . esc_html($post->post_excerpt) . '<br><br>';
-
-		if (!empty($post_author_IDs = get_field('people_creator', $post_id))) {
-			$post_author_ID = $post_author_IDs[0];
-			$post_author = new WP_User($post_author_ID);
-			$author_organisations = get_field('organisations', $post_author);
-
-			if (!empty($author_organisations)) {
-				$message .= sprintf('by %s from %s', $post_author->display_name, get_the_title($author_organisations[0]));
-			} else {
-				$message .= sprintf('by %s', $post_author->display_name);
-			}
-			$message .= '<br>';
-		}
-
-		$message .= sprintf(' — <a href="%s">%s</a>', get_permalink($post_id), __('See it', 'weadapt')) . '<br>';
-		$message .= sprintf(' — <a href="%s">%s</a>', get_edit_post_link($post_id), __('Publish / Edit / Delete it', 'weadapt'));
-
-		theme_mail_save_to_db($users, $subject, $message);
-		send_email_immediately($users, $subject, $message);
-
-
-	
-	}
-
-	// Set transient to mark notification as sent
-	set_transient('notified_post_' . $post_id, true, 60);
-
-	// Update post meta to mark notification as sent
-	update_post_meta($post_id, 'forum_notification_sent', true);
 }
 
 add_action('notify_editors_after_publish', 'notify_editors_after_publish', 10, 2);
+
+
 
 // Function to update theme meta
 function update_theme_meta($post_id, $post = null, $update = null)
