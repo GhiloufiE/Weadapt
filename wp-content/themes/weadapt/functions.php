@@ -402,22 +402,25 @@ function handle_create_post() {
             'post_title'    => $post_title,
             'post_content'  => $post_description,
             'post_status'   => 'pending',
-            'post_author'   => get_current_user_id(),
             'post_type'     => ($post_type === 'theme') ? 'article' : $post_type,
+            'meta_input'    => array() // Initialize meta_input array
         );
 
-        // Add meta input if necessary
+        // Set post author in meta instead of post data
+        $post_data['meta_input']['author'] = get_current_user_id();
+
+        // Add forum meta input if necessary
         if ($post_type == 'forum' && isset($_POST['forum'])) {
             $forum_id = intval($_POST['forum']);
             $forum_true_id = $wpdb->get_var($wpdb->prepare("SELECT forum_id FROM {$wpdb->prefix}theme_forum_relationship WHERE theme_id = %d", $forum_id));
-            $post_data['meta_input'] = array('forum' => $forum_true_id);
+            $post_data['meta_input']['forum'] = $forum_true_id;
             error_log('Forum ID: ' . $forum_true_id);
         }
 
         if ($post_type == 'theme' && isset($_POST['forum'])) {
             $forum_id = intval($_POST['forum']);
             $forum_true_id = $wpdb->get_var($wpdb->prepare("SELECT forum_id FROM {$wpdb->prefix}theme_forum_relationship WHERE theme_id = %d", $forum_id));
-            $post_data['meta_input'] = array('relevant_main_theme_network' => $forum_true_id);
+            $post_data['meta_input']['relevant_main_theme_network'] = $forum_true_id;
             error_log('Forum ID: ' . $forum_true_id);
         }
 
@@ -439,6 +442,7 @@ function handle_create_post() {
         wp_send_json_error('Missing required POST fields');
     }
 }
+
 
 add_action('admin_post_nopriv_create_post', 'handle_create_post');
 add_action('admin_post_create_post', 'handle_create_post');
@@ -743,50 +747,102 @@ function get_editors_by_theme($theme)
 	return $editors;
 }
 function notify_editors_after_publish($post_id, $new_theme) {
+    
+    error_log("notify_editors_after_publish called for post ID: $post_id");
     // Fetch the post using the post ID
     $post = get_post($post_id);
-    if (!$post) return; // Exit if post is not found
-
-    // Custom condition: skip notification if $send_notification is false
-    $notification_sent = get_post_meta($post_id, '_notification_sent', true);
-    if ($notification_sent) return; // Exit if notification has already been sent
+    if (!$post) {
+        error_log("Post not found for ID: $post_id");
+        return; // Exit if post is not found
+    }
+    $post_type_forum_topic = get_post_type($post_id);
+    error_log("Post type hhhhhhhhhhhhh : $post_type_forum_topic");
+    if ($post_type_forum_topic == 'forum') {
+        $forum_id = get_post_meta($post_id, 'forum', true);
+        $theme_id = get_post_meta($forum_id, 'relevant_main_theme_network', true);
+        $author = get_post_meta($post_id, 'author', true);
+        $author = is_array($author) ? $author : array($author);
+        $users = array(); 
         $published_for_the_first_time = (strtotime($post->post_date) >= (time() - 300));
-        // Notify editors of the new theme
-        notify_editors_of_new_theme($post_id, $new_theme);
-
-        // Gather the users to notify
-        $users = array();
-
-        // Adding main theme network editors
-        if ($main_theme_network = get_field('relevant_main_theme_network', $post_id)) {
-            if ($main_theme_network_editors = get_field('people_editors', $main_theme_network)) {
-               if ($published_for_the_first_time) { 
-                    $admins=get_blog_administrators( false, 1 );
-                    $users = array_merge($users, $main_theme_network_editors,$admins);
-                
-                }else{
-                    $users = array_merge($users, $main_theme_network_editors);
-                }
-            } 
+        $notification_sent = get_post_meta($post_id, '_notification_sent', true);
+        if ($notification_sent) {
+            error_log("Notification already sent for post ID: $post_id");
+            return; // Exit if notification has already been sent
         }
-        
-        if ($valid_contributors = get_field('people_contributors', $post_id)) {
-            $valid_contributors = array_merge($valid_contributors,  get_field('people_creator', $post_id));
+        error_log("Published for the first time: " . ($published_for_the_first_time ? 'yes' : 'no'));
+        if ($theme_network = get_field('relevant_main_theme_network', $forum_id)) {
+            error_log("Main theme network found for post ID: $post_id");
+            if ($main_theme_network_editors = get_field('people_editors', $theme_network)) {
+                if ($published_for_the_first_time) {
+                    $admins = get_blog_administrators(false, 1);
+                    $users = array_merge($users, $main_theme_network_editors, $admins);
+                    error_log("Added main theme network editors and admins for post ID: $post_id");
+                } else {
+                    $users = array_merge($users, $main_theme_network_editors);
+                    error_log("Added main theme network editors for post ID: $post_id");
+                }
+            }
+        }
+        $users = array_unique($users);
+
+        if (!empty($users)) {
+            if ($post->post_type == 'article' || $post->post_type == 'event' || $post->post_type == 'organisation') {
+                $subject = sprintf(
+                    __('An %s has been published on %s', 'weadapt'),
+                    ucfirst($post->post_type),
+                    get_bloginfo('name')
+                );
+            } else {
+                $subject = sprintf(
+                    __('A %s has been published on %s', 'weadapt'),
+                    ucfirst($post->post_type),
+                    get_bloginfo('name')
+                );
+            }
+    
+            $message = esc_html($post->post_title) . '<br>' . esc_html($post->post_excerpt) . '<br><br>';
+    
+            if ($post_author_IDs = get_field('author', $post_id)) {
+                $post_author_ID = $post_author_IDs[0];
+                $post_author = new WP_User($post_author_ID);
+                $author_organisations = get_field('organisations', $post_author);
+    
+                if ($author_organisations) {
+                    $message .= sprintf('by %s from %s', $post_author->display_name, get_the_title($author_organisations[0]));
+                } else {
+                    $message .= sprintf('by %s', $post_author->display_name);
+                }
+                $message .= '<br>';
+            }
+    
+            $message .= sprintf(' — <a href="%s">%s</a>', get_permalink($post_id), __('See it', 'weadapt')) . '<br>';
+            $message .= sprintf(' — <a href="%s">%s</a>', get_edit_post_link($post_id), __('Publish / Edit / Delete it', 'weadapt'));
+    
+            // Save to database and send email immediately
+            theme_mail_save_to_db($users, $subject, $message);
+            send_email_immediately($users, $subject, $message);
+            error_log("Sent notification to users for post ID: $post_id");
+        }
+ 
+  
+         $valid_contributors = get_field('people_contributors', $post_id) ?: array();
+         $valid_contributors = array_merge($author, $valid_contributors);
+         if (!empty($valid_contributors)) {
             $subject = sprintf(
                 __('Your %s has been published on %s', 'weadapt'),
                 ucfirst($post->post_type),
                 get_bloginfo('name')
             );
-
+    
             $message = __('Your content has now been reviewed and published. It will be shared on our social media channels where relevant. Please do re-share! ', 'weadapt') . '<br><br>';
             $message .= esc_html($post->post_title) . '<br>';
             $message .= esc_html($post->post_excerpt) . '<br><br>';
-
-            if ($post_author_IDs = get_field('people_creator', $post_id)) {
-                $post_author_ID = $post_author_IDs[0];
+    
+            if (!empty($people_creator)) {
+                $post_author_ID = $people_creator[0];
                 $post_author = new WP_User($post_author_ID);
                 $author_organisations = get_field('organisations', $post_author);
-
+    
                 if ($author_organisations) {
                     $message .= sprintf(
                         'by %s from %s',
@@ -799,10 +855,10 @@ function notify_editors_after_publish($post_id, $new_theme) {
                         $post_author->display_name
                     );
                 }
-
+    
                 $message .= '<br>';
             }
-
+    
             $message .= sprintf(
                 ' — <a href="%s">%s</a>',
                 get_permalink($post_id),
@@ -813,63 +869,167 @@ function notify_editors_after_publish($post_id, $new_theme) {
                 get_edit_post_link($post_id),
                 __('Edit it', 'weadapt')
             );
-
+    
             theme_mail_save_to_db(
                 $valid_contributors,
                 $subject,
                 $message
             );
             send_email_immediately($valid_contributors, $subject, $message);
-
+            error_log("Sent notification to valid contributors for post ID: $post_id");
+    
             // Update the custom field to mark the notification as sent
             update_post_meta($post_id, '_notification_sent', true);
+            error_log("Updated post meta to mark notification as sent for post ID: $post_id");
         }
 
-        // Remove duplicate user IDs to ensure each user only gets one email
-        $users = array_unique($users);
-
-        if (!empty($users)) { 
-            if ( $post->post_type == 'article' || $post->post_type == 'event'  || $post->post_type == 'organisation' ) {
-                $subject = sprintf( __( 'An %s has been published on %s', 'weadapt' ),
-                    ucfirst( $post->post_type ),
-                    get_bloginfo( 'name' )
-                );
-            } else {
-                $subject = sprintf( __( 'A %s has been published on %s', 'weadapt' ),
-                    ucfirst( $post->post_type ),
-                    get_bloginfo( 'name' )
-                );
-            }
-
-            $message = esc_html($post->post_title) . '<br>' . esc_html($post->post_excerpt) . '<br><br>';
-
-            if ($post_author_IDs = get_field('people_creator', $post_id)) {
-                $post_author_ID = $post_author_IDs[0];
-                $post_author = new WP_User($post_author_ID);
-                $author_organisations = get_field('organisations', $post_author);
-
-                if ($author_organisations) {
-                    $message .= sprintf('by %s from %s', $post_author->display_name, get_the_title($author_organisations[0]));
-                } else {
-                    $message .= sprintf('by %s', $post_author->display_name);
-                }
-                $message .= '<br>';
-            }
-
-            $message .= sprintf(' — <a href="%s">%s</a>', get_permalink($post_id), __('See it', 'weadapt')) . '<br>';
-            $message .= sprintf(' — <a href="%s">%s</a>', get_edit_post_link($post_id), __('Publish / Edit / Delete it', 'weadapt'));
-
-            // Save to database and send email immediately
-            theme_mail_save_to_db($users, $subject, $message);
-            send_email_immediately($users, $subject, $message);
-        }
-
-        // Set transient to mark notification as sent
-        set_transient('notified_post_' . $post_id, true, 60);
-
-        // Update post meta to mark notification as sent
-        update_post_meta($post_id, '_notification_sent', true);
+    } else {
+        
     
+    // Custom condition: skip notification if $send_notification is false
+    $notification_sent = get_post_meta($post_id, '_notification_sent', true);
+    if ($notification_sent) {
+        error_log("Notification already sent for post ID: $post_id");
+        return; // Exit if notification has already been sent
+    }
+
+    $published_for_the_first_time = (strtotime($post->post_date) >= (time() - 300));
+    error_log("Published for the first time: " . ($published_for_the_first_time ? 'yes' : 'no'));
+
+    // Notify editors of the new theme
+    notify_editors_of_new_theme($post_id, $new_theme);
+    error_log("Editors notified of new theme for post ID: $post_id");
+
+    // Gather the users to notify
+    $users = array();
+
+    // Adding main theme network editors
+    if ($main_theme_network = get_field('relevant_main_theme_network', $post_id)) {
+        error_log("Main theme network found for post ID: $post_id");
+        if ($main_theme_network_editors = get_field('people_editors', $main_theme_network)) {
+            if ($published_for_the_first_time) {
+                $admins = get_blog_administrators(false, 1);
+                $users = array_merge($users, $main_theme_network_editors, $admins);
+                error_log("Added main theme network editors and admins for post ID: $post_id");
+            } else {
+                $users = array_merge($users, $main_theme_network_editors);
+                error_log("Added main theme network editors for post ID: $post_id");
+            }
+        }
+    }
+
+       // Gather all potential valid contributors
+       $valid_contributors = get_field('people_contributors', $post_id) ?: array();
+       $people_creator = get_field('people_creator', $post_id) ?: array();
+       $valid_contributors = array_merge($valid_contributors, $people_creator);
+   
+       if (!empty($valid_contributors)) {
+           $subject = sprintf(
+               __('Your %s has been published on %s', 'weadapt'),
+               ucfirst($post->post_type),
+               get_bloginfo('name')
+           );
+   
+           $message = __('Your content has now been reviewed and published. It will be shared on our social media channels where relevant. Please do re-share! ', 'weadapt') . '<br><br>';
+           $message .= esc_html($post->post_title) . '<br>';
+           $message .= esc_html($post->post_excerpt) . '<br><br>';
+   
+           if (!empty($people_creator)) {
+               $post_author_ID = $people_creator[0];
+               $post_author = new WP_User($post_author_ID);
+               $author_organisations = get_field('organisations', $post_author);
+   
+               if ($author_organisations) {
+                   $message .= sprintf(
+                       'by %s from %s',
+                       $post_author->display_name,
+                       get_the_title($author_organisations[0])
+                   );
+               } else {
+                   $message .= sprintf(
+                       'by %s',
+                       $post_author->display_name
+                   );
+               }
+   
+               $message .= '<br>';
+           }
+   
+           $message .= sprintf(
+               ' — <a href="%s">%s</a>',
+               get_permalink($post_id),
+               __('See it', 'weadapt')
+           ) . '<br>';
+           $message .= sprintf(
+               ' — <a href="%s">%s</a>',
+               get_edit_post_link($post_id),
+               __('Edit it', 'weadapt')
+           );
+   
+           theme_mail_save_to_db(
+               $valid_contributors,
+               $subject,
+               $message
+           );
+           send_email_immediately($valid_contributors, $subject, $message);
+           error_log("Sent notification to valid contributors for post ID: $post_id");
+   
+           // Update the custom field to mark the notification as sent
+           update_post_meta($post_id, '_notification_sent', true);
+           error_log("Updated post meta to mark notification as sent for post ID: $post_id");
+       }
+   
+
+    // Remove duplicate user IDs to ensure each user only gets one email
+    $users = array_unique($users);
+
+    if (!empty($users)) {
+        if ($post->post_type == 'article' || $post->post_type == 'event' || $post->post_type == 'organisation') {
+            $subject = sprintf(
+                __('An %s has been published on %s', 'weadapt'),
+                ucfirst($post->post_type),
+                get_bloginfo('name')
+            );
+        } else {
+            $subject = sprintf(
+                __('A %s has been published on %s', 'weadapt'),
+                ucfirst($post->post_type),
+                get_bloginfo('name')
+            );
+        }
+
+        $message = esc_html($post->post_title) . '<br>' . esc_html($post->post_excerpt) . '<br><br>';
+
+        if ($post_author_IDs = get_field('people_creator', $post_id)) {
+            $post_author_ID = $post_author_IDs[0];
+            $post_author = new WP_User($post_author_ID);
+            $author_organisations = get_field('organisations', $post_author);
+
+            if ($author_organisations) {
+                $message .= sprintf('by %s from %s', $post_author->display_name, get_the_title($author_organisations[0]));
+            } else {
+                $message .= sprintf('by %s', $post_author->display_name);
+            }
+            $message .= '<br>';
+        }
+
+        $message .= sprintf(' — <a href="%s">%s</a>', get_permalink($post_id), __('See it', 'weadapt')) . '<br>';
+        $message .= sprintf(' — <a href="%s">%s</a>', get_edit_post_link($post_id), __('Publish / Edit / Delete it', 'weadapt'));
+
+        // Save to database and send email immediately
+        theme_mail_save_to_db($users, $subject, $message);
+        send_email_immediately($users, $subject, $message);
+        error_log("Sent notification to users for post ID: $post_id");
+    }
+
+    // Set transient to mark notification as sent
+    set_transient('notified_post_' . $post_id, true, 60);
+    error_log("Set transient for post ID: $post_id");
+
+    // Update post meta to mark notification as sent
+    update_post_meta($post_id, '_notification_sent', true);
+    error_log("Updated post meta to mark notification as sent for post ID: $post_id");
+}
 }
 
 add_action('notify_editors_after_publish', 'notify_editors_after_publish', 10, 2);
