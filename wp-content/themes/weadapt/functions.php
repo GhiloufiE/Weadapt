@@ -1021,6 +1021,77 @@ function notify_editors_after_publish($post_id, $new_theme) {
         send_email_immediately($users, $subject, $message);
         error_log("Sent notification to users for post ID: $post_id");
     }
+    $related_themes_networks = get_field('relevant_themes_networks', $post);
+    if (!empty($related_themes_networks)) {
+        foreach ($related_themes_networks as $theme_network_ID) {
+            $theme_network_editors = get_field('people_editors', $theme_network_ID);
+            if (!empty($theme_network_editors)) {
+                $theme_name = get_the_title($theme_network_ID);
+                $theme_editors_emails = [];
+    
+                foreach ($theme_network_editors as $editor_id) {
+                    $editor_data = get_userdata($editor_id);
+                    if ($editor_data && isset($editor_data->user_email)) {
+                        $theme_editors_emails[] = $editor_data->user_email;
+                    }
+                }
+                $theme_editors_emails = array_unique($theme_editors_emails);
+
+                if (!empty($theme_editors_emails)) {
+                    $subject = sprintf(
+                        __('Content has been published on %s which is related to your theme / network', 'weadapt'),
+                        get_bloginfo('name')
+                    );
+                    $post_author_IDs = get_field('people_creator', $post);
+                    $post_author = !empty($post_author_IDs) ? new WP_User($post_author_IDs[0]) : false;
+    
+                    if (!empty($post_author)) {
+                        $message = sprintf(
+                            __('Content has been published by <a href="%s">%s %s (%s)</a> on %s which is related to your theme / network: %s.', 'weadapt'),
+                            get_author_posts_url($post_author->ID),
+                            esc_attr($post_author->first_name),
+                            esc_attr($post_author->last_name),
+                            esc_attr($post_author->user_login),
+                            get_bloginfo('name'),
+                            esc_html($theme_name)
+                        ) . '<br><br>';
+                    } else {
+                        $message = sprintf(
+                            __('Content has been published on %s which is related to your theme / network: %s.', 'weadapt'),
+                            get_bloginfo('name'),
+                            esc_html($theme_name)
+                        ) . '<br><br>';
+                    }
+    
+                    $post_excerpt = get_the_excerpt($post);
+                    $post_excerpt = wp_strip_all_tags($post_excerpt);
+                    $post_excerpt = mb_strimwidth($post_excerpt, 0, 100, '...');
+                    $message .= __('You may like to create a link to it from your Theme / Network or discuss it in a Learning Forum.', 'weadapt') . '<br><br>';
+                    $post = get_post($post);
+                    $message .= sprintf(
+                        __('Content: %s', 'weadapt'),
+                        esc_html($post->post_title)
+                    ) . '<br>';
+                    $message .= sprintf(
+                        __('Summary: %s', 'weadapt'),
+                        esc_html($post_excerpt)
+                    ) . '<br><br>';
+                    $message .= sprintf(
+                        '<a href="%s">%s</a>',
+                        get_permalink($post),
+                        __('Go to the content', 'weadapt')
+                    );
+    
+                    theme_mail_save_to_db(
+                        $theme_editors_emails,
+                        $subject,
+                        $message
+                    );
+                    send_email_immediately($theme_editors_emails, $subject, $message);
+                }
+            }
+        }
+    }
 
     // Set transient to mark notification as sent
     set_transient('notified_post_' . $post_id, true, 60);
@@ -1056,11 +1127,17 @@ function update_theme_meta($post_id, $post = null, $update = null)
     $old_people_contributor = get_post_meta($post_id, 'people_contributors', true);
     $new_people_contributor = get_field('people_contributors', $post_id);
 
+    $old_relevent_theme = get_post_meta($post_id, 'relevant_themes_networks', true);
+    $new_relevent_theme = get_field('relevant_themes_networks', $post_id);
+
     error_log('Old theme: ' . json_encode($old_theme));
     error_log('New theme: ' . json_encode($new_theme));
 
     error_log('Old People Creator: ' . json_encode($old_people_contributor));
     error_log('New People Creator: ' . json_encode($new_people_contributor));
+
+    error_log('Old relevent theme: ' . json_encode($old_relevent_theme));
+    error_log('New relevent theme: ' . json_encode($new_relevent_theme));
 
     // Only proceed with updates if the theme or people_creator has changed
     if ($old_theme !== $new_theme || $old_people_contributor !== $new_people_contributor) {
@@ -1070,12 +1147,15 @@ function update_theme_meta($post_id, $post = null, $update = null)
         if ($old_people_contributor !== $new_people_contributor) {
             update_post_meta($post_id, 'people_contributors', $new_people_contributor);
         }
+        if ($old_relevent_theme !== $new_relevent_theme) {
+            update_post_meta($post_id, 'relevant_themes_networks', $new_relevent_theme);
+        }
 
         // Log theme and people creator update for debugging
     }
 
     // Trigger custom action to notify editors if the post is published and there are updates
-    if ($post->post_status === 'publish' && ($old_theme !== $new_theme || $old_people_contributor !== $new_people_contributor)) {
+    if ($post->post_status === 'publish' && ($old_theme !== $new_theme || $old_people_contributor !== $new_people_contributor || $old_relevent_theme !== $new_relevent_theme)) {
         // Clear any existing transient to avoid stale data
         delete_transient('notified_post_' . $post_id);
         do_action('notify_editors_after_publish', $post_id, $new_theme);

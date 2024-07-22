@@ -1,23 +1,5 @@
-<?php
-/**
- * Mail Notification on Publish Post
- *
- * For debugging use: error_log( print_r( $variable, true ) );
- */
-function theme_publish_post($post) {
-    if (!is_mailed_post_type($post->post_type)) {
-        return;
-    }
 
-    $post_ID = $post->ID;
-    $author_id = $post->post_author;
-    $contributors = get_field('people_contributors', $post_ID);
-    
-    // Check if the notification has already been sent
-    $notification_sent = get_post_meta($post_ID, '_notification_sent', true);
-    if ($notification_sent) {
-        return;
-    }
+<?php
 
     // // Exclude administrators from the contributors list
     // $valid_contributors = array();
@@ -104,69 +86,25 @@ function theme_publish_post($post) {
 
   
 
-    // Notify Editors of themes/networks ticked as ‘related’
-    if (!empty($related_themes_networks = get_field('relevant_themes_networks', $post_ID))) {
-        $relevant_users = [];
+/**
+ * Mail Notification on Publish Post
+ *
+ * For debugging use: error_log( print_r( $variable, true ) );
+ */
 
-        foreach ($related_themes_networks as $theme_network_ID) {
-            if (!empty($theme_network_editors = get_field('people_editors', $theme_network_ID))) {
-                $relevant_users = array_merge($relevant_users, $theme_network_editors);
-            }
-        }
+ function theme_publish_post($post) {
 
-        $relevant_users = array_unique($relevant_users);
+    // $contributors = get_field('people_contributors', $post);
 
-        if (!empty($relevant_users)) {
-            $subject = sprintf(
-                __('Content has been published on %s which is related to your theme / network', 'weadapt'),
-                get_bloginfo('name')
-            );
+    // // Check if the notification has already been sent
+    // $notification_sent = get_post_meta($post, '_notification_sent', true);
+    //  if ($notification_sent) {
+    //     error_log("Notification already sent for post ID: " . $post);
+    //     return;
+    // } 
 
-            $post_author_IDs = get_field('people_creator', $post_ID);
-            $post_author = !empty($post_author_IDs) ? new WP_User($post_author_IDs[0]) : false;
-
-            if (!empty($post_author)) {
-                $message = sprintf(
-                    __('Content has been published by <a href="%s">%s %s (%s)</a> on %s which is related to your theme / network.', 'weadapt'),
-                    get_author_posts_url($post_author->ID),
-                    esc_attr($post_author->user_firstname),
-                    esc_attr($post_author->user_lastname),
-                    esc_attr($post_author->user_login),
-                    get_bloginfo('name')
-                ) . '<br><br>';
-            } else {
-                $message = sprintf(
-                    __('Content has been published on %s which is related to your theme / network.', 'weadapt'),
-                    get_bloginfo('name')
-                ) . '<br><br>';
-            }
-
-            $message .= __('You may like to create a link to it from your Theme / Network or discuss it in a Learning Forum.', 'weadapt') . '<br><br>';
-
-            $message .= sprintf(
-                __('Content: %s', 'weadapt'),
-                esc_html($post->post_title)
-            ) . '<br>';
-            $message .= sprintf(
-                __('Summary: %s', 'weadapt'),
-                esc_html($post->post_excerpt)
-            ) . '<br><br>';
-            $message .= sprintf(
-                '<a href="%s">%s</a>',
-                get_permalink($post_ID),
-                __('Go to the content', 'weadapt')
-            );
-
-            theme_mail_save_to_db(
-                $relevant_users,
-                $subject,
-                $message
-            );
-            send_email_immediately($relevant_users, $subject, $message);
-        }
-    }
+ 
 }
-
 
 add_action('new_to_publish', 'theme_publish_post', 50);
 add_action('pending_to_publish', 'theme_publish_post', 50);
