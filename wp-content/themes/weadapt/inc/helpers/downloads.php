@@ -71,8 +71,8 @@ function get_cleaned_ip_downloaded( $file_id ){
 function get_download_count( $file_id ) {
     $download_count = (int) get_post_meta( $file_id, '_download_count', true );
     if ( $download_count === 0 ) {
-        return sprintf( _n( ' view', 'Views', 'weadapt' ), 0 );
+        return sprintf( _n( ' Download', 'Downloads', 'weadapt' ), 0 );
     }
     $download_count = normal_number( $download_count );
-    return sprintf( _n( '%s view', '%s Views', $download_count, 'weadapt' ), $download_count );
+    return sprintf( _n( '%s download', '%s Downloads', $download_count, 'weadapt' ), $download_count );
 }

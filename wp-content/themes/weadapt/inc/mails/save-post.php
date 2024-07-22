@@ -1,4 +1,5 @@
 <?php
+
 function theme_save_post( $post_ID, $post, $update ) {
     if ( ! isset( $_POST['_wpnonce'] ) || ! wp_verify_nonce( $_POST['_wpnonce'], 'update-post_' . $post_ID ) ) {
         return;
@@ -171,7 +172,7 @@ function on_pending_organisation( $ID, $post ) {
         foreach ( $published_to as $blog_id ) {
             $blog_editors = get_users( [
                 'blog_id' => $blog_id,
-                'exclude' => [1],  // Exclude 'Developers' User
+                'exclude' => [1], 
                 'theme_query' => true, // multisite fix
                 'role' => 'author',
                 'fields' => 'ID'
@@ -187,6 +188,7 @@ function on_pending_organisation( $ID, $post ) {
     $users = apply_filters( 'wp_mail_users', $users );
 
     if ( ! empty( $users ) ) {
+        $current_user = wp_get_current_user();
         $subject = sprintf( __( 'An Organisation is pending publication on [%s]', 'weadapt' ), get_bloginfo( 'name' ) );
         $message = sprintf( __( '%s %s (<a href="%s">%s</a>) has sent you an Organisation for review.', 'weadapt' ),
             esc_attr( $current_user->user_firstname ),
