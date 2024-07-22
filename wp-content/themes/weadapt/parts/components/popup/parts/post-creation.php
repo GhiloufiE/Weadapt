@@ -17,6 +17,7 @@
             </div>
             <input type="hidden" name="forum" id="forum-field" value="">
             <input type="hidden" name="post_type" id="post-type-field" value="">
+            <input type="hidden" name="user_id" value="<?php echo get_current_user_id(); ?>">
             <input type="hidden" name="action" value="create_post">
             <button type="submit" class="wp-block-button__link" style="margin-top: 20px"><?php _e('Create Post', 'weadapt'); ?></button>
         </form>

@@ -34,7 +34,7 @@ function get_post_views( $post_ID = false, $abridged = true, $with_title = true 
 	// With Title count
 	if ( $with_title ) {
 		// translators: %s is replaced with the views count
-		$output = sprintf( _n( '%s Page view', '%s Page views', $count, 'weadapt' ), $output );
+		$output = sprintf( _n( '%s View', '%s Views', $count, 'weadapt' ), $output );
 	}
 
 	return $output;

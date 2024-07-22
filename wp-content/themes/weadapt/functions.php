@@ -746,40 +746,40 @@ function get_editors_by_theme($theme)
 
 	return $editors;
 }
-function notify_editors_after_publish($post_id, $new_theme) {
-    
-    error_log("notify_editors_after_publish called for post ID: $post_id");
-    // Fetch the post using the post ID
+function notify_editors_after_publish($post_id, $new_theme)
+{
     $post = get_post($post_id);
     if (!$post) {
-        error_log("Post not found for ID: $post_id");
-        return; // Exit if post is not found
+        return;
     }
     $post_type_forum_topic = get_post_type($post_id);
-    error_log("Post type hhhhhhhhhhhhh : $post_type_forum_topic");
     if ($post_type_forum_topic == 'forum') {
         $forum_id = get_post_meta($post_id, 'forum', true);
         $theme_id = get_post_meta($forum_id, 'relevant_main_theme_network', true);
         $author = get_post_meta($post_id, 'author', true);
         $author = is_array($author) ? $author : array($author);
-        $users = array(); 
+        $users = array();
         $published_for_the_first_time = (strtotime($post->post_date) >= (time() - 300));
         $notification_sent = get_post_meta($post_id, '_notification_sent', true);
+
         if ($notification_sent) {
-            error_log("Notification already sent for post ID: $post_id");
-            return; // Exit if notification has already been sent
+            error_log("Post ID $post_id is recognized as an old post (notification already sent).");
+            return;
+        } else {
+            if ($published_for_the_first_time) {
+                error_log("Post ID $post_id is recognized as a new post (published for the first time).");
+            } else {
+                error_log("Post ID $post_id is recognized as an old post (not published for the first time but notification not sent).");
+            }
         }
-        error_log("Published for the first time: " . ($published_for_the_first_time ? 'yes' : 'no'));
+
         if ($theme_network = get_field('relevant_main_theme_network', $forum_id)) {
-            error_log("Main theme network found for post ID: $post_id");
             if ($main_theme_network_editors = get_field('people_editors', $theme_network)) {
                 if ($published_for_the_first_time) {
                     $admins = get_blog_administrators(false, 1);
                     $users = array_merge($users, $main_theme_network_editors, $admins);
-                    error_log("Added main theme network editors and admins for post ID: $post_id");
                 } else {
                     $users = array_merge($users, $main_theme_network_editors);
-                    error_log("Added main theme network editors for post ID: $post_id");
                 }
             }
         }
@@ -799,14 +799,14 @@ function notify_editors_after_publish($post_id, $new_theme) {
                     get_bloginfo('name')
                 );
             }
-    
+
             $message = esc_html($post->post_title) . '<br>' . esc_html($post->post_excerpt) . '<br><br>';
-    
+
             if ($post_author_IDs = get_field('author', $post_id)) {
                 $post_author_ID = $post_author_IDs[0];
                 $post_author = new WP_User($post_author_ID);
                 $author_organisations = get_field('organisations', $post_author);
-    
+
                 if ($author_organisations) {
                     $message .= sprintf('by %s from %s', $post_author->display_name, get_the_title($author_organisations[0]));
                 } else {
@@ -814,35 +814,32 @@ function notify_editors_after_publish($post_id, $new_theme) {
                 }
                 $message .= '<br>';
             }
-    
+
             $message .= sprintf(' — <a href="%s">%s</a>', get_permalink($post_id), __('See it', 'weadapt')) . '<br>';
             $message .= sprintf(' — <a href="%s">%s</a>', get_edit_post_link($post_id), __('Publish / Edit / Delete it', 'weadapt'));
-    
-            // Save to database and send email immediately
+
             theme_mail_save_to_db($users, $subject, $message);
             send_email_immediately($users, $subject, $message);
-            error_log("Sent notification to users for post ID: $post_id");
         }
- 
-  
-         $valid_contributors = get_field('people_contributors', $post_id) ?: array();
-         $valid_contributors = array_merge($author, $valid_contributors);
-         if (!empty($valid_contributors)) {
+
+        $valid_contributors = get_field('people_contributors', $post_id) ?: array();
+        $valid_contributors = array_merge($author, $valid_contributors);
+        if (!empty($valid_contributors)) {
             $subject = sprintf(
                 __('Your %s has been published on %s', 'weadapt'),
                 ucfirst($post->post_type),
                 get_bloginfo('name')
             );
-    
+
             $message = __('Your content has now been reviewed and published. It will be shared on our social media channels where relevant. Please do re-share! ', 'weadapt') . '<br><br>';
             $message .= esc_html($post->post_title) . '<br>';
             $message .= esc_html($post->post_excerpt) . '<br><br>';
-    
+
             if (!empty($people_creator)) {
                 $post_author_ID = $people_creator[0];
                 $post_author = new WP_User($post_author_ID);
                 $author_organisations = get_field('organisations', $post_author);
-    
+
                 if ($author_organisations) {
                     $message .= sprintf(
                         'by %s from %s',
@@ -855,10 +852,10 @@ function notify_editors_after_publish($post_id, $new_theme) {
                         $post_author->display_name
                     );
                 }
-    
+
                 $message .= '<br>';
             }
-    
+
             $message .= sprintf(
                 ' — <a href="%s">%s</a>',
                 get_permalink($post_id),
@@ -869,238 +866,239 @@ function notify_editors_after_publish($post_id, $new_theme) {
                 get_edit_post_link($post_id),
                 __('Edit it', 'weadapt')
             );
-    
+
             theme_mail_save_to_db(
                 $valid_contributors,
                 $subject,
                 $message
             );
-            send_email_immediately($valid_contributors, $subject, $message);
-            error_log("Sent notification to valid contributors for post ID: $post_id");
-    
-            // Update the custom field to mark the notification as sent
+            //send_email_immediately($valid_contributors, $subject, $message);
             update_post_meta($post_id, '_notification_sent', true);
-            error_log("Updated post meta to mark notification as sent for post ID: $post_id");
-        }
-
-    } else {
-        
-    
-    // Custom condition: skip notification if $send_notification is false
-    $notification_sent = get_post_meta($post_id, '_notification_sent', true);
-    if ($notification_sent) {
-        error_log("Notification already sent for post ID: $post_id");
-        return; // Exit if notification has already been sent
-    }
-
-    $published_for_the_first_time = (strtotime($post->post_date) >= (time() - 300));
-    error_log("Published for the first time: " . ($published_for_the_first_time ? 'yes' : 'no'));
-
-    // Notify editors of the new theme
-    notify_editors_of_new_theme($post_id, $new_theme);
-    error_log("Editors notified of new theme for post ID: $post_id");
-
-    // Gather the users to notify
-    $users = array();
-
-    // Adding main theme network editors
-    if ($main_theme_network = get_field('relevant_main_theme_network', $post_id)) {
-        error_log("Main theme network found for post ID: $post_id");
-        if ($main_theme_network_editors = get_field('people_editors', $main_theme_network)) {
-            if ($published_for_the_first_time) {
-                $admins = get_blog_administrators(false, 1);
-                $users = array_merge($users, $main_theme_network_editors, $admins);
-                error_log("Added main theme network editors and admins for post ID: $post_id");
-            } else {
-                $users = array_merge($users, $main_theme_network_editors);
-                error_log("Added main theme network editors for post ID: $post_id");
-            }
         }
     }
-
-       // Gather all potential valid contributors
-       $valid_contributors = get_field('people_contributors', $post_id) ?: array();
-       $people_creator = get_field('people_creator', $post_id) ?: array();
-       $valid_contributors = array_merge($valid_contributors, $people_creator);
-   
-       if (!empty($valid_contributors)) {
-           $subject = sprintf(
-               __('Your %s has been published on %s', 'weadapt'),
-               ucfirst($post->post_type),
-               get_bloginfo('name')
-           );
-   
-           $message = __('Your content has now been reviewed and published. It will be shared on our social media channels where relevant. Please do re-share! ', 'weadapt') . '<br><br>';
-           $message .= esc_html($post->post_title) . '<br>';
-           $message .= esc_html($post->post_excerpt) . '<br><br>';
-   
-           if (!empty($people_creator)) {
-               $post_author_ID = $people_creator[0];
-               $post_author = new WP_User($post_author_ID);
-               $author_organisations = get_field('organisations', $post_author);
-   
-               if ($author_organisations) {
-                   $message .= sprintf(
-                       'by %s from %s',
-                       $post_author->display_name,
-                       get_the_title($author_organisations[0])
-                   );
-               } else {
-                   $message .= sprintf(
-                       'by %s',
-                       $post_author->display_name
-                   );
-               }
-   
-               $message .= '<br>';
-           }
-   
-           $message .= sprintf(
-               ' — <a href="%s">%s</a>',
-               get_permalink($post_id),
-               __('See it', 'weadapt')
-           ) . '<br>';
-           $message .= sprintf(
-               ' — <a href="%s">%s</a>',
-               get_edit_post_link($post_id),
-               __('Edit it', 'weadapt')
-           );
-   
-           theme_mail_save_to_db(
-               $valid_contributors,
-               $subject,
-               $message
-           );
-           send_email_immediately($valid_contributors, $subject, $message);
-           error_log("Sent notification to valid contributors for post ID: $post_id");
-   
-           // Update the custom field to mark the notification as sent
-           update_post_meta($post_id, '_notification_sent', true);
-           error_log("Updated post meta to mark notification as sent for post ID: $post_id");
-       }
-   
-
-    // Remove duplicate user IDs to ensure each user only gets one email
-    $users = array_unique($users);
-
-    if (!empty($users)) {
-        if ($post->post_type == 'article' || $post->post_type == 'event' || $post->post_type == 'organisation') {
-            $subject = sprintf(
-                __('An %s has been published on %s', 'weadapt'),
-                ucfirst($post->post_type),
-                get_bloginfo('name')
-            );
-        } else {
-            $subject = sprintf(
-                __('A %s has been published on %s', 'weadapt'),
-                ucfirst($post->post_type),
-                get_bloginfo('name')
-            );
+    // Your %s content has been published 
+    else {
+        $notification_sent = get_post_meta($post_id, '_notification_sent', true);
+        $published_for_the_first_time = (strtotime($post->post_date) >= (time() - 300));
+        if ($notification_sent) {
+            error_log("Post ID $post_id is recognized as an old post (notification already sent).");
+            return;
         }
 
-        $message = esc_html($post->post_title) . '<br>' . esc_html($post->post_excerpt) . '<br><br>';
-
-        if ($post_author_IDs = get_field('people_creator', $post_id)) {
-            $post_author_ID = $post_author_IDs[0];
-            $post_author = new WP_User($post_author_ID);
-            $author_organisations = get_field('organisations', $post_author);
-
-            if ($author_organisations) {
-                $message .= sprintf('by %s from %s', $post_author->display_name, get_the_title($author_organisations[0]));
-            } else {
-                $message .= sprintf('by %s', $post_author->display_name);
-            }
-            $message .= '<br>';
-        }
-
-        $message .= sprintf(' — <a href="%s">%s</a>', get_permalink($post_id), __('See it', 'weadapt')) . '<br>';
-        $message .= sprintf(' — <a href="%s">%s</a>', get_edit_post_link($post_id), __('Publish / Edit / Delete it', 'weadapt'));
-
-        // Save to database and send email immediately
-        theme_mail_save_to_db($users, $subject, $message);
-        send_email_immediately($users, $subject, $message);
-        error_log("Sent notification to users for post ID: $post_id");
-    }
-    $related_themes_networks = get_field('relevant_themes_networks', $post);
-    if (!empty($related_themes_networks)) {
-        foreach ($related_themes_networks as $theme_network_ID) {
-            $theme_network_editors = get_field('people_editors', $theme_network_ID);
-            if (!empty($theme_network_editors)) {
-                $theme_name = get_the_title($theme_network_ID);
-                $theme_editors_emails = [];
-    
-                foreach ($theme_network_editors as $editor_id) {
-                    $editor_data = get_userdata($editor_id);
-                    if ($editor_data && isset($editor_data->user_email)) {
-                        $theme_editors_emails[] = $editor_data->user_email;
-                    }
+        $users = array();
+        if ($main_theme_network = get_field('relevant_main_theme_network', $post_id)) {
+            if ($main_theme_network_editors = get_field('people_editors', $main_theme_network)) {
+                if ($published_for_the_first_time) {
+                    $admins = get_blog_administrators(false, 1);
+                    $users = array_merge($users, $main_theme_network_editors, $admins);
+                } else {
+                    $users = array_merge($users, $main_theme_network_editors);
                 }
-                $theme_editors_emails = array_unique($theme_editors_emails);
+            }
+        }
+        if ($published_for_the_first_time) {
+            $valid_contributors = get_field('people_contributors', $post_id) ?: array();
+            $people_creator = get_field('people_creator', $post_id) ?: array();
+            $valid_contributors = array_merge($valid_contributors, $people_creator);
 
-                if (!empty($theme_editors_emails)) {
+            if (!empty($valid_contributors)) {
+                $subject = sprintf(
+                    __('Your %s has been published on %s', 'weadapt'),
+                    ucfirst($post->post_type),
+                    get_bloginfo('name')
+                );
+
+                $message = __('Your content has now been reviewed and published. It will be shared on our social media channels where relevant. Please do re-share! ', 'weadapt') . '<br><br>';
+                $message .= esc_html($post->post_title) . '<br>';
+                $message .= esc_html($post->post_excerpt) . '<br><br>';
+
+                if (!empty($people_creator)) {
+                    $post_author_ID = $people_creator[0];
+                    $post_author = new WP_User($post_author_ID);
+                    $author_organisations = get_field('organisations', $post_author);
+
+                    if ($author_organisations) {
+                        $message .= sprintf(
+                            'by %s from %s',
+                            $post_author->display_name,
+                            get_the_title($author_organisations[0])
+                        );
+                    } else {
+                        $message .= sprintf(
+                            'by %s',
+                            $post_author->display_name
+                        );
+                    }
+
+                    $message .= '<br>';
+                }
+
+                $message .= sprintf(
+                    ' — <a href="%s">%s</a>',
+                    get_permalink($post_id),
+                    __('See it', 'weadapt')
+                ) . '<br>';
+                $message .= sprintf(
+                    ' — <a href="%s">%s</a>',
+                    get_edit_post_link($post_id),
+                    __('Edit it', 'weadapt')
+                );
+
+                theme_mail_save_to_db(
+                    $valid_contributors,
+                    $subject,
+                    $message
+                );
+                send_email_immediately($valid_contributors, $subject, $message);
+
+                update_post_meta($post_id, '_notification_sent', true);
+            }
+
+
+            $users = array_unique($users);
+            // an article has been published on weadapt
+            $admins = get_blog_administrators(false, 1);
+            $users = array_merge($users, $admins);
+            if (!empty($users)) {
+                if ($post->post_type == 'article' || $post->post_type == 'event' || $post->post_type == 'organisation') {
                     $subject = sprintf(
-                        __('Content has been published on %s which is related to your theme / network', 'weadapt'),
+                        __('An %s has been published on %s', 'weadapt'),
+                        ucfirst($post->post_type),
                         get_bloginfo('name')
                     );
-                    $post_author_IDs = get_field('people_creator', $post);
-                    $post_author = !empty($post_author_IDs) ? new WP_User($post_author_IDs[0]) : false;
-    
-                    if (!empty($post_author)) {
-                        $message = sprintf(
-                            __('Content has been published by <a href="%s">%s %s (%s)</a> on %s which is related to your theme / network: %s.', 'weadapt'),
-                            get_author_posts_url($post_author->ID),
-                            esc_attr($post_author->first_name),
-                            esc_attr($post_author->last_name),
-                            esc_attr($post_author->user_login),
-                            get_bloginfo('name'),
-                            esc_html($theme_name)
-                        ) . '<br><br>';
-                    } else {
-                        $message = sprintf(
-                            __('Content has been published on %s which is related to your theme / network: %s.', 'weadapt'),
-                            get_bloginfo('name'),
-                            esc_html($theme_name)
-                        ) . '<br><br>';
-                    }
-    
-                    $post_excerpt = get_the_excerpt($post);
-                    $post_excerpt = wp_strip_all_tags($post_excerpt);
-                    $post_excerpt = mb_strimwidth($post_excerpt, 0, 100, '...');
-                    $message .= __('You may like to create a link to it from your Theme / Network or discuss it in a Learning Forum.', 'weadapt') . '<br><br>';
-                    $post = get_post($post);
-                    $message .= sprintf(
-                        __('Content: %s', 'weadapt'),
-                        esc_html($post->post_title)
-                    ) . '<br>';
-                    $message .= sprintf(
-                        __('Summary: %s', 'weadapt'),
-                        esc_html($post_excerpt)
-                    ) . '<br><br>';
-                    $message .= sprintf(
-                        '<a href="%s">%s</a>',
-                        get_permalink($post),
-                        __('Go to the content', 'weadapt')
+                } else {
+                    $subject = sprintf(
+                        __('A %s has been published on %s', 'weadapt'),
+                        ucfirst($post->post_type),
+                        get_bloginfo('name')
                     );
-    
-                    theme_mail_save_to_db(
-                        $theme_editors_emails,
-                        $subject,
-                        $message
-                    );
-                    send_email_immediately($theme_editors_emails, $subject, $message);
                 }
+
+                $message = esc_html($post->post_title) . '<br>' . esc_html($post->post_excerpt) . '<br><br>';
+                if ($published_for_the_first_time) {
+                    if ($post_author_IDs = get_field('people_creator', $post_id)) {
+                        $post_author_ID = $post_author_IDs[0];
+                        $post_author = new WP_User($post_author_ID);
+                        $author_organisations = get_field('organisations', $post_author);
+
+                        if ($author_organisations) {
+                            $message .= sprintf('by %s from %s', $post_author->display_name, get_the_title($author_organisations[0]));
+                        } else {
+                            $message .= sprintf('by %s', $post_author->display_name);
+                        }
+                        $message .= '<br>';
+                    }
+
+                    $message .= sprintf(' — <a href="%s">%s</a>', get_permalink($post_id), __('See it', 'weadapt')) . '<br>';
+                    $message .= sprintf(' — <a href="%s">%s</a>', get_edit_post_link($post_id), __('Publish / Edit / Delete it', 'weadapt'));
+
+                    theme_mail_save_to_db($users, $subject, $message);
+
+
+                    send_email_immediately($users, $subject, $message);
+                }
+            } else {
+                error_log("not post published for the first time else an article has been pubslished");
             }
         }
+        // related to your theme/network 
+        if ($published_for_the_first_time) {
+
+            $related_themes_networks = get_field('relevant_themes_networks', $post);
+            error_log("get_field('relevant_themes_networks'): " . print_r($related_themes_networks, true));
+
+            if (!empty($related_themes_networks)) {
+                foreach ($related_themes_networks as $theme_network_ID) {
+                    $theme_network_editors = get_field('people_editors', $theme_network_ID);
+                    error_log("get_field('people_editors') for theme_network_ID $theme_network_ID: " . print_r($theme_network_editors, true));
+
+                    if (!empty($theme_network_editors)) {
+                        $theme_name = get_the_title($theme_network_ID);
+                        $theme_editors_user_ids = [];
+
+                        foreach ($theme_network_editors as $editor_id) {
+                            $editor_data = get_userdata($editor_id);
+                            if ($editor_data && isset($editor_data->user_email)) {
+                                $theme_editors_user_ids[] = $editor_id;
+                            }
+                        }
+
+                        $theme_editors_user_ids = array_unique($theme_editors_user_ids);
+                        error_log("theme_editors_user_ids for theme_network_ID $theme_network_ID: " . print_r($theme_editors_user_ids, true));
+
+                        if (!empty($theme_editors_user_ids)) {
+                            $subject = sprintf(
+                                __('Content has been published on %s which is related to your theme / network', 'weadapt'),
+                                get_bloginfo('name')
+                            );
+
+                            $post_author_IDs = get_field('people_creator', $post);
+                            $post_author = !empty($post_author_IDs) ? new WP_User($post_author_IDs[0]) : false;
+
+                            if (!empty($post_author)) {
+                                $message = sprintf(
+                                    __('Content has been published by <a href="%s">%s %s (%s)</a> on %s which is related to your theme / network: %s.', 'weadapt'),
+                                    get_author_posts_url($post_author->ID),
+                                    esc_attr($post_author->first_name),
+                                    esc_attr($post_author->last_name),
+                                    esc_attr($post_author->user_login),
+                                    get_bloginfo('name'),
+                                    esc_html($theme_name)
+                                ) . '<br><br>';
+                            } else {
+                                $message = sprintf(
+                                    __('Content has been published on %s which is related to your theme / network: %s.', 'weadapt'),
+                                    get_bloginfo('name'),
+                                    esc_html($theme_name)
+                                ) . '<br><br>';
+                            }
+
+                            $post_excerpt = get_the_excerpt($post);
+                            $post_excerpt = wp_strip_all_tags($post_excerpt);
+                            $post_excerpt = mb_strimwidth($post_excerpt, 0, 100, '...');
+
+                            $message .= __('You may like to create a link to it from your Theme / Network or discuss it in a Learning Forum.', 'weadapt') . '<br><br>';
+                            $message .= sprintf(
+                                __('Content: %s', 'weadapt'),
+                                esc_html($post->post_title)
+                            ) . '<br>';
+                            $message .= sprintf(
+                                __('Summary: %s', 'weadapt'),
+                                esc_html($post_excerpt)
+                            ) . '<br><br>';
+                            $message .= sprintf(
+                                '<a href="%s">%s</a>',
+                                get_permalink($post),
+                                __('Go to the content', 'weadapt')
+                            );
+
+                            error_log("Before calling theme_mail_save_to_db");
+                            theme_mail_save_to_db(
+                                $theme_editors_user_ids, // Ensure user IDs are passed
+                                $subject,
+                                $message
+                            );
+
+                            error_log("Before calling send_email_immediately");
+                            send_email_immediately($theme_editors_user_ids, $subject, $message);
+                            error_log("Email sent and DB save functions called");
+                        } else {
+                            error_log("theme_editors_user_ids is empty, skipping email and DB save");
+                        }
+                    } else {
+                        error_log("theme_network_editors is empty, skipping email and DB save");
+                    }
+                }
+            } else {
+                error_log("related_themes_networks is empty, nothing to process");
+            }
+
+            set_transient('notified_post_' . $post_id, true, 60);
+            update_post_meta($post_id, '_notification_sent', true);
+        } else {
+            error_log("Post not published for the first time; else block executed.");
+        }
     }
-
-    // Set transient to mark notification as sent
-    set_transient('notified_post_' . $post_id, true, 60);
-    error_log("Set transient for post ID: $post_id");
-
-    // Update post meta to mark notification as sent
-    update_post_meta($post_id, '_notification_sent', true);
-    error_log("Updated post meta to mark notification as sent for post ID: $post_id");
-}
 }
 
 add_action('notify_editors_after_publish', 'notify_editors_after_publish', 10, 2);
