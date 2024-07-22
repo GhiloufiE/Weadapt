@@ -92,11 +92,24 @@
  * For debugging use: error_log( print_r( $variable, true ) );
  */
 
-/* 
+ function theme_publish_post($post) {
+
+    // $contributors = get_field('people_contributors', $post);
+
+    // // Check if the notification has already been sent
+    // $notification_sent = get_post_meta($post, '_notification_sent', true);
+    //  if ($notification_sent) {
+    //     error_log("Notification already sent for post ID: " . $post);
+    //     return;
+    // } 
+
+ 
+}
+
 add_action('new_to_publish', 'theme_publish_post', 50);
 add_action('pending_to_publish', 'theme_publish_post', 50);
 add_action('draft_to_publish', 'theme_publish_post', 50);
 add_action('auto-draft_to_publish', 'theme_publish_post', 50);
 add_action('future_to_publish', 'theme_publish_post', 50);
 add_action('private_to_publish', 'theme_publish_post', 50);
-add_action('trash_to_publish', 'theme_publish_post', 50); */
+add_action('trash_to_publish', 'theme_publish_post', 50);
