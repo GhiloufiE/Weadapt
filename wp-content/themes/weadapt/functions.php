@@ -1105,6 +1105,10 @@ add_action('notify_editors_after_publish', 'notify_editors_after_publish', 10, 2
 
 
 
+add_action('notify_editors_after_publish', 'notify_editors_after_publish', 10, 2);
+
+
+
 function update_theme_meta($post_id, $post = null, $update = null)
 {
     if (wp_is_post_autosave($post_id) || wp_is_post_revision($post_id)) {
