@@ -5,7 +5,7 @@
  * For debugging use: error_log( print_r( $variable, true ) );
  */
 function theme_publish_post($post) {
-    if (!is_mailed_post_type($post->post_type)) {
+   /*  if (!is_mailed_post_type($post->post_type)) {
         return;
     }
 
@@ -17,7 +17,7 @@ function theme_publish_post($post) {
     $notification_sent = get_post_meta($post_ID, '_notification_sent', true);
     if ($notification_sent) {
         return;
-    }
+    } */
 
     // // Exclude administrators from the contributors list
     // $valid_contributors = array();
@@ -105,7 +105,7 @@ function theme_publish_post($post) {
   
 
     // Notify Editors of themes/networks ticked as ‘related’
-    if (!empty($related_themes_networks = get_field('relevant_themes_networks', $post_ID))) {
+    /* if (!empty($related_themes_networks = get_field('relevant_themes_networks', $post_ID))) {
         $relevant_users = [];
 
         foreach ($related_themes_networks as $theme_network_ID) {
@@ -164,35 +164,15 @@ function theme_publish_post($post) {
             );
             send_email_immediately($relevant_users, $subject, $message);
         }
-    }
+    } */
 }
 
 
-<<<<<<< HEAD
- function theme_publish_post($post) {
 
-    // $contributors = get_field('people_contributors', $post);
-
-    // // Check if the notification has already been sent
-    // $notification_sent = get_post_meta($post, '_notification_sent', true);
-    //  if ($notification_sent) {
-    //     error_log("Notification already sent for post ID: " . $post);
-    //     return;
-    // } 
-
- 
-}
-
-=======
->>>>>>> parent of 85279248 (Forum notifications changes)
 add_action('new_to_publish', 'theme_publish_post', 50);
 add_action('pending_to_publish', 'theme_publish_post', 50);
 add_action('draft_to_publish', 'theme_publish_post', 50);
 add_action('auto-draft_to_publish', 'theme_publish_post', 50);
 add_action('future_to_publish', 'theme_publish_post', 50);
 add_action('private_to_publish', 'theme_publish_post', 50);
-<<<<<<< HEAD
 add_action('trash_to_publish', 'theme_publish_post', 50);
-=======
-add_action('trash_to_publish', 'theme_publish_post', 50);
->>>>>>> parent of 85279248 (Forum notifications changes)
