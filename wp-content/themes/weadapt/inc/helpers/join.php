@@ -241,6 +241,7 @@ if ( ! function_exists( 'get_members_count' ) ) :
 		if ( $count === 0 && $hide_if_empty ) {
 			return '';
 		}
+		global $post;
 		$post_id = $post->ID;
 		if ( 'forums' === $type ) {
 			$theme_id = get_field('relevant_main_theme_network', $post_id);
