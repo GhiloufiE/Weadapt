@@ -17,6 +17,7 @@
 		'meta_query'     => [[
 			'key'   => 'relevant_main_theme_network',
 			'value' => get_the_ID(),
+			'compare' => 'LIKE',
 		]],
 		'ignore_sticky_posts' => true,
 		'theme_query'         => true, // multisite fix
