@@ -30,6 +30,12 @@ $items = [
 		'selected' => false,
 		'label' => __( 'Members', 'weadapt' ),
 	],
+	[
+		'id' => 'tab-members',
+		'controls' => 'tab-forum-panel',
+		'selected' => false,
+		'label' => __( 'Forum topics', 'weadapt' ),
+	],
 ];
 
 get_part( 'components/single-tabs-nav/index', ['items' => $items] );
