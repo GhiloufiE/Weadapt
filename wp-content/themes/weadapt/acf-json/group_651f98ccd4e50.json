@@ -7,7 +7,7 @@
             "label": "Main Theme\/Network",
             "name": "relevant_main_theme_network",
             "aria-label": "",
-            "type": "post_object",
+            "type": "relationship",
             "instructions": "",
             "required": 0,
             "conditional_logic": 0,
@@ -17,16 +17,20 @@
                 "id": ""
             },
             "post_type": [
-                "theme",
-                "network"
+                "network",
+                "theme"
             ],
             "post_status": "",
             "taxonomy": "",
+            "filters": [
+                "search",
+                "post_type"
+            ],
             "return_format": "id",
-            "multiple": 0,
-            "allow_null": 0,
+            "min": "",
+            "max": "",
+            "elements": "",
             "bidirectional": 0,
-            "ui": 1,
             "bidirectional_target": []
         },
         {
@@ -115,5 +119,5 @@
     "active": true,
     "description": "4 [article | course | event | blog | case-study]",
     "show_in_rest": 0,
-    "modified": 1711074833
+    "modified": 1721772767
 }

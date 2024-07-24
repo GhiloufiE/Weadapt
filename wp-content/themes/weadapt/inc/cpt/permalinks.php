@@ -106,20 +106,29 @@ add_filter('rewrite_rules_array', function($rules) {
  * Custom Permalinks
  */
 add_filter('post_type_link', function( $post_link, $post, $leavename, $sample ) {
+    
+    // Blog, Articles, Courses, Events
+    if ( false !== strpos( $post_link, '/%main_theme_network%/' ) ) {
+        $main_theme_networks = get_field( 'relevant_main_theme_network', $post->ID );
 
-	// Blog, Articles, Courses, Events
-	if ( false !== strpos( $post_link, '/%main_theme_network%/' ) ) {
-		$main_theme_network_ID = get_field( 'relevant_main_theme_network', $post->ID );
+        if ( ! empty( $main_theme_networks ) && is_array( $main_theme_networks ) ) {
+            // Get the first non-empty main theme network
+            foreach ( $main_theme_networks as $main_theme_network_ID ) {
+                if ( ! empty( $main_theme_network_ID ) ) {
+                    $main_theme_network = get_post( $main_theme_network_ID );
+                    if ( $main_theme_network ) {
+                        $post_link = str_replace( '%main_theme_network%', $main_theme_network->post_name, $post_link );
+                        break;
+                    }
+                }
+            }
+        }
+        
+        // If no valid main theme network was found, remove the placeholder
+        if ( false !== strpos( $post_link, '/%main_theme_network%' ) ) {
+            $post_link = str_replace( '/%main_theme_network%', '', $post_link );
+        }
+    }
 
-		if ( ! empty( $main_theme_network_ID ) ) {
-			$main_theme_network = get_post( $main_theme_network_ID );
-
-			$post_link = str_replace( '%main_theme_network%', $main_theme_network->post_name, $post_link );
-		}
-		else {
-			$post_link = str_replace( '/%main_theme_network%', '', $post_link );
-		}
-	}
-
-	return $post_link;
+    return $post_link;
 }, 10, 4);

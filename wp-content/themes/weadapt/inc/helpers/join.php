@@ -216,42 +216,48 @@ if ( ! function_exists( 'get_members_count' ) ) :
 		global $wpdb;
 		global $join_table;
 
+		// If no post_ID is provided, try to get it from the global $post
 		if ( empty( $post_ID ) ) {
 			global $post;
+
+			if ( ! isset( $post->ID ) ) {
+				return ''; // Exit early if $post is not set
+			}
 
 			$post_ID = $post->ID;
 		}
 
-		$type  = ! empty( $type ) ? $type : get_post_type( $post_ID );
+		$type = ! empty( $type ) ? $type : get_post_type( $post_ID );
 
 		if ( 'organisation' === $type ) {
-			$count = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT( $wpdb->users.ID ) as count
+			$count = (int) $wpdb->get_var( $wpdb->prepare( 
+				"SELECT COUNT( $wpdb->users.ID ) as count
 				FROM $wpdb->users
 				LEFT JOIN $wpdb->usermeta ON $wpdb->users.ID = $wpdb->usermeta.user_id
-				WHERE $wpdb->usermeta.meta_key = 'organisations' AND $wpdb->usermeta.meta_value LIKE '%:\"%d\"%'", $post_ID )
-			);
-		}
-		else {
-			$count = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $join_table WHERE join_id = %d and type = %s",
-				$post_ID,
-				$type
+				WHERE $wpdb->usermeta.meta_key = 'organisations' AND $wpdb->usermeta.meta_value LIKE %s", 
+				'%:"' . $post_ID . '"%'
+			) );
+		} elseif ( 'forums' === $type ) {
+			$theme_id = get_field('relevant_main_theme_network', $post_ID);
+			$count = (int) $wpdb->get_var( $wpdb->prepare( 
+				"SELECT COUNT(*) FROM $join_table WHERE join_id = %d", 
+				$theme_id 
+			) );
+		} else {
+			$count = (int) $wpdb->get_var( $wpdb->prepare( 
+				"SELECT COUNT(*) FROM $join_table WHERE join_id = %d AND type = %s", 
+				$post_ID, 
+				$type 
 			) );
 		}
 
 		if ( $count === 0 && $hide_if_empty ) {
 			return '';
 		}
-		$post_id = $post->ID;
-		if ( 'forums' === $type ) {
-			$theme_id = get_field('relevant_main_theme_network', $post_id);
-			$count = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $join_table WHERE join_id = %d ", $theme_id ) );
-			$count_html = $count; 
-		}
 
 		if ( 'user' === $type ) {
 			$count_html = sprintf( _n( '%s Follower', '%s Followers', $count, 'weadapt' ), $count );
-		}
-		else {
+		} else {
 			$count_html = sprintf( _n( '%s Member', '%s Members', $count, 'weadapt' ), $count );
 		}
 
@@ -259,10 +265,11 @@ if ( ! function_exists( 'get_members_count' ) ) :
 			'<span class="join-count" data-id="%d" data-type="%s">%s</span>',
 			$post_ID,
 			$type,
-			$count_html 
+			$count_html
 		);
 	}
 endif;
+
 
 
 if ( ! function_exists( 'get_followed_posts' ) ) :

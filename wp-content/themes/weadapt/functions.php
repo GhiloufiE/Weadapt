@@ -235,54 +235,56 @@ function forum_new_post_notification($post_id)
         } else {
             return;
         }
-        $meta_value = get_post_meta($forum_post_id, 'relevant_main_theme_network', true);
-        if ($meta_value) {
-            $theme_name = get_the_title($forum_post_id);
-
-            $table_name = $wpdb->prefix . 'wa_join';
-            $user_ids = $wpdb->get_col($wpdb->prepare("SELECT user_id FROM $table_name WHERE join_id = %s", $meta_value));
-
-            if (!empty($user_ids)) {
-                $users_table_name = $wpdb->prefix . 'users';
-                $user_ids_placeholder = implode(',', array_fill(0, count($user_ids), '%d'));
-                $query_user_emails = $wpdb->prepare("SELECT ID, user_email, display_name FROM $users_table_name WHERE ID IN ($user_ids_placeholder)", $user_ids);
-                $user_emails_results = $wpdb->get_results($query_user_emails);
-
-                $post_title = get_the_title($post_id);
-                $post_excerpt = get_the_excerpt($post_id);
-                $post_excerpt = wp_strip_all_tags($post_excerpt);
-                $post_excerpt = mb_strimwidth($post_excerpt, 0, 100, '...');
-                $post_link = get_permalink($post_id);
-                $site_name = get_bloginfo('name');
+        $meta_values = get_field('relevant_main_theme_network', $forum_post_id);
+        if ($meta_values && is_array($meta_values)) {
+            foreach ($meta_values as $meta_value) {
                 $theme_name = get_the_title($forum_post_id);
-                $theme_link = get_permalink($meta_value);
-                $post_type = get_post_type($post_id);
 
-                $post_type_labels = array(
-                    'forum' => 'Forum Topic'
-                );
+                $table_name = $wpdb->prefix . 'wa_join';
+                $user_ids = $wpdb->get_col($wpdb->prepare("SELECT user_id FROM $table_name WHERE join_id = %s", $meta_value));
 
-                $post_type_label = isset($post_type_labels[$post_type]) ? $post_type_labels[$post_type] : 'Post';
-                $subject = "New forum discussion in the $theme_name theme on weADAPT";
+                if (!empty($user_ids)) {
+                    $users_table_name = $wpdb->prefix . 'users';
+                    $user_ids_placeholder = implode(',', array_fill(0, count($user_ids), '%d'));
+                    $query_user_emails = $wpdb->prepare("SELECT ID, user_email, display_name FROM $users_table_name WHERE ID IN ($user_ids_placeholder)", $user_ids);
+                    $user_emails_results = $wpdb->get_results($query_user_emails);
 
-                foreach ($user_emails_results as $user) {
-                    $recipient_email = $user->user_email;
-                    $display_name = $user->display_name;
+                    $post_title = get_the_title($post_id);
+                    $post_excerpt = get_the_excerpt($post_id);
+                    $post_excerpt = wp_strip_all_tags($post_excerpt);
+                    $post_excerpt = mb_strimwidth($post_excerpt, 0, 100, '...');
+                    $post_link = get_permalink($post_id);
+                    $site_name = get_bloginfo('name');
+                    $theme_name = get_the_title($forum_post_id);
+                    $theme_link = get_permalink($meta_value);
+                    $post_type = get_post_type($post_id);
 
-                    $message = "Hi $display_name, <br><br>";
-                    $message .= "We wanted to inform you of a new Forum Discussion in the <b>$theme_name</b> theme you are a member of.<br><br>
-                    Title: $post_title <br>
-                    Content: $post_excerpt <br><br>
-                    Reply to the conversation and engage with other members here:<br>
-                    <a href='$post_link'>$post_title</a><br><br>
-                    Thank you for your continued participation and contributions to our community.<br><br>
-                    If you do not want to receive any more notifications, you can unsubscribe from this theme by following this link and clicking on 'Unsubscribe Theme':<br>
-                    <a href='$theme_link'>Unsubscribe Theme</a><br><br>
-                    Best Regards,<br>
-                    $site_name";
+                    $post_type_labels = array(
+                        'forum' => 'Forum Topic'
+                    );
 
-                    $headers = array('Content-Type: text/html; charset=UTF-8');
-                    //wp_mail($recipient_email, $subject, $message, $headers);
+                    $post_type_label = isset($post_type_labels[$post_type]) ? $post_type_labels[$post_type] : 'Post';
+                    $subject = "New forum discussion in the $theme_name theme on weADAPT";
+
+                    foreach ($user_emails_results as $user) {
+                        $recipient_email = $user->user_email;
+                        $display_name = $user->display_name;
+
+                        $message = "Hi $display_name, <br><br>";
+                        $message .= "We wanted to inform you of a new Forum Discussion in the <b>$theme_name</b> theme you are a member of.<br><br>
+                        Title: $post_title <br>
+                        Content: $post_excerpt <br><br>
+                        Reply to the conversation and engage with other members here:<br>
+                        <a href='$post_link'>$post_title</a><br><br>
+                        Thank you for your continued participation and contributions to our community.<br><br>
+                        If you do not want to receive any more notifications, you can unsubscribe from this theme by following this link and clicking on 'Unsubscribe Theme':<br>
+                        <a href='$theme_link'>Unsubscribe Theme</a><br><br>
+                        Best Regards,<br>
+                        $site_name";
+
+                        $headers = array('Content-Type: text/html; charset=UTF-8');
+                        //wp_mail($recipient_email, $subject, $message, $headers);
+                    }
                 }
             }
         }
@@ -291,6 +293,7 @@ function forum_new_post_notification($post_id)
 }
 
 add_action('acf/save_post', 'forum_new_post_notification', 10, 1);
+
 
 
 function handle_create_post()
@@ -454,7 +457,6 @@ function create_forum_post_on_theme_creation($new_status, $old_status, $post)
 }
 function notify_admin_on_edit($new_status, $old_status, $post)
 {
-
     $ignored_old_statuses = array('auto-draft', 'inherit', 'new', 'draft', 'future', 'pending', 'trash');
     if (in_array($old_status, $ignored_old_statuses)) {
         return;
@@ -504,6 +506,7 @@ function notify_admin_on_edit($new_status, $old_status, $post)
 }
 add_action('transition_post_status', 'notify_admin_on_edit', 10, 3);
 
+
 add_action('save_post', function ($post_id) {
     delete_post_meta($post_id, '_notify_admin_on_edit_sent');
 });
@@ -535,7 +538,7 @@ function notify_editors_after_publish($post_id, $new_theme)
     $post_type_forum_topic = get_post_type($post_id);
     if ($post_type_forum_topic == 'forum') {
         $forum_id = get_post_meta($post_id, 'forum', true);
-        $theme_id = get_post_meta($forum_id, 'relevant_main_theme_network', true);
+        $theme_ids = get_post_meta($forum_id, 'relevant_main_theme_network', true);
         $author = get_post_meta($post_id, 'author', true);
         $author = is_array($author) ? $author : array($author);
         $users = array();
@@ -545,13 +548,15 @@ function notify_editors_after_publish($post_id, $new_theme)
         if ($notification_sent) {
             return;
         }
-        if ($theme_network = get_field('relevant_main_theme_network', $forum_id)) {
-            if ($main_theme_network_editors = get_field('people_editors', $theme_network)) {
-                if ($published_for_the_first_time) {
-                    $admins = get_blog_administrators(false, 1);
-                    $users = array_merge($users, $main_theme_network_editors, $admins);
-                } else {
-                    $users = array_merge($users, $main_theme_network_editors);
+        if (is_array($theme_ids)) {
+            foreach ($theme_ids as $theme_network) {
+                if ($main_theme_network_editors = get_field('people_editors', $theme_network)) {
+                    if ($published_for_the_first_time) {
+                        $admins = get_blog_administrators(false, 1);
+                        $users = array_merge($users, $main_theme_network_editors, $admins);
+                    } else {
+                        $users = array_merge($users, $main_theme_network_editors);
+                    }
                 }
             }
         }
@@ -662,13 +667,15 @@ function notify_editors_after_publish($post_id, $new_theme)
         }
 
         $users = array();
-        if ($main_theme_network = get_field('relevant_main_theme_network', $post_id)) {
-            if ($main_theme_network_editors = get_field('people_editors', $main_theme_network)) {
-                if ($published_for_the_first_time) {
-                    $admins = get_blog_administrators(false, 1);
-                    $users = array_merge($users, $main_theme_network_editors, $admins);
-                } else {
-                    $users = array_merge($users, $main_theme_network_editors);
+        if (is_array($main_theme_network = get_field('relevant_main_theme_network', $post_id))) {
+            foreach ($main_theme_network as $theme_network) {
+                if ($main_theme_network_editors = get_field('people_editors', $theme_network)) {
+                    if ($published_for_the_first_time) {
+                        $admins = get_blog_administrators(false, 1);
+                        $users = array_merge($users, $main_theme_network_editors, $admins);
+                    } else {
+                        $users = array_merge($users, $main_theme_network_editors);
+                    }
                 }
             }
         }
@@ -857,7 +864,6 @@ function notify_editors_after_publish($post_id, $new_theme)
     }
 }
 
-
 add_action('notify_editors_after_publish', 'notify_editors_after_publish', 10, 2);
 
 
@@ -877,16 +883,17 @@ function update_theme_meta($post_id, $post = null, $update = null)
     }
 
     $old_theme = get_post_meta($post_id, '_relevant_main_theme_network_old', true);
-    $new_theme = get_field('relevant_main_theme_network', $post_id);
+    $new_themes = get_field('relevant_main_theme_network', $post_id);
 
     $old_people_contributor = get_post_meta($post_id, 'people_contributors', true);
     $new_people_contributor = get_field('people_contributors', $post_id);
 
     $old_relevent_theme = get_post_meta($post_id, 'relevant_themes_networks', true);
     $new_relevent_theme = get_field('relevant_themes_networks', $post_id);
-    if ($old_theme !== $new_theme || $old_people_contributor !== $new_people_contributor) {
-        if ($old_theme !== $new_theme) {
-            update_post_meta($post_id, '_relevant_main_theme_network_old', $new_theme);
+
+    if ($old_theme !== $new_themes || $old_people_contributor !== $new_people_contributor) {
+        if ($old_theme !== $new_themes) {
+            update_post_meta($post_id, '_relevant_main_theme_network_old', $new_themes);
         }
         if ($old_people_contributor !== $new_people_contributor) {
             update_post_meta($post_id, 'people_contributors', $new_people_contributor);
@@ -896,9 +903,9 @@ function update_theme_meta($post_id, $post = null, $update = null)
         }
     }
 
-    if ($post->post_status === 'publish' && ($old_theme !== $new_theme || $old_people_contributor !== $new_people_contributor || $old_relevent_theme !== $new_relevent_theme)) {
+    if ($post->post_status === 'publish' && ($old_theme !== $new_themes || $old_people_contributor !== $new_people_contributor || $old_relevent_theme !== $new_relevent_theme)) {
         delete_transient('notified_post_' . $post_id);
-        do_action('notify_editors_after_publish', $post_id, $new_theme);
+        do_action('notify_editors_after_publish', $post_id, $new_themes);
     }
 }
 
