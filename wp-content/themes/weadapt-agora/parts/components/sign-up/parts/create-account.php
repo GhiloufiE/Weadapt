@@ -49,6 +49,54 @@
 	<div class="col-12 col-md-6">
 		<span class="ajax-form__description"><?php _e( 'Provide a password for the new account in both fields.', 'weadapt' ); ?></span>
 	</div>
+	<div class="col-12 col-md-6">
+		<p class="ajax-form__field">
+			<label for="user-roles"><?php _e('Roles', 'weadapt'); ?></label>
+			<?php
+			$terms = get_terms(
+				array(
+					'taxonomy' => 'role',
+					'hide_empty' => false,
+				)
+			);
+
+			if (!empty($terms) && !is_wp_error($terms)) {
+				echo '<select id="user-roles" multiple="multiple" name="role[]">';
+				foreach ($terms as $term) {
+					echo '<option value="' . esc_attr($term->term_id) . '">' . esc_html($term->name) . '</option>';
+				}
+				echo '</select>';
+			} else {
+				echo 'No roles found.';
+			}
+			?>
+		</p>
+	</div>
+	
+	<div class="col-12 col-md-6">
+			<p class="ajax-form__field">
+				<label for="user-country"><?php _e('Country', 'weadapt'); ?></label>
+					<option value=""><?php _e('Select Country', 'weadapt'); ?></option>
+					<?php
+					// Get the field object using the field key
+					$field_key = "field_6437a20cbbc21"; // Replace with your actual field key if different
+					$field = get_field_object($field_key);
+
+					if ($field) {
+						echo '<select name="' . esc_attr($field['name']) . '">';
+
+						foreach ($field['choices'] as $value => $label) {
+							echo '<option value="' . esc_attr($value) . '">' . esc_html($label) . '</option>';
+						}
+
+						echo '</select>';
+					}
+					?>
+				
+			</p>
+		</div>
+
+
 	<div class="col-12 col-md-12">
     <div class="registration__checkbox">
         <label class="registration-form__checkbox">
@@ -59,6 +107,10 @@
             </span>
         </label>
     </div>
+
+
+
+
 </div>
 	
 </div>
@@ -88,7 +140,7 @@
 	display:inline-flex !important;
 }
 </style>
-<?php
+<!-- <?php
 	$google_recaptcha_site_key = get_field( 'google_recaptcha_site_key', 'options' );
 
 	if ( ! empty( $google_recaptcha_site_key ) ) {
@@ -106,7 +158,7 @@
 			</script>
 		<?php
 	}
-?>
+?> -->
 
 <?php wp_nonce_field( 'ajax-create-nonce', 'ajax_create_nonce' ); ?>
 <input type="hidden" name="redirect_to" value="<?php echo get_current_url(); ?>">

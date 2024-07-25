@@ -201,6 +201,7 @@ function theme_ajax_create() {
 		$user_pass         = sanitize_text_field( trim( wp_unslash( $_POST['user_pass'] ) ) );
 		$user_pass_confirm = sanitize_text_field( trim( wp_unslash( $_POST['user_pass_confirm'] ) ) );
 		$redirect_url      = esc_url( trim( $_POST['redirect_to'] ) );
+		$address_country   = sanitize_text_field( trim( $_POST['country'] ) );
 
 		if ( $user_pass !== $user_pass_confirm ) {
 			die_json_message( 'error', __( "Passwords don't match!", 'weadapt' ) );
@@ -217,6 +218,12 @@ function theme_ajax_create() {
 		if ( is_wp_error( $user_ID ) ) {
 			die_json_message( 'error', $user_ID->get_error_message() );
 		} else {
+			$roles = isset($_POST['role']) ? $_POST['role'] : array();
+			update_field('role', $roles, 'user_' . $user_ID);
+
+			update_user_meta($user_ID, 'user_roles', $roles);
+			update_user_meta($user_ID, 'address_country', $address_country);
+
 			$new_user_additional_mail['subject'] = 'Welcome to the Agora Community Hub';
 			$new_user_additional_mail['message'] = "<p>[" . get_bloginfo( 'name' ) . "] Login Details</p>" .
 				"<p>Username: " . $user_name . "<br />Password: " . $user_pass . "</p><br />" .
@@ -225,7 +232,7 @@ function theme_ajax_create() {
 				"<p>This is a <a href=\"https://weadapt.org/microsites/\"> weADAPT microsite</a> which connects to the <a href=\"https://weadapt.org\"> weADAPT community and its content </a> to amplify the impact of your work.</p><br />" .
 				"<p>Here you can <b>learn</b> about climate adaptation issues,<b>share</b> your knowledge and experience, <b>connect</b> with citizens, researchers, practitioners and decision-makers and create adaptation <b>action</b> around the world.</p>" .
 				"<p>We encourage you to upload a profile image that portrays climate change adaptation challenges or opportunities in your region. Please fill in the information on your profile page as much as possible, as this will make it more easily searchable and will ensure you see content that is relevant to you.</p>" .
-				"<p>Sharing information on the  <a href=\"https://agoracommunity.org\">Agora Community Hub</a> is simple - just follow these step-by-step guidelines for <a href=\"https://agoracommunity.org/agora-guidance/\">addin content</a>.</p>" .
+				"<p>Sharing information on the  <a href=\"https://agoracommunity.org\">Agora Community Hub</a> is simple - just follow these step-by-step guidelines for <a href=\"https://agoracommunity.org/agora-guidance/\">adding content</a>.</p>" .
 				"<p>To keep up to date with the latest news and content you can join us on <a href=\"https://www.linkedin.com/company/adaptation-agora/\">LinkedIn</a>, <a href=\"https://www.linkedin.com/company/adaptation-agora\">Twitter/X</a> or <a href=\"https://www.facebook.com/profile.php?id=100090701292038\">Facebook</a>, and <a href=\"https://adaptationagora.eu/join-our-community/\">join the community</a>.</p><br />" .
 				"<p>We use these outlets to share your content widely and give it the greatest visibility.</p><br />" .
 				"<p>If you require assistance or would like training on the use of the platform, please get in touch with us at <a href=\"mailto:info@weadapt.org\">info@weadapt.org</a>.</p><br />" .
@@ -241,8 +248,7 @@ function theme_ajax_create() {
 
 			if ( ! $send ) {
 				die_json_message( 'error', esc_html__( 'The email could not be sent. Your site may not be correctly configured to send emails.', 'weadapt' ) );
-			}
-			else {
+			} else {
 				theme_auth_user( $user_name, $user_pass, $redirect_url, esc_html__( 'Register successful, redirecting...', 'weadapt' ) );
 			}
 		}

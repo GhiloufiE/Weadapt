@@ -71,16 +71,21 @@ function theme_posts_column_content( $colname, $post_ID ) {
 			}
 			break;
 
-		case 'theme':
-			$main_theme_network = get_field( 'relevant_main_theme_network', $post_ID );
-
-			if ( empty( $main_theme_network ) ) {
-				echo '—';
-			}
-			else {
-				echo get_the_title( $main_theme_network );
-			}
-			break;
+			case 'theme':
+				$main_theme_network = get_field( 'relevant_main_theme_network', $post_ID );
+	
+				if ( empty( $main_theme_network ) ) {
+					echo '—';
+				} else {
+					$theme_titles = array();
+	
+					foreach ( $main_theme_network as $theme_id ) {
+						$theme_titles[] = get_the_title( $theme_id );
+					}
+	
+					echo implode( ', ', $theme_titles );
+				}
+				break;
 
 		case 'users':
 			$user_query = new WP_User_Query( [
