@@ -148,18 +148,20 @@ switch ( $type ) {
 		];
 
 		$relevant = get_field( 'relevant' );
-		$main_theme_network = get_field( 'relevant_main_theme_network' );
-
-		if ( ! empty( $main_theme_network ) ) {
-			$type_ID = $main_theme_network;
-
-			$fields['type_link'] = [
-				'url'    => get_permalink( $type_ID ),
-				'title'  => get_the_title( $type_ID ),
-				'target' => '_self',
-			];
+		$main_theme_networks = get_field('relevant_main_theme_network', $post_ID);
+		error_log(print_r($main_theme_networks, true));
+		if (!empty($main_theme_networks) && is_array($main_theme_networks)) {
+			$fields['type_link'] = []; 
+			foreach ($main_theme_networks as $type_ID) {
+				if (!empty($type_ID)) {
+					$fields['type_link'][] = [ 
+						'url' => get_permalink($type_ID),
+						'title' => get_the_title($type_ID),
+						'target' => '_self',
+					];
+				}
+			}
 		}
-
 		$people  = get_field( 'people' );
 		$authors = ! empty( $people['contributors'] ) ? $people['contributors']: array();
 
@@ -192,60 +194,102 @@ switch ( $type ) {
 	<div class="single-hero__container container">
 		<div class="single-hero__row row <?php echo empty( $thumb_ID ) ? 'single-hero__row_top' : ''; ?>">
 			<div class="single-hero__left">
-				<div class="single-hero__left-inner">
-					<?php if ( array_key_exists( 'type_link', $fields ) && ! empty( $type_item = $fields['type_link'] ) ) : ?>
-						<div class="single-hero__types">
-							<?php
-								if ( is_array( $type_item ) ) {
-									echo get_button(
-										$type_item,
-										'outline-small',
-										'single-hero__type'
-									);
-								}
-								else {
-									?><span><?php echo esc_html( $type_item ); ?></span><?php
-								}
-							?>
-						</div>
+			<div class="single-hero__left-inner">
+					<?php if (array_key_exists('type_link', $fields) && !empty($fields['type_link']) && is_array($fields['type_link'])) : ?>
+					    <div class="single-hero__types">
+						<style>
+						.single-hero__types {
+						    display: flex;
+						    gap: 1rem;
+						    flex-wrap: wrap; /* Ensure items wrap if necessary */
+						}
+						
+						@media (max-width: 768px) {
+						    .single-hero__types {
+						        flex-direction: column;
+						        gap: 0.5rem; /* Adjust gap for smaller screens */
+						    }
+						}
+						</style>
+					        <?php foreach ($fields['type_link'] as $type_item) : 
+					            echo get_button(
+					                $type_item,
+					                'outline-small',
+					                'single-hero__type'
+					            );
+					        endforeach; ?>
+					    </div>
 					<?php endif; ?>
-
 					<h1 class="single-hero__title" id="main-heading"><?php echo $title; ?></h1>
 
-					
+					<?php if ($excerpt) : ?>
+						<div class="single-hero__excerpt"><?php echo $excerpt; ?></div>
+					<?php endif; ?>
 
 					<?php
-						if ( ! empty( $authors ) ) {
-							$author_class  = 'single-hero__author cpt-list-item__author';
+					if (!empty($authors)) {
+						$author_class = 'single-hero__author cpt-list-item__author';
 
-							if ( count( $authors ) > 1 ) {
-								$author_class .= ' cpt-list-item__author--multiple';
-							}
-							the_post_author_html( $authors, $author_class, '', $post_author_html );
+						if (count($authors) > 1) {
+							$author_class .= ' cpt-list-item__author--multiple';
 						}
+						the_post_author_html($authors, $author_class, '', $post_author_html);
+					}
 					?>
 
-					<?php if ( ! empty( $post_meta_items ) ) : ?>
+					<?php if (!empty($post_meta_items)) : ?>
 						<ul class="post-meta single-hero__meta">
-							<?php foreach ( $post_meta_items as $item ) :
-								$id = isset( $item[2] ) ? 'id="' . $item[2] . '"' : '';
+							<?php
+							$post_ID = get_the_ID();
+							$views = get_post_views($post_ID);
+							echo " $views";
+
+							set_post_views($post_ID); ?>
+							<?php foreach ($post_meta_items as $item) :
+								$id = isset($item[2]) ? 'id="' . $item[2] . '"' : '';
 							?>
 								<li class="post-meta__item">
-									<span class="icon" aria-label="<?php echo esc_attr( $item[0] ); ?>"><?php echo get_img( $item[0] ); ?></span>
+
+									<span class="icon" aria-label="<?php echo esc_attr($item[0]); ?>"><?php echo get_img($item[0]); ?></span>
 
 									<span class="text" <?php echo $id; ?>><?php echo $item[1]; ?></span>
 								</li>
 							<?php endforeach; ?>
-							<?php if( $type === 'event' ) :
-							    $date_html = get_event_formatted_date( $post_ID);
-                               	if( ! empty( $date_html ) ) : ?>
-                                    <li class="post-meta__item event_date">
-                                        <span class="text" ><b><?php echo $date_html; ?></b></span>
-                                    </li>
-                                <?php endif ?>
+
+							<?php
+							if ($type === 'theme') : ?>
+								<div class="wp-block-button">
+									<button class="wp-block-button__link has-background" data-post-id="<?php echo esc_attr($post_ID); ?>" data-post-type="forum" data-popup="post-creation" onclick="setPostDetails(this)">
+										<?php echo sprintf("<span>%s</span>", esc_html__("Start a conversation", "weadapt")); ?>
+									</button>
+								</div>
+								<script>
+									function setPostDetails(button) {
+										const postId = button.getAttribute('data-post-id');
+										const postType = button.getAttribute('data-post-type');
+										const forumField = document.getElementById('forum-field');
+										const postTypeField = document.getElementById('post-type-field');
+
+										if (forumField) {
+											forumField.value = postId;
+										}
+										if (postTypeField) {
+											postTypeField.value = postType;
+										}
+									}
+								</script>
+							<?php endif; ?>
+							<?php if ($type === 'event') :
+								$date_html = get_event_formatted_date($post_ID);
+								if (!empty($date_html)) : ?>
+									<li class="post-meta__item">
+										<span class="text"><b><?php echo $date_html; ?></b></span>
+									</li>
+								<?php endif ?>
 							<?php endif ?>
 						</ul>
 					<?php endif; ?>
+
 				</div>
 			</div>
 
