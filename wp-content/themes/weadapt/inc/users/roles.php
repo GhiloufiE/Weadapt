@@ -178,40 +178,43 @@ add_action( 'init', function() {
 	// Author (Editor)
 	if ( in_array( 'author', $current_user->roles ) ) {
 		add_filter( 'map_meta_cap', function( $caps, $cap, $user_id, $args ) {
-
+	
 			if (
 				// $args[0] holds post ID.
 				! empty( $args[0] ) &&
-
+	
 				// Only edit_post cap
 				'edit_others_posts' === $cap
 			) {
 				$caps = ['do_not_allow'];
 			}
-
-
+	
+	
 			if (
 				// $args[0] holds post ID.
 				! empty( $args[0] ) &&
-
+	
 				// Only edit_post cap
 				'edit_post' === $cap
 			) {
-				$main_theme_network = get_field( 'relevant_main_theme_network', $args[0] );
-
-				if ( ! empty( $main_theme_network ) ) {
-					$main_theme_network_editors = get_field( 'people_editors', $main_theme_network );
-
-					if (
-						! empty( $main_theme_network_editors ) &&
-						in_array( $user_id, $main_theme_network_editors )
-					) {
-						$caps = [ 'edit_posts' ];
+				$main_theme_networks = get_field( 'relevant_main_theme_network', $args[0] );
+	
+				if ( ! empty( $main_theme_networks ) && is_array( $main_theme_networks ) ) {
+					foreach ( $main_theme_networks as $main_theme_network ) {
+						$main_theme_network_editors = get_field( 'people_editors', $main_theme_network );
+	
+						if (
+							! empty( $main_theme_network_editors ) &&
+							in_array( $user_id, $main_theme_network_editors )
+						) {
+							$caps = [ 'edit_posts' ];
+							break;
+						}
 					}
 				}
-
+	
 				$people = get_field( 'people', $args[0] );
-
+	
 				foreach ( [
 					'creator',
 					'publisher',
@@ -222,16 +225,17 @@ add_action( 'init', function() {
 						$caps = ['edit_posts'];
 					}
 				}
-
+	
 				// Allow Microsite Editors edit Organization
 				if ( get_post_type($args[0]) === 'organisation' ) {
 					$caps = ['edit_posts'];
 				}
 			}
-
+	
 			return $caps;
 		}, 10, 4 );
 	}
+	
 
 	// Administrator / Editor (Microsite Editor)
 	if (
