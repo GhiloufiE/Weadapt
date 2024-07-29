@@ -155,16 +155,19 @@ switch ($type) {
 		];
 
 		$relevant = get_field('relevant');
-		$main_theme_network = get_field('relevant_main_theme_network');
-
-		if (!empty($main_theme_network)) {
-			$type_ID = $main_theme_network;
-
-			$fields['type_link'] = [
-				'url' => get_permalink($type_ID),
-				'title' => get_the_title($type_ID),
-				'target' => '_self',
-			];
+		$main_theme_networks = get_field('relevant_main_theme_network', $post_ID);
+		error_log(print_r($main_theme_networks, true));
+		if (!empty($main_theme_networks) && is_array($main_theme_networks)) {
+			$fields['type_link'] = []; 
+			foreach ($main_theme_networks as $type_ID) {
+				if (!empty($type_ID)) {
+					$fields['type_link'][] = [ 
+						'url' => get_permalink($type_ID),
+						'title' => get_the_title($type_ID),
+						'target' => '_self',
+					];
+				}
+			}
 		}
 
 		$people = get_field('people');
@@ -242,20 +245,30 @@ switch ($type) {
 		<div class="single-hero__row row <?php echo empty($thumb_ID) ? 'single-hero__row_top' : ''; ?>">
 			<div class="single-hero__left">
 				<div class="single-hero__left-inner">
-					<?php if (array_key_exists('type_link', $fields) && !empty($type_item = $fields['type_link'])) : ?>
-						<div class="single-hero__types">
-							<?php
-							if (is_array($type_item)) {
-								echo get_button(
-									$type_item,
-									'outline-small',
-									'single-hero__type'
-								);
-							} else {
-							?><span><?php echo esc_html($type_item); ?></span><?php
-																				}
-																					?>
-						</div>
+				<?php if (array_key_exists('type_link', $fields) && !empty($fields['type_link']) && is_array($fields['type_link'])) : ?>
+					    <div class="single-hero__types">
+						<style>
+						.single-hero__types {
+						    display: flex;
+						    gap: 1rem;
+						    flex-wrap: wrap; /* Ensure items wrap if necessary */
+						}
+						
+						@media (max-width: 768px) {
+						    .single-hero__types {
+						        flex-direction: column;
+						        gap: 0.5rem; /* Adjust gap for smaller screens */
+						    }
+						}
+						</style>
+					        <?php foreach ($fields['type_link'] as $type_item) : 
+					            echo get_button(
+					                $type_item,
+					                'outline-small',
+					                'single-hero__type'
+					            );
+					        endforeach; ?>
+					    </div>
 					<?php endif; ?>
 
 					<h1 class="single-hero__title" id="main-heading"><?php echo $title; ?></h1>

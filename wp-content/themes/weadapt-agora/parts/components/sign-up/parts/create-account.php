@@ -76,8 +76,7 @@
 		<p class="ajax-form__field">
 			<label for="user-country"><?php _e('Country', 'weadapt'); ?></label>
 			<?php
-			// Get the field object using the field key
-			$field_key = "field_6437a20cbbc21"; // Replace with your actual field key if different
+			$field_key = "field_6437a20cbbc21"; 
 			$field = get_field_object($field_key);
 
 			if ($field) {
@@ -92,7 +91,16 @@
 		</p>
 	</div>
 
-
+	<div class="col-12 col-md-6">
+		<p class="ajax-form__field">
+			<?php 	$field_key = "field_6437a28bbbc22"; 
+			$field = get_field_object($field_key);
+			?>
+			<label for="user-town-city"><?php _e('Town/City', 'weadapt'); ?><span class="required">*</span></label>
+			<input id="user-town-city" type="text" name="<?php  esc_attr($field['name']); ?>">
+		</p>
+	</div>
+	
 	<div class="col-12 col-md-12">
 		<div class="registration__checkbox">
 			<label class="registration-form__checkbox">
