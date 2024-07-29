@@ -4,16 +4,17 @@
 /**
  * Add Reset Password Attributes/Code
  */
-function theme_popup_attributes() {
-	if ( isset( $_GET['action'] ) && $_GET['action'] === 'reset-password' ) {
+function theme_popup_attributes()
+{
+	if (isset($_GET['action']) && $_GET['action'] === 'reset-password') {
 		echo ' data-popup="reset-password"';
 
-		add_action( 'popup-content', function() {
-			echo get_part( 'components/popup/index', [
-				'template'  => 'reset-password',
+		add_action('popup-content', function () {
+			echo get_part('components/popup/index', [
+				'template' => 'reset-password',
 				'is_active' => true
-			] );
-		} );
+			]);
+		});
 	}
 }
 
@@ -21,60 +22,59 @@ function theme_popup_attributes() {
 /**
  * Die Json Message
  */
-function die_json_message( $status = '', $message = '', $reload = false, $timeout = 0, $popup_trigger = '') {
+function die_json_message($status = '', $message = '', $reload = false, $timeout = 0, $popup_trigger = '')
+{
 	$data = [
-		'status'  => $status,
+		'status' => $status,
 		'message' => $message
 	];
 
-	if ( $reload ) {
+	if ($reload) {
 		$data['reload'] = $reload;
 	}
 
-	if ( $timeout ) {
+	if ($timeout) {
 		$data['timeout'] = $timeout;
 	}
 
-	if ( $popup_trigger ) {
+	if ($popup_trigger) {
 		$data['popupTrigger'] = $popup_trigger;
 	}
 
-	wp_die( json_encode( $data ) );
+	wp_die(json_encode($data));
 }
 
 
 /**
  * Auth User
  */
-function theme_auth_user( $user_login, $user_password, $redirect_url, $custom_message = '' ) {
-	if ( is_email( $user_login ) ) {
-		$user_by_email = get_user_by( 'email', $user_login );
+function theme_auth_user($user_login, $user_password, $redirect_url, $custom_message = '')
+{
+	if (is_email($user_login)) {
+		$user_by_email = get_user_by('email', $user_login);
 
-		if ( ! $user_by_email ) {
-			die_json_message( 'error', esc_html__( 'Email not recognised. Please try again.', 'weadapt' ) );
+		if (!$user_by_email) {
+			die_json_message('error', esc_html__('Email not recognised. Please try again.', 'weadapt'));
 		}
 
 		$user_name = $user_by_email->user_login;
-	}
-	else {
+	} else {
 		$user_name = $user_login;
 	}
 
-	$user_signon = wp_signon( [
-		'user_login'    => $user_name,
+	$user_signon = wp_signon([
+		'user_login' => $user_name,
 		'user_password' => $user_password,
-		'remember'      => true
-	], is_ssl() );
+		'remember' => true
+	], is_ssl());
 
-	if ( is_wp_error( $user_signon ) ) {
-		die_json_message( 'error', esc_html__( 'Email or password not recognised. Please try again.', 'weadapt' ) );
-	}
-	else {
-		if ( $custom_message ) {
-			die_json_message( 'success', $custom_message, $redirect_url );
-		}
-		else {
-			die_json_message( 'success', esc_html__( 'Log In successful, redirecting...', 'weadapt' ), $redirect_url );
+	if (is_wp_error($user_signon)) {
+		die_json_message('error', esc_html__('Email or password not recognised. Please try again.', 'weadapt'));
+	} else {
+		if ($custom_message) {
+			die_json_message('success', $custom_message, $redirect_url);
+		} else {
+			die_json_message('success', esc_html__('Log In successful, redirecting...', 'weadapt'), $redirect_url);
 		}
 	}
 
@@ -85,73 +85,69 @@ function theme_auth_user( $user_login, $user_password, $redirect_url, $custom_me
 /**
  * Ajax Log In
  */
-function theme_ajax_login() {
-	if ( ! wp_verify_nonce( $_POST['ajax_login_nonce'], 'ajax-login-nonce' ) ) {
-		die_json_message( 'error', esc_html__( 'Sorry, the verification data does not match', 'weadapt' ) );
-	}
-	else {
-		$user_name    = sanitize_text_field( trim( $_POST['user_name'] ) );
-		$user_pass    = sanitize_text_field( trim( $_POST['user_pass'] ) );
-		$redirect_url = esc_url( trim( $_POST['redirect_to'] ) );
+function theme_ajax_login()
+{
+	if (!wp_verify_nonce($_POST['ajax_login_nonce'], 'ajax-login-nonce')) {
+		die_json_message('error', esc_html__('Sorry, the verification data does not match', 'weadapt'));
+	} else {
+		$user_name = sanitize_text_field(trim($_POST['user_name']));
+		$user_pass = sanitize_text_field(trim($_POST['user_pass']));
+		$redirect_url = esc_url(trim($_POST['redirect_to']));
 
-		theme_auth_user( $user_name, $user_pass, $redirect_url );
+		theme_auth_user($user_name, $user_pass, $redirect_url);
 	}
 
 	die();
 }
-add_action( 'wp_ajax_theme_ajax_login', 'theme_ajax_login' );
-add_action( 'wp_ajax_nopriv_theme_ajax_login', 'theme_ajax_login' );
+add_action('wp_ajax_theme_ajax_login', 'theme_ajax_login');
+add_action('wp_ajax_nopriv_theme_ajax_login', 'theme_ajax_login');
 
 
 /**
  * Ajax Forgot
  */
-function theme_ajax_forgot() {
-	require_once( ABSPATH . 'wp-includes/class-phpass.php' );
+function theme_ajax_forgot()
+{
+	require_once (ABSPATH . 'wp-includes/class-phpass.php');
 
-	if ( ! wp_verify_nonce( $_POST['ajax_forgot_nonce'], 'ajax-forgot-nonce' ) ) {
-		die_json_message( 'error', esc_html__( 'Sorry, the verification data does not match', 'weadapt' ) );
-	}
-	else {
-		$user_login = sanitize_text_field( trim( $_POST['user_name'] ) );
+	if (!wp_verify_nonce($_POST['ajax_forgot_nonce'], 'ajax-forgot-nonce')) {
+		die_json_message('error', esc_html__('Sorry, the verification data does not match', 'weadapt'));
+	} else {
+		$user_login = sanitize_text_field(trim($_POST['user_name']));
 
-		if ( ! $user_login ) {
-			die_json_message( 'error', esc_html__( 'Empty username or email address!', 'weadapt' ) );
-		}
-		else {
-			if ( is_email( $user_login ) ) {
-				$current_user = get_user_by( 'email', $user_login );
-			}
-			else {
-				$current_user = get_user_by( 'login', $user_login );
+		if (!$user_login) {
+			die_json_message('error', esc_html__('Empty username or email address!', 'weadapt'));
+		} else {
+			if (is_email($user_login)) {
+				$current_user = get_user_by('email', $user_login);
+			} else {
+				$current_user = get_user_by('login', $user_login);
 			}
 
-			if ( empty( $current_user->data ) ) {
-				die_json_message( 'error', esc_html__( 'This user does not exist!', 'weadapt' ) );
-			}
-			else {
+			if (empty($current_user->data)) {
+				die_json_message('error', esc_html__('This user does not exist!', 'weadapt'));
+			} else {
 				// E-mail Message
-				$key       = get_password_reset_key( $current_user );
-				$site_name = wp_specialchars_decode( get_option( 'blogname' ), ENT_QUOTES );
+				$key = get_password_reset_key($current_user);
+				$site_name = wp_specialchars_decode(get_option('blogname'), ENT_QUOTES);
 
-				$message = __( 'Someone has requested a password reset for the following account:', 'weadapt' ) . "<br><br>";
-				$message .= sprintf( __( 'Site Name: %s', 'weadapt' ), $site_name ) . "<br>";
-				$message .= sprintf( __( 'Username: %s', 'weadapt' ), $current_user->user_login ) . "<br><br>";
-				$message .= __( 'If this was a mistake, ignore this email and nothing will happen.', 'weadapt' ) . "<br><br>";
-				$message .= __( 'To reset your password, visit the following address:', 'weadapt' ) . "<br><br>";
-				$message .= home_url( "?action=reset-password&key=$key&login=" . rawurlencode( $current_user->user_login ), 'login' ) . "<br><br>";
+				$message = __('Someone has requested a password reset for the following account:', 'weadapt') . "<br><br>";
+				$message .= sprintf(__('Site Name: %s', 'weadapt'), $site_name) . "<br>";
+				$message .= sprintf(__('Username: %s', 'weadapt'), $current_user->user_login) . "<br><br>";
+				$message .= __('If this was a mistake, ignore this email and nothing will happen.', 'weadapt') . "<br><br>";
+				$message .= __('To reset your password, visit the following address:', 'weadapt') . "<br><br>";
+				$message .= home_url("?action=reset-password&key=$key&login=" . rawurlencode($current_user->user_login), 'login') . "<br><br>";
 
 				$send = theme_mail(
 					$current_user->user_email,
-					sprintf( '[%s] %s', get_bloginfo( 'name' ), __( 'Password Reset', 'weadapt' ) ),
+					sprintf('[%s] %s', get_bloginfo('name'), __('Password Reset', 'weadapt')),
 					$message
 				);
 
-				if ( ! $send ) {
-					die_json_message( 'error', esc_html__( 'The email could not be sent. Your site may not be correctly configured to send emails.', 'weadapt' ) );
-				}
-				else {
-					die_json_message( 'success', esc_html__( 'Thank you! We sent an e-mail to your inbox to reset your password. This action can take up to 30 seconds. Also check your spam folder.', 'weadapt' ), false, 15000 );
+				if (!$send) {
+					die_json_message('error', esc_html__('The email could not be sent. Your site may not be correctly configured to send emails.', 'weadapt'));
+				} else {
+					die_json_message('success', esc_html__('Thank you! We sent an e-mail to your inbox to reset your password. This action can take up to 30 seconds. Also check your spam folder.', 'weadapt'), false, 15000);
 				}
 			}
 		}
@@ -159,73 +155,119 @@ function theme_ajax_forgot() {
 
 	die();
 }
-add_action( 'wp_ajax_theme_ajax_forgot', 'theme_ajax_forgot' );
-add_action( 'wp_ajax_nopriv_theme_ajax_forgot', 'theme_ajax_forgot' );
+add_action('wp_ajax_theme_ajax_forgot', 'theme_ajax_forgot');
+add_action('wp_ajax_nopriv_theme_ajax_forgot', 'theme_ajax_forgot');
 
 
 /**
  * Ajax Create
  */
-function theme_ajax_create() {
-	if ( ! wp_verify_nonce( $_POST['ajax_create_nonce'], 'ajax-create-nonce' ) ) {
-		die_json_message( 'error', esc_html__( 'Sorry, the verification data does not match', 'weadapt' ) );
-	}
-	else {
+function theme_ajax_create()
+{
+	if (!wp_verify_nonce($_POST['ajax_create_nonce'], 'ajax-create-nonce')) {
+		die_json_message('error', esc_html__('Sorry, the verification data does not match', 'weadapt'));
+	} else {
 		// reCaptcha
-		$google_recaptcha_secret_key = get_field( 'google_recaptcha_secret_key', 'options' );
+		// $google_recaptcha_secret_key = get_field( 'google_recaptcha_secret_key', 'options' );
 
-		if ( ! empty( $google_recaptcha_secret_key ) ) {
-			$recaptcha_response = wp_remote_post( 'https://www.google.com/recaptcha/api/siteverify', [
-				'body' => [
-					'secret'   => $google_recaptcha_secret_key,
-					'response' => $_POST['g-recaptcha-response'],
-				],
-			]);
+		// if ( ! empty( $google_recaptcha_secret_key ) ) {
+		// 	$recaptcha_response = wp_remote_post( 'https://www.google.com/recaptcha/api/siteverify', [
+		// 		'body' => [
+		// 			'secret'   => $google_recaptcha_secret_key,
+		// 			'response' => $_POST['g-recaptcha-response'],
+		// 		],
+		// 	]);
 
-			if ( is_wp_error( $recaptcha_response ) ) {
-				die_json_message( 'error', __( 'reCAPTCHA verification failed!', 'weadapt' ) );
-			}
+		// 	if ( is_wp_error( $recaptcha_response ) ) {
+		// 		die_json_message( 'error', __( 'reCAPTCHA verification failed!', 'weadapt' ) );
+		// 	}
 
-			$recaptcha_body   = wp_remote_retrieve_body( $recaptcha_response );
-			$recaptcha_result = json_decode($recaptcha_body, true);
+		// 	$recaptcha_body   = wp_remote_retrieve_body( $recaptcha_response );
+		// 	$recaptcha_result = json_decode($recaptcha_body, true);
 
-			if ( ! isset( $recaptcha_result['success'] ) || ! wp_validate_boolean( $recaptcha_result['success'] ) ) {
-				die_json_message( 'error', __( 'reCAPTCHA verification failed!', 'weadapt' ) );
-			}
+		// 	if ( ! isset( $recaptcha_result['success'] ) || ! wp_validate_boolean( $recaptcha_result['success'] ) ) {
+		// 		die_json_message( 'error', __( 'reCAPTCHA verification failed!', 'weadapt' ) );
+		// 	}
+		// }
+
+		$user_first_name = sanitize_text_field(trim($_POST['user_first_name']), 1);
+		$user_last_name = sanitize_text_field(trim($_POST['user_last_name']), 1);
+		$user_name = sanitize_user(trim($_POST['user_name']), 1);
+		$user_email = sanitize_email(trim($_POST['user_email']));
+		$user_pass = sanitize_text_field(trim(wp_unslash($_POST['user_pass'])));
+		$user_pass_confirm = sanitize_text_field(trim(wp_unslash($_POST['user_pass_confirm'])));
+		$redirect_url = esc_url(trim($_POST['redirect_to']));
+		$address_country = sanitize_text_field(trim($_POST['country']));
+		$address_town_city = sanitize_text_field(trim($_POST['city']));
+		$address_county = sanitize_text_field(trim($_POST['county']));
+
+		if ($user_pass !== $user_pass_confirm) {
+			die_json_message('error', __("Passwords don't match!", 'weadapt'));
 		}
 
-		$user_first_name   = sanitize_text_field( trim( $_POST['user_first_name'] ), 1 );
-		$user_last_name    = sanitize_text_field( trim( $_POST['user_last_name'] ), 1 );
-		$user_name         = sanitize_user( trim( $_POST['user_name'] ), 1 );
-		$user_email        = sanitize_email( trim( $_POST['user_email'] ) );
-		$user_pass         = sanitize_text_field( trim( wp_unslash( $_POST['user_pass'] ) ) );
-		$user_pass_confirm = sanitize_text_field( trim( wp_unslash( $_POST['user_pass_confirm'] ) ) );
-		$redirect_url      = esc_url( trim( $_POST['redirect_to'] ) );
-		$address_country   = sanitize_text_field( trim( $_POST['country'] ) );
+		$user_ID = wp_insert_user(
+			array(
+				'first_name' => $user_first_name,
+				'last_name' => $user_last_name,
+				'user_login' => $user_name,
+				'user_email' => $user_email,
+				'user_pass' => $user_pass,
+			));
 
-		if ( $user_pass !== $user_pass_confirm ) {
-			die_json_message( 'error', __( "Passwords don't match!", 'weadapt' ) );
-		}
-
-		$user_ID = wp_insert_user( array(
-			'first_name' => $user_first_name,
-			'last_name'  => $user_last_name,
-			'user_login' => $user_name,
-			'user_email' => $user_email,
-			'user_pass'  => $user_pass,
-		) );
-
-		if ( is_wp_error( $user_ID ) ) {
-			die_json_message( 'error', $user_ID->get_error_message() );
+		if (is_wp_error($user_ID)) {
+			die_json_message('error', $user_ID->get_error_message());
 		} else {
 			$roles = isset($_POST['role']) ? $_POST['role'] : array();
 			update_field('role', $roles, 'user_' . $user_ID);
 
 			update_user_meta($user_ID, 'user_roles', $roles);
 			update_user_meta($user_ID, 'address_country', $address_country);
+			update_user_meta($user_ID, 'address_city', $address_town_city);
+			update_user_meta($user_ID, 'address_county', $address_county);
+			if (isset($_POST['mailchimp_subscribe']) && $_POST['mailchimp_subscribe'] === '1') {
+				$api_key = '8b4651ed405334d02ccaa5870f9b2770-us22';
+				$audience_id = '1d67a109f9';
+				$data_center = substr($api_key, strpos($api_key, '-') + 1);
+				$url = 'https://' . $data_center . '.api.mailchimp.com/3.0/lists/' . $audience_id . '/members';
+				$data = [
+					'email_address' => $user_email,
+					'status'        => 'subscribed',
+					'merge_fields'  => [
+						'FNAME'   => $user_first_name,
+						'LNAME'   => $user_last_name,
+						'ADDRESS' => [
+							'addr1'   => $address_town_city, 
+							'city'    => $address_town_city,
+							'state'   => $address_county, 
+							'zip'     => '00000', 
+							'country' => $address_country
+						]
+					]
+				];
+
+				$json_data = json_encode($data);
+				error_log(print_r($json_data, true)); // Log the data to the PHP error log for inspection
+				$ch = curl_init($url);
+				curl_setopt($ch, CURLOPT_USERPWD, 'user:' . $api_key);
+				curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+				curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+				curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+				curl_setopt($ch, CURLOPT_POST, true);
+				curl_setopt($ch, CURLOPT_POSTFIELDS, $json_data);
+
+				$result = curl_exec($ch);
+				$http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+				curl_close($ch);
+
+				if ($http_code != 200) {
+					$response = json_decode($result, true);
+					$error_detail = $response['detail'] ?? 'Unknown error occurred.';
+					die_json_message('error', "Mailchimp Error: $error_detail");
+				}
+			}
 
 			$new_user_additional_mail['subject'] = 'Welcome to the Agora Community Hub';
-			$new_user_additional_mail['message'] = "<p>[" . get_bloginfo( 'name' ) . "] Login Details</p>" .
+			$new_user_additional_mail['message'] = "<p>[" . get_bloginfo('name') . "] Login Details</p>" .
 				"<p>Username: " . $user_name . "<br />Password: " . $user_pass . "</p><br />" .
 				"<p>Dear " . $user_name . ",</p><br />" .
 				"<p>Welcome to the  <a href=\"https://agoracommunity.org\">Agora Community Hub</a>!</p><br />" .
@@ -246,62 +288,60 @@ function theme_ajax_create() {
 				$new_user_additional_mail['message']
 			);
 
-			if ( ! $send ) {
-				die_json_message( 'error', esc_html__( 'The email could not be sent. Your site may not be correctly configured to send emails.', 'weadapt' ) );
+			if (!$send) {
+				die_json_message('error', esc_html__('The email could not be sent. Your site may not be correctly configured to send emails.', 'weadapt'));
 			} else {
-				theme_auth_user( $user_name, $user_pass, $redirect_url, esc_html__( 'Register successful, redirecting...', 'weadapt' ) );
+				theme_auth_user($user_name, $user_pass, $redirect_url, esc_html__('Register successful, redirecting...', 'weadapt'));
 			}
 		}
 	}
 
 	die();
 }
-add_action( 'wp_ajax_theme_ajax_create', 'theme_ajax_create' );
-add_action( 'wp_ajax_nopriv_theme_ajax_create', 'theme_ajax_create' );
+add_action('wp_ajax_theme_ajax_create', 'theme_ajax_create');
+add_action('wp_ajax_nopriv_theme_ajax_create', 'theme_ajax_create');
 
 
 /**
  * Ajax Reset
  */
-function theme_ajax_reset() {
-	require_once( ABSPATH . 'wp-includes/class-phpass.php' );
+function theme_ajax_reset()
+{
+	require_once (ABSPATH . 'wp-includes/class-phpass.php');
 
-	if ( ! wp_verify_nonce( $_POST['ajax_reset_nonce'], 'ajax-reset-nonce' ) ) {
-		die_json_message( 'error', esc_html__( 'Sorry, the verification data does not match', 'weadapt' ) );
-	}
-	else {
-		$user_pass         = sanitize_text_field( trim( wp_unslash( $_POST['user_pass'] ) ) );
-		$user_pass_confirm = sanitize_text_field( trim( wp_unslash( $_POST['user_pass_confirm'] ) ) );
+	if (!wp_verify_nonce($_POST['ajax_reset_nonce'], 'ajax-reset-nonce')) {
+		die_json_message('error', esc_html__('Sorry, the verification data does not match', 'weadapt'));
+	} else {
+		$user_pass = sanitize_text_field(trim(wp_unslash($_POST['user_pass'])));
+		$user_pass_confirm = sanitize_text_field(trim(wp_unslash($_POST['user_pass_confirm'])));
 
-		if ( $user_pass !== $user_pass_confirm ) {
-			die_json_message( 'error', __( "Passwords don't match!", 'weadapt' ) );
+		if ($user_pass !== $user_pass_confirm) {
+			die_json_message('error', __("Passwords don't match!", 'weadapt'));
 		}
 
-		$user_login = ! empty( $_POST['user_login'] ) ? sanitize_text_field( trim( $_POST['user_login'] ) ) : '';
-		$user_key   = ! empty( $_POST['user_key'] ) ? sanitize_text_field( trim( $_POST['user_key'] ) ) : '';
+		$user_login = !empty($_POST['user_login']) ? sanitize_text_field(trim($_POST['user_login'])) : '';
+		$user_key = !empty($_POST['user_key']) ? sanitize_text_field(trim($_POST['user_key'])) : '';
 
-		if ( $user_login && $user_key ) {
-			$current_user = check_password_reset_key( $user_key, $user_login );
+		if ($user_login && $user_key) {
+			$current_user = check_password_reset_key($user_key, $user_login);
 
-			if ( is_wp_error( $current_user ) ) {
-				die_json_message( 'error', str_replace( '<strong>Error</strong>: ', '', $current_user->get_error_message() ) );
+			if (is_wp_error($current_user)) {
+				die_json_message('error', str_replace('<strong>Error</strong>: ', '', $current_user->get_error_message()));
 			}
-		}
-		else {
+		} else {
 			$current_user = wp_get_current_user();
 		}
 
-		if ( ! $current_user->exists() ) {
-			die_json_message( 'error', esc_html__( 'We can\'t find an your account.', 'weadapt' ) );
-		}
-		else {
-			wp_set_password( $user_pass, $current_user->ID );
+		if (!$current_user->exists()) {
+			die_json_message('error', esc_html__('We can\'t find an your account.', 'weadapt'));
+		} else {
+			wp_set_password($user_pass, $current_user->ID);
 
-			die_json_message( 'success', esc_html__( 'Your password has been reset.', 'weadapt' ), false, 15000, 'sign-in' );
+			die_json_message('success', esc_html__('Your password has been reset.', 'weadapt'), false, 15000, 'sign-in');
 		}
 	}
 
 	die();
 }
-add_action( 'wp_ajax_theme_ajax_reset', 'theme_ajax_reset' );
-add_action( 'wp_ajax_nopriv_theme_ajax_reset', 'theme_ajax_reset' );
+add_action('wp_ajax_theme_ajax_reset', 'theme_ajax_reset');
+add_action('wp_ajax_nopriv_theme_ajax_reset', 'theme_ajax_reset');
