@@ -314,15 +314,15 @@ class Temp_Mails_List_Table extends WP_List_Table {
  * Define Admin Page
  */
 add_action('admin_menu', function() {
-	add_menu_page(
-		__( 'Temp Mails', 'weadapt' ),
-		__( 'Temp Mails', 'weadapt' ),
-		'activate_plugins',
-		'temp-mails',
-		'temp_mail_render_list_page',
-		'dashicons-email-alt',
-		100
-	);
+    add_menu_page(
+        __( 'Temp Mails', 'weadapt' ),
+        __( 'Temp Mails', 'weadapt' ),
+        'manage_options', 
+        'temp-mails',
+        'temp_mail_render_list_page',
+        'dashicons-email-alt',
+        100
+    );
 });
 
 
