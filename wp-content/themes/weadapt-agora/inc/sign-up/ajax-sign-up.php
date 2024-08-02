@@ -200,7 +200,10 @@ function theme_ajax_create()
 		$address_country = sanitize_text_field(trim($_POST['country']));
 		$address_town_city = sanitize_text_field(trim($_POST['city']));
 		$address_county = sanitize_text_field(trim($_POST['county']));
-
+		if (isset($_POST['add_org']) && $_POST['add_org'] === '1') {
+			$redirect_url = add_query_arg('account_created', 'true', home_url('profile'));
+		}
+		
 		if ($user_pass !== $user_pass_confirm) {
 			die_json_message('error', __("Passwords don't match!", 'weadapt'));
 		}

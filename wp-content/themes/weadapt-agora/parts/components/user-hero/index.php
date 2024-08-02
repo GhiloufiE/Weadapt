@@ -125,3 +125,22 @@ if ( ! empty( $members_count = get_members_count( $user_ID, 'user', true ) ) ) {
 		</div>
 	</div>
 </section>
+
+<?php
+
+add_action( 'popup-content', function() {
+		echo get_part( 'components/popup/index', [ 'template' => 'org-creation' ] );
+} );
+?>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+	const urlParams = new URLSearchParams(window.location.search);
+	if (urlParams.has('account_created') && urlParams.get('account_created') === 'true') {
+		const createAccountButton = document.querySelector('button[data-popup="org-creation"]');
+		if (createAccountButton) {
+			createAccountButton.click();
+		}
+	}
+});
+</script>
