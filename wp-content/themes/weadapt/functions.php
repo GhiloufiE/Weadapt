@@ -3,25 +3,25 @@
 /**
  * Init theme base scripts
  */
-require_once(get_theme_file_path('/base/init.php'));
+require_once (get_theme_file_path('/base/init.php'));
 
 
 /**
  * Include All Inc Files
  */
 foreach (get_glob_folders_path('/inc/*/*.php') as $file_path) {
-    require_once(get_theme_file_path($file_path));
+    require_once (get_theme_file_path($file_path));
 }
 
 /**
  * Register Gutenberg Blocks
  */
-if (!function_exists('register_acf_blocks')) :
+if (!function_exists('register_acf_blocks')):
 
     function register_acf_blocks()
     {
         foreach (get_glob_folders_path('/parts/gutenberg/*/register.php') as $file_path) {
-            require_once(get_theme_file_path($file_path));
+            require_once (get_theme_file_path($file_path));
         }
     }
 
@@ -147,10 +147,12 @@ function replace_howdy($wp_admin_bar)
 {
     $my_account = $wp_admin_bar->get_node('my-account');
     $greeting = str_replace('Howdy,', 'Hello,', $my_account->title);
-    $wp_admin_bar->add_node(array(
-        'id' => 'my-account',
-        'title' => $greeting,
-    ));
+    $wp_admin_bar->add_node(
+        array(
+            'id' => 'my-account',
+            'title' => $greeting,
+        )
+    );
 }
 add_filter('admin_bar_menu', 'replace_howdy', 25);
 
@@ -165,9 +167,9 @@ add_action('wp_enqueue_scripts', 'enqueue_custom_scripts');
 // Add JavaScript code to add low-quality image warning boxes
 function add_low_quality_image_warning_script()
 {
-?>
+    ?>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             function getCookie(name) {
                 let match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
                 return match ? match[2] : null;
@@ -195,7 +197,7 @@ function add_low_quality_image_warning_script()
             }
 
             const checkbox = document.getElementById('low-quality-images');
-            checkbox.addEventListener('change', function() {
+            checkbox.addEventListener('change', function () {
                 document.cookie = 'weadapt-low-quality-images=' + (this.checked ? '1' : '0') + '; path=/';
                 removeLowQualityWarnings();
                 if (this.checked) {
@@ -205,7 +207,7 @@ function add_low_quality_image_warning_script()
             });
         });
     </script>
-<?php
+    <?php
 }
 add_action('wp_footer', 'add_low_quality_image_warning_script');
 
@@ -338,10 +340,11 @@ function handle_create_post()
 }
 add_action('admin_post_nopriv_create_post', 'handle_create_post');
 add_action('admin_post_create_post', 'handle_create_post');
-function notify_admins_of_pending_posts($post_id, $post_type) {
-    global $wpdb; 
-   
-    
+function notify_admins_of_pending_posts($post_id, $post_type)
+{
+    global $wpdb;
+
+
     $post_title = get_the_title($post_id);
     $post_link = get_edit_post_link($post_id);
     $site_name = get_bloginfo('name');
@@ -355,7 +358,7 @@ function notify_admins_of_pending_posts($post_id, $post_type) {
             return;
         }
         $forum_name = get_the_title($forum_id);
-        $subject = sprintf( __( 'Content has been submitted for review on [%s]', 'weadapt' ), get_bloginfo( 'name' ) );
+        $subject = sprintf(__('Content has been submitted for review on [%s]', 'weadapt'), get_bloginfo('name'));
 
         $message = "A new forum topic titled <b>$post_title</b> in the forum <b>$forum_name</b> is pending review.<br><br>";
 
@@ -403,7 +406,7 @@ function notify_admins_of_pending_posts($post_id, $post_type) {
     foreach ($admins_info as $admin) {
         $admin_email = $admin['user_email'];
         $admin_name = $admin['display_name'];
-        $personalized_message = sprintf( __( 'Dear %s,', 'weadapt' ), esc_html($admin_name) ) . "<br><br>" . $message;
+        $personalized_message = sprintf(__('Dear %s,', 'weadapt'), esc_html($admin_name)) . "<br><br>" . $message;
         //wp_mail($admin_email, $subject, $personalized_message, $headers);
         theme_mail_save_to_db(array($admin_email), $subject, $personalized_message);
     }
@@ -434,10 +437,10 @@ function create_forum_post_on_theme_creation($new_status, $old_status, $post)
     if ($post->post_type == 'theme' && $old_status == 'auto-draft' && $new_status == 'publish') {
 
         $forum_post = array(
-            'post_title'    => $post->post_title,
-            'post_content'  => 'This is a forum linked to the theme: ' . $post->post_title,
-            'post_status'   => 'publish',
-            'post_type'     => 'forums'
+            'post_title' => $post->post_title,
+            'post_content' => 'This is a forum linked to the theme: ' . $post->post_title,
+            'post_status' => 'publish',
+            'post_type' => 'forums'
         );
         $forum_post_id = wp_insert_post($forum_post);
         if ($forum_post_id != 0) {
@@ -462,7 +465,8 @@ function notify_admin_on_edit($new_status, $old_status, $post)
         return;
     }
 
-    if (($old_status === 'publish' && in_array($new_status, array('pending', 'draft'))) ||
+    if (
+        ($old_status === 'publish' && in_array($new_status, array('pending', 'draft'))) ||
         ($old_status === 'draft' && $new_status === 'pending')
     ) {
 
@@ -520,7 +524,7 @@ add_action('save_post', function ($post_id) {
 function get_editors_by_theme($theme)
 {
     $args = array(
-        'role'    => 'editor',
+        'role' => 'editor',
         'meta_key' => 'user_theme',
         'meta_value' => $theme,
     );
@@ -612,16 +616,16 @@ function notify_editors_after_publish($post_id, $new_theme)
                 ucfirst($post->post_type),
                 get_bloginfo('name')
             );
-    
+
             $message = __('Your content has now been reviewed and published. It will be shared on our social media channels where relevant. Please do re-share! ', 'weadapt') . '<br><br>';
             $message .= esc_html($post->post_title) . '<br>';
             $message .= esc_html($post->post_excerpt) . '<br><br>';
-    
+
             if (!empty($people_creator)) {
                 $post_author_ID = $people_creator[0];
                 $post_author = new WP_User($post_author_ID);
                 $author_organisations = get_field('organisations', $post_author);
-    
+
                 if ($author_organisations) {
                     $message .= sprintf(
                         'by %s from %s',
@@ -634,10 +638,10 @@ function notify_editors_after_publish($post_id, $new_theme)
                         $post_author->display_name
                     );
                 }
-    
+
                 $message .= '<br>';
             }
-    
+
             $message .= sprintf(
                 ' — <a href="%s">%s</a>',
                 get_permalink($post_id),
@@ -648,7 +652,7 @@ function notify_editors_after_publish($post_id, $new_theme)
                 get_edit_post_link($post_id),
                 __('Edit it', 'weadapt')
             );
-    
+
             theme_mail_save_to_db(
                 $valid_contributors,
                 $subject,
@@ -910,3 +914,228 @@ function update_theme_meta($post_id, $post = null, $update = null)
 }
 
 add_action('acf/save_post', 'update_theme_meta', 10, 3);
+// Add action to initialize custom dashboard widgets
+add_action('wp_dashboard_setup', 'add_custom_dashboard_widgets');
+
+function add_custom_dashboard_widgets() {
+    wp_add_dashboard_widget(    
+        'monthly_downloads_widget',
+        'Top 10 Articles by Downloads This Month',
+        'monthly_downloads_widget_display'
+    );
+    wp_add_dashboard_widget(
+        'total_downloads_widget',
+        'Top 10 Articles by Total Downloads',
+        'total_downloads_widget_display'
+    );
+}
+
+function get_top_articles_by_monthly_downloads($limit = 10, $offset = 0) {
+    global $wpdb;
+    $query = $wpdb->prepare("
+        SELECT pm1.post_id, SUM(pm2.meta_value) as total_downloads
+        FROM {$wpdb->postmeta} pm1
+        JOIN {$wpdb->postmeta} pm2 ON pm1.meta_value = pm2.post_id
+        WHERE pm1.meta_key = 'document_list_0_file'
+        AND pm2.meta_key = '_download_count_month'
+        GROUP BY pm1.post_id
+        ORDER BY total_downloads DESC
+        LIMIT %d OFFSET %d
+    ", $limit, $offset);
+    
+    // Print query for debugging
+    error_log($query);
+
+    $results = $wpdb->get_results($query);
+
+    // Print results for debugging
+    error_log(print_r($results, true));
+
+    return $results;
+}
+
+
+function get_top_articles_by_total_downloads($limit = 10, $offset = 0) {
+    global $wpdb;
+    $results = $wpdb->get_results($wpdb->prepare("
+        SELECT pm1.post_id, SUM(pm2.meta_value) as total_downloads
+        FROM {$wpdb->postmeta} pm1
+        JOIN {$wpdb->postmeta} pm2 ON pm1.meta_value = pm2.post_id
+        WHERE pm1.meta_key = 'document_list_0_file'
+        AND pm2.meta_key = '_download_count'
+        GROUP BY pm1.post_id
+        ORDER BY total_downloads DESC
+        LIMIT %d OFFSET %d
+    ", $limit, $offset));
+    return $results;
+}
+
+function monthly_downloads_widget_display() {
+    $top_articles = get_top_articles_by_monthly_downloads();
+    echo '<table class="widefat">';
+    echo '<thead><tr><th>Article Title</th><th>Total Downloads This Month</th></tr></thead>';
+    echo '<tbody id="monthly-downloads-table">';
+    if (!empty($top_articles)) {
+        $displayed_articles = [];
+        foreach ($top_articles as $article) {
+            if (!in_array($article->post_id, $displayed_articles)) {
+                $post_title = get_the_title($article->post_id);
+                $post_url = get_permalink($article->post_id);
+                echo '<tr>';
+                echo '<td><a href="' . esc_url($post_url) . '">' . esc_html($post_title) . '</a></td>';
+                echo '<td>' . intval($article->total_downloads) . '</td>';
+                echo '</tr>';
+                $displayed_articles[] = $article->post_id;
+            }
+        }
+    } else {
+        echo '<tr><td colspan="2">No articles found.</td></tr>';
+    }
+    echo '</tbody>';
+    echo '</table>';
+    echo '<button id="load-more-monthly" data-offset="10">Load More</button>';
+}
+
+function total_downloads_widget_display() {
+    $top_articles = get_top_articles_by_total_downloads();
+    echo '<table class="widefat">';
+    echo '<thead><tr><th>Article Title</th><th>Total Downloads</th></tr></thead>';
+    echo '<tbody id="total-downloads-table">';
+    if (!empty($top_articles)) {
+        $displayed_articles = [];
+        foreach ($top_articles as $article) {
+            if (!in_array($article->post_id, $displayed_articles)) {
+                $post_title = get_the_title($article->post_id);
+                $post_url = get_permalink($article->post_id);
+                echo '<tr>';
+                echo '<td><a href="' . esc_url($post_url) . '">' . esc_html($post_title) . '</a></td>';
+                echo '<td>' . intval($article->total_downloads) . '</td>';
+                echo '</tr>';
+                $displayed_articles[] = $article->post_id;
+            }
+        }
+    } else {
+        echo '<tr><td colspan="2">No articles found.</td></tr>';
+    }
+    echo '</tbody>';
+    echo '</table>';
+    echo '<button id="load-more-total" data-offset="10">Load More</button>';
+}
+
+function enqueue_dashboard_scripts($hook) {
+    if ('index.php' != $hook) {
+        return;
+    }
+    // Enqueue a script here. Replace 'YOUR_SCRIPT_URL' with the actual script URL.
+    wp_enqueue_script('dashboard-ajax-script', 'YOUR_SCRIPT_URL', array('jquery'), null, true);
+    wp_localize_script('dashboard-ajax-script', 'ajax_object', array(
+        'ajax_url' => admin_url('admin-ajax.php'),
+        'nonce' => wp_create_nonce('dashboard-ajax-nonce')
+    ));
+
+    $inline_js = "
+    jQuery(document).ready(function($) {
+        $('#load-more-monthly').on('click', function() {
+            var button = $(this);
+            var offset = button.data('offset');
+            console.log('Loading more monthly articles with offset:', offset);
+
+            $.ajax({
+                type: 'POST',
+                url: ajax_object.ajax_url,
+                data: {
+                    action: 'load_more_monthly',
+                    offset: offset,
+                    security: ajax_object.nonce
+                },
+                success: function(response) {
+                    console.log('Response:', response);
+                    $('#monthly-downloads-table').append(response);
+                    button.data('offset', offset + 10);
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX Error:', status, error);
+                }
+            });
+        });
+
+        $('#load-more-total').on('click', function() {
+            var button = $(this);
+            var offset = button.data('offset');
+            console.log('Loading more total articles with offset:', offset);
+
+            $.ajax({
+                type: 'POST',
+                url: ajax_object.ajax_url,
+                data: {
+                    action: 'load_more_total',
+                    offset: offset,
+                    security: ajax_object.nonce
+                },
+                success: function(response) {
+                    console.log('Response:', response);
+                    $('#total-downloads-table').append(response);
+                    button.data('offset', offset + 10);
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX Error:', status, error);
+                }
+            });
+        });
+    });
+    ";
+    wp_add_inline_script('dashboard-ajax-script', $inline_js);
+}
+add_action('admin_enqueue_scripts', 'enqueue_dashboard_scripts');
+
+add_action('wp_ajax_load_more_monthly', 'load_more_monthly');
+function load_more_monthly() {
+    check_ajax_referer('dashboard-ajax-nonce', 'security');
+    if (!isset($_POST['offset']) || !is_numeric($_POST['offset'])) {
+        wp_send_json_error('Invalid offset.');
+    }
+
+    $offset = intval($_POST['offset']);
+    $top_articles = get_top_articles_by_monthly_downloads(10, $offset);
+
+    if (!empty($top_articles)) {
+        foreach ($top_articles as $article) {
+            $post_title = get_the_title($article->post_id);
+            $post_url = get_permalink($article->post_id);
+            echo '<tr>';
+            echo '<td><a href="' . esc_url($post_url) . '">' . esc_html($post_title) . '</a></td>';
+            echo '<td>' . intval($article->total_downloads) . '</td>';
+            echo '</tr>';
+        }
+    } else {
+        echo '<tr><td colspan="2">No more articles found.</td></tr>';
+    }
+
+    wp_die();
+}
+
+add_action('wp_ajax_load_more_total', 'load_more_total');
+function load_more_total() {
+    check_ajax_referer('dashboard-ajax-nonce', 'security');
+    if (!isset($_POST['offset']) || !is_numeric($_POST['offset'])) {
+        wp_send_json_error('Invalid offset.');
+    }
+
+    $offset = intval($_POST['offset']);
+    $top_articles = get_top_articles_by_total_downloads(10, $offset);
+
+    if (!empty($top_articles)) {
+        foreach ($top_articles as $article) {
+            $post_title = get_the_title($article->post_id);
+            $post_url = get_permalink($article->post_id);
+            echo '<tr>';
+            echo '<td><a href="' . esc_url($post_url) . '">' . esc_html($post_title) . '</a></td>';
+            echo '<td>' . intval($article->total_downloads) . '</td>';
+            echo '</tr>';
+        }
+    } else {
+        echo '<tr><td colspan="2">No more articles found.</td></tr>';
+    }
+
+    wp_die();
+}
