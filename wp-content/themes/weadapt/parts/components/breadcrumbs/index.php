@@ -11,8 +11,7 @@ $breadcrumbs = ! empty( $args['breadcrumbs'] ) ? $args['breadcrumbs'] : [];
 	<?php load_inline_styles( __DIR__, 'breadcrumbs' ); ?>
 	<ol class="breadcrumbs__list" role="list">
 	<?php foreach ($breadcrumbs as $crumb) : ?>
-		<?php error_log("zeby"); 
-		error_log(print_r($crumb,true)); ?>
+		
 		<li class="breadcrumbs__item<?php if (isset($crumb['current']) && $crumb['current']) echo ' breadcrumbs__item--current'; ?>" role="listitem"<?php if (isset($crumb['current']) && $crumb['current']) echo ' aria-current="page"'; ?>>
 			<?php if (!empty($crumb['url'])) : ?>
 				<a href="<?php echo esc_url($crumb['url']); ?>" class="breadcrumbs__link"><?php echo esc_html($crumb['label']); ?></a>
