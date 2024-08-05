@@ -79,9 +79,21 @@ $current_tab = ! empty( $_GET['section-tab'] ) ? trim( esc_attr( $_GET['section-
 							];
 
 							if ( 'event' === $post_type ) {
+								$current_date = current_time('Y-m-d H:i:s');
+								
+								$query_args['meta_query'] = array(
+									array(
+										'key'     => 'start_date',
+										'value'   => $current_date,
+										'compare' => '>=',
+										'type'    => 'DATETIME'
+									),
+								);
+								
 								$query_args['orderby']   = 'meta_value';
 								$query_args['meta_key']  = 'start_date';
 								$query_args['meta_type'] = 'DATETIME';
+								$query_args['order']     = 'ASC';
 							}
 
 							if ( 'course' === $post_type ) {
