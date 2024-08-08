@@ -86,14 +86,14 @@ load_blocks_script('cpt-query', 'weadapt/cpt-query');
 
 				if (!empty($categories)) :
 			?><ul class="cpt-filters__categories"><?php
-																foreach ($categories as $term) {
-																?>
+													foreach ($categories as $term) {
+													?>
 							<li class="cpt-filters__category">
 								<input id="term-<?php echo esc_attr("$unique_ID-$term->term_id"); ?>" type="checkbox" name="categories[]" value="<?php echo esc_attr($term->term_id); ?>" <?php echo in_array($term->term_id, $selected_categories) ? 'checked' : null; ?>>
 								<label tabindex="0" for="term-<?php echo esc_attr("$unique_ID-$term->term_id"); ?>" class="dropdown-wrapper__btn"><?php echo $term->name; ?></label>
 							</li>
 						<?php
-																}
+													}
 						?>
 					</ul>
 					<input type="hidden" value="1" name="has_categories">
@@ -143,15 +143,19 @@ load_blocks_script('cpt-query', 'weadapt/cpt-query');
 				!$query->have_posts()
 			) {
 				$max_num_pages = 0;
-
+		
 				if (!$hide_no_found) {
 					echo sprintf('<span class="empty-result">%s</span>', __('Nothing found.', 'weadapt'));
 				}
+				
+				// Log the query and SQL request when no posts are found
+				error_log('Query arguments: ' . print_r($query_args, true));
+				error_log('SQL request: ' . $query->request);
 			} else {
 				if ($query->have_posts()) {
 					while ($query->have_posts()) {
 						$query->the_post();
-
+		
 						foreach ([
 							'theme_show_buttons',
 							'theme_is_author_page',
@@ -161,14 +165,14 @@ load_blocks_script('cpt-query', 'weadapt/cpt-query');
 								set_query_var($query_var, wp_validate_boolean($query_args[$query_var]));
 							}
 						}
-
+		
 						the_archive_template_grid();
 					}
 				}
 			}
+		}
 
 			wp_reset_postdata();
-		}
 		?>
 	</div>
 

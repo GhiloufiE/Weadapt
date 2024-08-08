@@ -64,7 +64,7 @@ if (!empty($post_ID)):
 				<div class="wp-block-button">
 					<button class="wp-block-button__link has-background" data-post-id="<?php echo esc_attr($post_ID); ?>"
 						data-post-type="forum" data-popup="post-creation" onclick="setPostDetails(this)">
-						<?php echo sprintf("<span>%s</span>", esc_html__("Start a conversation", "weadapt")); ?>
+						<?php echo sprintf("<span>%s</span>", esc_html__("Add a forum post", "weadapt")); ?>
 					</button>
 				</div>
 			</div>

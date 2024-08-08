@@ -17,7 +17,7 @@ $excerpt = has_excerpt() ? get_the_excerpt() : '';
             }
         </style>
       	<?php if ( 'solutions-portal' === get_post_type() ) { ?>
-        <div class="single-hero__excerpt"><?php echo $excerpt; ?></div>
+       
     <?php } endif; ?>
     <div class="archive-main__entry">
 

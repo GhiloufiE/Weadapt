@@ -158,10 +158,10 @@ switch ($type) {
 		$main_theme_networks = get_field('relevant_main_theme_network', $post_ID);
 		error_log(print_r($main_theme_networks, true));
 		if (!empty($main_theme_networks) && is_array($main_theme_networks)) {
-			$fields['type_link'] = []; 
+			$fields['type_link'] = [];
 			foreach ($main_theme_networks as $type_ID) {
 				if (!empty($type_ID)) {
-					$fields['type_link'][] = [ 
+					$fields['type_link'][] = [
 						'url' => get_permalink($type_ID),
 						'title' => get_the_title($type_ID),
 						'target' => '_self',
@@ -245,34 +245,55 @@ switch ($type) {
 		<div class="single-hero__row row <?php echo empty($thumb_ID) ? 'single-hero__row_top' : ''; ?>">
 			<div class="single-hero__left">
 				<div class="single-hero__left-inner">
-				<?php if (array_key_exists('type_link', $fields) && !empty($fields['type_link']) && is_array($fields['type_link'])) : ?>
-					    <div class="single-hero__types">
-						<style>
-						.single-hero__types {
-						    display: flex;
-						    gap: 1rem;
-						    flex-wrap: wrap; /* Ensure items wrap if necessary */
-						}
-						
-						@media (max-width: 768px) {
-						    .single-hero__types {
-						        flex-direction: column;
-						        gap: 0.5rem; /* Adjust gap for smaller screens */
-						    }
-						}
-						</style>
-					        <?php foreach ($fields['type_link'] as $type_item) : 
-					            echo get_button(
-					                $type_item,
-					                'outline-small',
-					                'single-hero__type'
-					            );
-					        endforeach; ?>
-					    </div>
+					<?php if (array_key_exists('type_link', $fields) && !empty($fields['type_link']) && is_array($fields['type_link'])) : ?>
+						<div class="single-hero__types">
+							<style>
+								.single-hero__types {
+									display: flex;
+									gap: 1rem;
+									flex-wrap: wrap;
+									/* Ensure items wrap if necessary */
+								}
+
+								@media (max-width: 768px) {
+									.single-hero__types {
+										flex-direction: column;
+										gap: 0.5rem;
+										/* Adjust gap for smaller screens */
+									}
+								}
+							</style>
+							<?php foreach ($fields['type_link'] as $type_item) :
+								echo get_button(
+									$type_item,
+									'outline-small',
+									'single-hero__type'
+								);
+							endforeach; ?>
+						</div>
 					<?php endif; ?>
+					<?php
+					function insert_line_breaks($title, $word_limit = 3)
+					{
+						$words = explode(' ', $title);
+						$new_title = '';
+						$word_count = 0;
 
-					<h1 class="single-hero__title" id="main-heading"><?php echo $title; ?></h1>
+						foreach ($words as $word) {
+							$new_title .= $word . ' ';
+							$word_count++;
+							if ($word_count >= $word_limit) {
+								$new_title .= '<br>';
+								$word_count = 0;
+							}
+						}
 
+						return trim($new_title);
+					}
+
+					$title_with_breaks = insert_line_breaks($title);
+					?>
+					<h1 class="single-hero__title" id="main-heading"><?php echo $title_with_breaks; ?></h1>
 					<?php if ($excerpt) : ?>
 						<div class="single-hero__excerpt"><?php echo $excerpt; ?></div>
 					<?php endif; ?>
