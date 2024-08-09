@@ -298,7 +298,7 @@ add_action('acf/save_post', 'forum_new_post_notification', 10, 1);
 
 
 
-function handle_create_post()
+function handle_create_post() 
 {
     global $wpdb;
     if (!isset($_POST['_wpnonce']) || !wp_verify_nonce($_POST['_wpnonce'], 'create_post_nonce')) {
@@ -306,17 +306,18 @@ function handle_create_post()
         return;
     }
 
+
     if (isset($_POST['post_title']) && isset($_POST['post_description']) && isset($_POST['post_type'])) {
         $post_title = sanitize_text_field($_POST['post_title']);
         $post_description = sanitize_textarea_field($_POST['post_description']);
         $post_type = sanitize_text_field($_POST['post_type']);
 
         $post_data = array(
-            'post_title' => $post_title,
-            'post_content' => $post_description,
-            'post_status' => 'pending',
-            'post_author' => get_current_user_id(),
-            'post_type' => ($post_type === 'theme') ? 'article' : $post_type,
+            'post_title'    => $post_title,
+            'post_content'  => $post_description,
+            'post_status'   => 'pending',
+            'post_author'   => get_current_user_id(),
+            'post_type'     => ($post_type === 'theme') ? 'article' : $post_type,
         );
 
         if ($post_type == 'forum' && isset($_POST['forum'])) {
@@ -324,20 +325,29 @@ function handle_create_post()
             $forum_true_id = $wpdb->get_var($wpdb->prepare("SELECT forum_id FROM {$wpdb->prefix}theme_forum_relationship WHERE theme_id = %d", $forum_id));
             $post_data['meta_input'] = array('forum' => $forum_true_id);
         }
+
+        if ($post_type == 'forum' && isset($_POST['forum'])) {
+            $forum_id = intval($_POST['forum']);
+            $network_true_id = $wpdb->get_var($wpdb->prepare("SELECT forum_id FROM {$wpdb->prefix}network_forum_relationship WHERE network_id = %d", $forum_id));
+            $post_data['meta_input'] = array('forum' => $network_true_id);
+        }
+
+        // Insert post
         $post_id = wp_insert_post($post_data);
 
+        // Check for errors
         if (is_wp_error($post_id)) {
             wp_send_json_error('Error creating post: ' . $post_id->get_error_message());
         } else {
-
+            // Notify admins of the new pending post
             notify_admins_of_pending_posts($post_id, $post_type);
-
             wp_send_json_success('Post created successfully');
         }
     } else {
         wp_send_json_error('Missing required POST fields');
     }
 }
+
 add_action('admin_post_nopriv_create_post', 'handle_create_post');
 add_action('admin_post_create_post', 'handle_create_post');
 function notify_admins_of_pending_posts($post_id, $post_type)
@@ -1138,4 +1148,123 @@ function load_more_total() {
     }
 
     wp_die();
+}
+
+add_action('admin_menu', 'register_migration_menu_page');
+
+function register_migration_menu_page() {
+    add_menu_page(
+        'Forum to Network Migration', // Page title
+        'Forum Migration',            // Menu title
+        'manage_options',             // Capability
+        'forum-migration',            // Menu slug
+        'migration_menu_page_html',   // Callback function
+        'dashicons-update',           // Icon
+        20                            // Position
+    );
+}
+
+function migration_menu_page_html() {
+    if (!current_user_can('manage_options')) {
+        return;
+    }
+
+    if (isset($_POST['create_table'])) {
+        create_network_forum_relationship_table();
+        echo '<div class="notice notice-success is-dismissible"><p>Table created successfully.</p></div>';
+    }
+
+    if (isset($_POST['migrate_forum_to_network'])) {
+        migrate_forum_to_network_relationship();
+        echo '<div class="notice notice-success is-dismissible"><p>Data migration completed successfully.</p></div>';
+    }
+    
+    ?>
+    <div class="wrap">
+        <h1>Forum to Network Migration</h1>
+        <form method="post" action="">
+            <?php wp_nonce_field('forum_migration_action', 'forum_migration_nonce'); ?>
+            <input type="submit" name="create_table" class="button button-secondary" value="Create Table">
+            <input type="submit" name="migrate_forum_to_network" class="button button-primary" value="Migrate Now">
+        </form>
+    </div>
+    <?php
+}
+
+function create_network_forum_relationship_table() {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'network_forum_relationship';
+    $charset_collate = $wpdb->get_charset_collate();
+
+    $sql = "CREATE TABLE $table_name (
+        id mediumint(9) NOT NULL AUTO_INCREMENT,
+        forum_id mediumint(9) NOT NULL,
+        network_id mediumint(9) NOT NULL,
+        PRIMARY KEY  (id)
+    ) $charset_collate;";
+
+    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+    dbDelta($sql);
+}
+
+function migrate_forum_to_network_relationship() {
+    global $wpdb;
+
+    // Verify nonce
+    if (!isset($_POST['forum_migration_nonce']) || !wp_verify_nonce($_POST['forum_migration_nonce'], 'forum_migration_action')) {
+        error_log('Nonce verification failed.');
+        return;
+    }
+
+    // Get all network posts
+    $network_posts = $wpdb->get_results("
+        SELECT p.ID 
+        FROM {$wpdb->posts} p
+        WHERE p.post_type = 'network'
+    ");
+
+    // Iterate through each network post
+    foreach ($network_posts as $post) {
+        $network_id = $post->ID;
+        error_log('Processing network post ID: ' . $network_id);
+
+        // Get the network post details
+        $network_post = get_post($network_id);
+
+        if ($network_post) {
+            // Create a new forum post with the same details
+            $new_forum_post = array(
+                'post_title'    => $network_post->post_title,
+                'post_content'  => $network_post->post_content,
+                'post_status'   => 'publish',
+                'post_author'   => $network_post->post_author,
+                'post_type'     => 'forums'
+            );
+
+            // Insert the new forum post
+            $new_forum_id = wp_insert_post($new_forum_post);
+
+            if (is_wp_error($new_forum_id)) {
+                error_log('Failed to create forum post for network ID: ' . $network_id . '. Error: ' . $new_forum_id->get_error_message());
+            } else {
+                error_log('Created forum post ID: ' . $new_forum_id . ' for network ID: ' . $network_id);
+
+                // Insert into network_forum_relationship table
+                $wpdb->insert(
+                    "{$wpdb->prefix}network_forum_relationship",
+                    array(
+                        'forum_id' => $new_forum_id,
+                        'network_id' => $network_id
+                    ),
+                    array(
+                        '%d',
+                        '%d'
+                    )
+                );
+                error_log('Inserted forum ID: ' . $new_forum_id . ' and network ID: ' . $network_id);
+            }
+        } else {
+            error_log('Network post not found for ID: ' . $network_id);
+        }
+    }
 }
