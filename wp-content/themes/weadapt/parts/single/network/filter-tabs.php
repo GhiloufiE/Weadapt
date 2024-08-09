@@ -36,6 +36,12 @@ $items = [
 		'selected' => false,
 		'label' => __( 'Organisations', 'weadapt' ),
 	],
+	[
+		'id' => 'network-forum',
+		'controls' => 'tab-forum-panel',
+		'selected' => false,
+		'label' => __( 'Forum topics', 'weadapt' ),
+	],
 ];
 
 get_part( 'components/single-tabs-nav/index', ['items' => $items] );

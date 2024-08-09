@@ -99,3 +99,76 @@
 		]);
 	?>
 </section>
+<section id="tab-forum-panel" role="tabpanel" aria-hidden="true" hidden>
+	<?php
+	global $wpdb;
+	$wpdb->save_queries = true;
+
+	$theme_id = get_the_ID();
+
+	$sql = $wpdb->prepare("
+    SELECT wp_posts.ID
+    FROM wp_posts
+    INNER JOIN {$wpdb->prefix}network_forum_relationship
+    ON wp_posts.ID = {$wpdb->prefix}network_forum_relationship.forum_id
+    WHERE 
+     wp_posts.post_status = 'publish'
+    AND {$wpdb->prefix}network_forum_relationship.network_id = %d
+    ORDER BY wp_posts.post_date DESC
+    LIMIT 0, 10
+", $theme_id);
+
+	$post_ids = $wpdb->get_col($sql);
+	if ($wpdb->last_error) {
+		error_log('SQL Query: ' . $sql);
+	}
+	
+	$query_args = array(
+		'post_status'    => 'publish',
+		'post_type'      => get_allowed_post_types(['forum']),
+		'orderby'        => 'date',
+		'order'          => 'DESC',
+		'meta_query'     => [[
+			'key'      => 'forum',
+			'value'    => $post_ids
+		]],
+		'ignore_sticky_posts' => true,
+		'theme_query'         => true, // multisite fix
+		'categories'          => []
+	);
+
+	get_part('components/cpt-query/index', [
+		'query_args'      => $query_args,
+		'show_post_types' => false,
+		'show_categories' => false
+	]);
+	$query_args = array(
+		'post__in' => $post_ids,
+		'post_status' => 'publish',
+		'orderby' => 'post_date',
+		'order' => 'DESC',
+		'ignore_sticky_posts' => true,
+	);
+	$query = new WP_Query($query_args);
+	if ($query->have_posts()) {
+		while ($query->have_posts()) {
+			$query->the_post();
+			get_part('components/cpt-query/index', [
+				'query_args'      => $query_args,
+				'show_post_types' => true,
+				'show_categories' => true
+			]);
+		}
+		wp_reset_postdata();
+	}
+	if (apply_filters('show_related_single_theme_content', true)) {
+		get_part('components/related-content/index');
+	}
+
+	if (!empty(get_allowed_post_types(['forums']))) {
+		get_part('components/forum-cta/index');
+	}
+	get_part('components/forum-cta/index');
+
+	?>
+</section>
