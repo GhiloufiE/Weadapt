@@ -167,28 +167,28 @@ function theme_ajax_create()
 	if (!wp_verify_nonce($_POST['ajax_create_nonce'], 'ajax-create-nonce')) {
 		die_json_message('error', esc_html__('Sorry, the verification data does not match', 'weadapt'));
 	} else {
-		// reCaptcha
-		// $google_recaptcha_secret_key = get_field( 'google_recaptcha_secret_key', 'options' );
+		//reCaptcha
+		$google_recaptcha_secret_key = get_field( 'google_recaptcha_secret_key', 'options' );
 
-		// if ( ! empty( $google_recaptcha_secret_key ) ) {
-		// 	$recaptcha_response = wp_remote_post( 'https://www.google.com/recaptcha/api/siteverify', [
-		// 		'body' => [
-		// 			'secret'   => $google_recaptcha_secret_key,
-		// 			'response' => $_POST['g-recaptcha-response'],
-		// 		],
-		// 	]);
+		if ( ! empty( $google_recaptcha_secret_key ) ) {
+			$recaptcha_response = wp_remote_post( 'https://www.google.com/recaptcha/api/siteverify', [
+				'body' => [
+					'secret'   => $google_recaptcha_secret_key,
+					'response' => $_POST['g-recaptcha-response'],
+				],
+			]);
 
-		// 	if ( is_wp_error( $recaptcha_response ) ) {
-		// 		die_json_message( 'error', __( 'reCAPTCHA verification failed!', 'weadapt' ) );
-		// 	}
+			if ( is_wp_error( $recaptcha_response ) ) {
+				die_json_message( 'error', __( 'reCAPTCHA verification failed!', 'weadapt' ) );
+			}
 
-		// 	$recaptcha_body   = wp_remote_retrieve_body( $recaptcha_response );
-		// 	$recaptcha_result = json_decode($recaptcha_body, true);
+			$recaptcha_body   = wp_remote_retrieve_body( $recaptcha_response );
+			$recaptcha_result = json_decode($recaptcha_body, true);
 
-		// 	if ( ! isset( $recaptcha_result['success'] ) || ! wp_validate_boolean( $recaptcha_result['success'] ) ) {
-		// 		die_json_message( 'error', __( 'reCAPTCHA verification failed!', 'weadapt' ) );
-		// 	}
-		// }
+			if ( ! isset( $recaptcha_result['success'] ) || ! wp_validate_boolean( $recaptcha_result['success'] ) ) {
+				die_json_message( 'error', __( 'reCAPTCHA verification failed!', 'weadapt' ) );
+			}
+		}
 
 		$user_first_name = sanitize_text_field(trim($_POST['user_first_name']), 1);
 		$user_last_name = sanitize_text_field(trim($_POST['user_last_name']), 1);
