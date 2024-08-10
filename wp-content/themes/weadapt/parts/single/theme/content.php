@@ -114,10 +114,13 @@
 			'categories'          => []
 		);
 
-		get_part('components/cpt-query/index', [
+		get_part('components/cpt-search-query/index', [
 			'query_args'      => $query_args,
 			'show_post_types' => false,
-			'show_categories' => false
+			'show_categories' => false,
+			'query_type'      => 'forum_query',
+			'title'       => __('Forum Topics', 'weadapt'),
+			'description' => __('Discover the forum topics in this theme.', 'weadapt'),
 		]);
 
 		$query_args = array(
@@ -131,7 +134,7 @@
 		if ($query->have_posts()) {
 			while ($query->have_posts()) {
 				$query->the_post();
-				get_part('components/cpt-query/index', [
+				get_part('components/cpt-search-query/index', [
 					'query_args'      => $query_args,
 					'show_post_types' => true,
 					'show_categories' => true
