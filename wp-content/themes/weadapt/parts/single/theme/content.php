@@ -5,7 +5,9 @@
  *
  * @package WeAdapt
  */
+
 ?>
+
 
 <section id="tab-latest-panel" role="tabpanel" aria-hidden="false">
 	<?php
@@ -96,7 +98,7 @@
     LIMIT 0, 10", $theme_id);
 
 	$post_ids = $wpdb->get_col($sql);
-
+	$show_search = get_field( 'show_search' ) ? get_field( 'show_search' ) : true;
 	if (empty($post_ids)) {
 		echo 'No forum topics available';
 	} else {
@@ -114,9 +116,10 @@
 			'categories'          => []
 		);
 
-		get_part('components/cpt-search-query/index', [
+		get_part('components/cpt-query/index', [
 			'query_args'      => $query_args,
 			'show_post_types' => false,
+			'show_search'	=> $show_search,
 			'show_categories' => false,
 			'query_type'      => 'forum_query',
 			'title'       => __('Forum Topics', 'weadapt'),
