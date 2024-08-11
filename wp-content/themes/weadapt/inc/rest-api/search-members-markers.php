@@ -24,12 +24,12 @@ function rest_search_members_markers( $request ) {
 		'meta_query'      => [
 			'relation' => 'AND',
 			[
-				'key'     => 'location',
+				'key'     => 'location_members',
 				'value'   => ':"lat";',
 				'compare' => 'LIKE'
 			],
 			[
-				'key'     => 'location',
+				'key'     => 'location_members',
 				'value'   => ':"lng";',
 				'compare' => 'LIKE'
 			]
