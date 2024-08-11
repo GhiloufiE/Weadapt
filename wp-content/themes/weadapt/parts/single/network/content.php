@@ -103,7 +103,7 @@
 	<?php
 	global $wpdb;
 	$wpdb->save_queries = true;
-
+	$show_search = get_field( 'show_search' ) ? get_field( 'show_search' ) : true;
 	$theme_id = get_the_ID();
 
 	$sql = $wpdb->prepare("
@@ -140,7 +140,11 @@
 	get_part('components/cpt-query/index', [
 		'query_args'      => $query_args,
 		'show_post_types' => false,
-		'show_categories' => false
+		'show_search'	=> $show_search,
+		'show_categories' => false,
+		'query_type'      => 'forum_query',
+		'title'       => __('Forum Topics', 'weadapt'),
+		'description' => __('Discover the forum topics in this theme.', 'weadapt'),
 	]);
 	$query_args = array(
 		'post__in' => $post_ids,
