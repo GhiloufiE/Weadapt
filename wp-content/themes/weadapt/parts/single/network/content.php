@@ -4,9 +4,11 @@
  *
  * @package WeAdapt
  */
+
+$is_about_default = ( get_the_ID() == 28392 );
 ?>
 
-<section id="tab-latest-panel" role="tabpanel" aria-hidden="false">
+<section id="tab-latest-panel" role="tabpanel" aria-hidden="<?php echo $is_about_default ? 'true' : 'false'; ?>" <?php if ( $is_about_default ) echo 'hidden'; ?>>
 	<?php
 		$query_args = array(
 			'post_status'    => 'publish',
@@ -38,7 +40,7 @@
 	?>
 </section>
 
-<section id="tab-about-panel" role="tabpanel" aria-hidden="true" hidden>
+<section id="tab-about-panel" role="tabpanel" aria-hidden="<?php echo $is_about_default ? 'false' : 'true'; ?>" <?php if ( ! $is_about_default ) echo 'hidden'; ?>>
 	<div class="archive-main__entry archive-main__entry--smaller">
 		<?php
 			if ( empty( get_the_content() ) ) {
