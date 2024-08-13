@@ -143,6 +143,11 @@ switch ($type) {
 			}
 		}
 		break;
+		case 'members':
+			$fields = [
+				'type_link' => ucfirst($type),
+			];
+			break;
 
 	default:
 		$fields = [

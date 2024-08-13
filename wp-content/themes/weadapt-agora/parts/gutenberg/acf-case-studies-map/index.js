@@ -520,7 +520,7 @@ const initMap = function (mapBlockNode, mapNode, markerNodes, markerOrgNodes, ma
 				mapBlockNode.classList.add('has-overlay');
 
 				// Update URL
-				window.history.pushState({}, '', `${markerData.currentUrl}/members/view/${markerNode.dataset.slug}/`);
+				window.history.pushState({}, '', `/member/${markerNode.dataset.slug}/`);
 
 				// Set Active Marker
 				activeMarker = marker;
@@ -552,7 +552,7 @@ const initMap = function (mapBlockNode, mapNode, markerNodes, markerOrgNodes, ma
 					.then(data => {
 						try {
 							const response = JSON.parse(data);
-
+							console.log('Response:', response);
 							if (response.output_html) {
 								contentNode.innerHTML = response.output_html;
 
