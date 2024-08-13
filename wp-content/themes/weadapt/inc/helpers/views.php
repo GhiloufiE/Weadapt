@@ -26,8 +26,13 @@ function get_post_views( $post_ID = false, $abridged = true, $with_title = true 
     $output = $abridged ? abridged_number( $view_count ) : $view_count;
 
     // With Title count
-    if ( $with_title ) {
-        $output = sprintf( _n( '%s View', '%s Views', $view_count, 'weadapt' ), $output );
+    if ( $view_count > 0 ) {
+        if ( $with_title ) {
+            $output = sprintf( _n( '%s Page view', '%s Page views', $view_count, 'weadapt' ), $view_count );
+        }
+    }
+    else{
+        $output="";
     }
 
     return $output;

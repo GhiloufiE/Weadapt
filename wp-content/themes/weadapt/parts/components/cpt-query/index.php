@@ -148,9 +148,6 @@ load_blocks_script('cpt-query', 'weadapt/cpt-query');
 					echo sprintf('<span class="empty-result">%s</span>', __('Nothing found.', 'weadapt'));
 				}
 				
-				// Log the query and SQL request when no posts are found
-				error_log('Query arguments: ' . print_r($query_args, true));
-				error_log('SQL request: ' . $query->request);
 			} else {
 				if ($query->have_posts()) {
 					while ($query->have_posts()) {

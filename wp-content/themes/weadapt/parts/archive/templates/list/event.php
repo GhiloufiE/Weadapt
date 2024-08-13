@@ -12,7 +12,9 @@ if ( ! empty( $post_ID ) ) :
 
 	if ( post_type_supports( get_post_type(), 'comments' ) ) {
 		$comments_count = wp_count_comments( $post_ID );
-		$post_meta[]    = ['icon-chat-20', sprintf( _n( '%s Comment', '%s Comments', $comments_count->approved, 'weadapt' ), number_format_i18n( $comments_count->approved ) )];
+		if ( $comments_count->approved > 0 ) {
+			$post_meta[] = ['icon-chat-20', sprintf( _n( '%s Comment', '%s Comments', $comments_count->approved, 'weadapt' ), number_format_i18n( $comments_count->approved ) )];
+		}
 	}
 
 	$contributors  = get_field( 'people_contributors', $post_ID ) ? get_field( 'people_contributors', $post_ID ) : [];
