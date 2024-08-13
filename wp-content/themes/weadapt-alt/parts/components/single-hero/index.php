@@ -108,22 +108,28 @@ switch ( $type ) {
 
 		if ( post_type_supports( get_post_type(), 'comments' ) ) {
 			$comments_count = wp_count_comments( $post_ID );
-			$replies_text = $comments_count->approved > 0 ? sprintf( _n( '%s reply', '%s replies', $comments_count->approved, 'weadapt' ), $comments_count->approved ) : __('Replies', 'weadapt');
-		
+			$replies_text = $comments_count->approved > 0 ? sprintf( _n( '%s reply', '%s replies', $comments_count->approved, 'weadapt' ), $comments_count->approved ) : '';
+			$likes_count = get_like_count( $post_ID );		
 			$post_meta_items = [
 				['icon-calendar', get_the_date()],
 				['icon-clock', get_estimate_reading_time( get_the_content() )],
-				['icon-chat-20', $replies_text !== '' ? $replies_text : '', 'replies-count'],
-				['icon-thumb-up', get_like_count( $post_ID ), 'likes-count']
-			];
+			];		
+			if ( $replies_text !== '' ) {
+				$post_meta_items[] = ['icon-chat-20', $replies_text, 'replies-count'];
+			}
+			if ( $likes_count > 0 ) {
+				$post_meta_items[] = ['icon-thumb-up', $likes_count, 'likes-count'];
+			}
 		} else {
 			$post_meta_items = [
 				['icon-calendar', get_the_date()],
 				['icon-clock', get_estimate_reading_time( get_the_content() )],
-				['icon-thumb-up', get_like_count( $post_ID ), 'likes-count']
-			];
+			];		
+			$likes_count = get_like_count( $post_ID );
+			if ( $likes_count > 0 ) {
+				$post_meta_items[] = ['icon-thumb-up', $likes_count, 'likes-count'];
+			}
 		}
-
 		$authors    = get_field( 'people_contributors' );
 		$post_forum = get_field( 'forum' );
 
@@ -149,7 +155,6 @@ switch ( $type ) {
 
 		$relevant = get_field( 'relevant' );
 		$main_theme_networks = get_field('relevant_main_theme_network', $post_ID);
-		error_log(print_r($main_theme_networks, true));
 		if (!empty($main_theme_networks) && is_array($main_theme_networks)) {
 			$fields['type_link'] = []; 
 			foreach ($main_theme_networks as $type_ID) {
@@ -167,20 +172,28 @@ switch ( $type ) {
 
 		if ( post_type_supports( get_post_type(), 'comments' ) ) {
 			$comments_count = wp_count_comments( $post_ID );
-			$replies_text = $comments_count->approved > 0 ? sprintf( _n( '%s reply', '%s replies', $comments_count->approved, 'weadapt' ), $comments_count->approved ) : __('Replies', 'weadapt');
-		
+			$replies_text = $comments_count->approved > 0 ? sprintf( _n( '%s reply', '%s replies', $comments_count->approved, 'weadapt' ), $comments_count->approved ) : '';
+			$likes_count = get_like_count( $post_ID );		
 			$post_meta_items = [
 				['icon-calendar', get_the_date()],
 				['icon-clock', get_estimate_reading_time( get_the_content() )],
-				['icon-chat-20', $replies_text !== '' ? $replies_text : '', 'replies-count'],
-				['icon-thumb-up', get_like_count( $post_ID ), 'likes-count']
 			];
+			if ( $replies_text !== '' ) {
+				$post_meta_items[] = ['icon-chat-20', $replies_text, 'replies-count'];
+			}
+		
+			if ( $likes_count > 0 ) {
+				$post_meta_items[] = ['icon-thumb-up', $likes_count, 'likes-count'];
+			}
 		} else {
 			$post_meta_items = [
 				['icon-calendar', get_the_date()],
 				['icon-clock', get_estimate_reading_time( get_the_content() )],
-				['icon-thumb-up', get_like_count( $post_ID ), 'likes-count']
 			];
+			$likes_count = get_like_count( $post_ID );
+			if ( $likes_count > 0 ) {
+				$post_meta_items[] = ['icon-thumb-up', $likes_count, 'likes-count'];
+			}
 		}
 
 		break;

@@ -18,6 +18,7 @@ if ( ! function_exists( 'get_post_meta_count' ) ) :
 			'meta_query'     => [ [
 				'key'   => 'relevant_main_theme_network',
 				'value' => $post_ID,
+				
 			] ],
 			'ignore_sticky_posts' => true,
 			'theme_query'         => true, // multisite fix
