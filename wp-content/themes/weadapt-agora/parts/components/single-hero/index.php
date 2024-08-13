@@ -320,12 +320,7 @@ switch ($type) {
 							<?php foreach ($post_meta_items as $item) :
 								$id = isset($item[2]) ? 'id="' . $item[2] . '"' : '';
 							?>
-								<li class="post-meta__item">
-
-									<span class="icon" aria-label="<?php echo esc_attr($item[0]); ?>"><?php echo get_img($item[0]); ?></span>
-
-									<span class="text" <?php echo $id; ?>><?php echo $item[1]; ?></span>
-								</li>
+								
 							<?php endforeach; ?>
 
 							<?php
