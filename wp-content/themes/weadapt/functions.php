@@ -1350,13 +1350,17 @@ function migrate_user_to_member_relationship() {
         error_log('Processing user ID: ' . $user_id);
 
         // Fetch user meta directly
+        $first_name = get_user_meta($user_id, 'first_name', true);
+        $last_name = get_user_meta($user_id, 'last_name', true);
+        $full_name = trim($first_name . ' ' . $last_name);
+
         $address_country = get_user_meta($user_id, 'address_country', true);
         $address_city = get_user_meta($user_id, 'address_city', true);
         $address_county = get_user_meta($user_id, 'address_county', true);
 
         // Create a new member post with the user details
         $new_member_post = array(
-            'post_title'    => $username,
+            'post_title'    => $full_name,
             'post_status'   => 'publish',
             'post_author'   => $user_id,
             'post_type'     => 'members'
@@ -1373,6 +1377,8 @@ function migrate_user_to_member_relationship() {
             // Insert user meta into the member post as post meta
             update_post_meta($new_member_id, 'user_id', $user_id);
             update_post_meta($new_member_id, 'username', $username);
+            update_post_meta($new_member_id, 'full_name', $full_name); // Save the full name
+            
             if (is_array($address_country)) {
                 $address_country_str = $address_country[1]; 
             } else {

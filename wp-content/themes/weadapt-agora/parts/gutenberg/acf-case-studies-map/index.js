@@ -198,6 +198,7 @@ const initMap = function (mapBlockNode, mapNode, markerNodes, markerOrgNodes, ma
 			const lat = parseFloat(markerNode.dataset.lat);
 			const lng = parseFloat(markerNode.dataset.lng);
 			const latLng = { lat, lng };
+			// console.log("hhhhhhhhhhhhhhhhhhhhhhhhhhh",markerNode.dataset);
 
 			const marker = new google.maps.Marker({
 				position: latLng,
@@ -506,6 +507,7 @@ const initMap = function (mapBlockNode, mapNode, markerNodes, markerOrgNodes, ma
 			const lat = parseFloat(markerNode.dataset.lat);
 			const lng = parseFloat(markerNode.dataset.lng);
 			const latLng = { lat, lng };
+			console.log("hhhhhhhhhhhhhhhhhhhhhhhhhhh",markerNode.dataset);
 
 			const marker = new google.maps.Marker({
 				position: latLng,
@@ -552,15 +554,65 @@ const initMap = function (mapBlockNode, mapNode, markerNodes, markerOrgNodes, ma
 					.then(data => {
 						try {
 							const response = JSON.parse(data);
-							console.log('Response:', response);
+		
 							if (response.output_html) {
 								contentNode.innerHTML = response.output_html;
-
+		
+								// Ensure the correct section is visible
+								const sections = ['tab-about-panel', 'tab-latest-panel', 'tab-members-panel'];
+								sections.forEach(sectionId => {
+									const sectionNode = document.getElementById(sectionId);
+									if (sectionNode) {
+										if (response.active_tab === sectionId) {
+											sectionNode.removeAttribute('hidden');
+											sectionNode.setAttribute('aria-hidden', 'false');
+										} else {
+											sectionNode.setAttribute('hidden', '');
+											sectionNode.setAttribute('aria-hidden', 'true');
+										}
+									}
+								});
+		
 								runPopups();
+		
+								// Tab functionality
+								const tabButtons = document.querySelectorAll('.single-tabs-nav__btn');
+								const tabPanels = document.querySelectorAll('section[role="tabpanel"]');
+		
+								tabButtons.forEach(button => {
+									button.addEventListener('click', () => {
+										const targetPanelId = button.getAttribute('aria-controls');
+										const targetPanel = document.getElementById(targetPanelId);
+		
+										// Update ARIA-selected attributes
+										tabButtons.forEach(btn => {
+											btn.setAttribute('aria-selected', 'false');
+										});
+										button.setAttribute('aria-selected', 'true');
+		
+										// Show/Hide tab panels
+										tabPanels.forEach(panel => {
+											panel.classList.remove('active');
+											panel.setAttribute('aria-hidden', 'true');
+											panel.setAttribute('hidden', '');
+										});
+										targetPanel.classList.add('active');
+										targetPanel.setAttribute('aria-hidden', 'false');
+										targetPanel.removeAttribute('hidden');
+									});
+								});
+		
+								// Optionally, activate the first tab by default
+								if (tabButtons.length > 0) {
+									tabButtons[0].click();
+								}
+							} else {
+								console.error('No output_html in response:', response);
 							}
-
+		
 							contentNode.classList.remove('loading');
 						} catch (error) {
+							console.error('Error parsing response:', error);
 							contentNode.classList.remove('loading');
 						}
 					})

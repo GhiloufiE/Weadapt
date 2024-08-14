@@ -44,4 +44,10 @@ $items = [
 	],
 ];
 
+// Check if the current post ID is 28392 and swap the first and second items
+if ( get_the_ID() == 28392 && count($items) > 1 ) {
+    $items[1]['selected'] = true;
+    $items[0]['selected'] = false;
+}
+
 get_part( 'components/single-tabs-nav/index', ['items' => $items] );
