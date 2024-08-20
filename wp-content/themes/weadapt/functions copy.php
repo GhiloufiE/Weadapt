@@ -3,25 +3,25 @@
 /**
  * Init theme base scripts
  */
-require_once(get_theme_file_path('/base/init.php'));
+require_once (get_theme_file_path('/base/init.php'));
 
 
 /**
  * Include All Inc Files
  */
 foreach (get_glob_folders_path('/inc/*/*.php') as $file_path) {
-    require_once(get_theme_file_path($file_path));
+    require_once (get_theme_file_path($file_path));
 }
 
 /**
  * Register Gutenberg Blocks
  */
-if (!function_exists('register_acf_blocks')) :
+if (!function_exists('register_acf_blocks')):
 
     function register_acf_blocks()
     {
         foreach (get_glob_folders_path('/parts/gutenberg/*/register.php') as $file_path) {
-            require_once(get_theme_file_path($file_path));
+            require_once (get_theme_file_path($file_path));
         }
     }
 
@@ -138,7 +138,7 @@ function notify_admin_on_pending_comment($comment_id, $comment_approved)
             $post->post_title,
             admin_url('comment.php?action=editcomment&c=' . $comment_id)
         );
-        wp_mail($admin_email, $subject, $message);
+        //wp_mail($admin_email, $subject, $message);
     }
 }
 
@@ -147,10 +147,12 @@ function replace_howdy($wp_admin_bar)
 {
     $my_account = $wp_admin_bar->get_node('my-account');
     $greeting = str_replace('Howdy,', 'Hello,', $my_account->title);
-    $wp_admin_bar->add_node(array(
-        'id' => 'my-account',
-        'title' => $greeting,
-    ));
+    $wp_admin_bar->add_node(
+        array(
+            'id' => 'my-account',
+            'title' => $greeting,
+        )
+    );
 }
 add_filter('admin_bar_menu', 'replace_howdy', 25);
 
@@ -165,9 +167,9 @@ add_action('wp_enqueue_scripts', 'enqueue_custom_scripts');
 // Add JavaScript code to add low-quality image warning boxes
 function add_low_quality_image_warning_script()
 {
-?>
+    ?>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             function getCookie(name) {
                 let match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
                 return match ? match[2] : null;
@@ -195,7 +197,7 @@ function add_low_quality_image_warning_script()
             }
 
             const checkbox = document.getElementById('low-quality-images');
-            checkbox.addEventListener('change', function() {
+            checkbox.addEventListener('change', function () {
                 document.cookie = 'weadapt-low-quality-images=' + (this.checked ? '1' : '0') + '; path=/';
                 removeLowQualityWarnings();
                 if (this.checked) {
@@ -205,103 +207,94 @@ function add_low_quality_image_warning_script()
             });
         });
     </script>
-<?php
+    <?php
 }
 add_action('wp_footer', 'add_low_quality_image_warning_script');
 
-function get_admin_info()
-{
-    global $wpdb;
-    $admin_info = get_transient('cached_admin_info');
-    if ($admin_info === false) {
-        $admin_info = $wpdb->get_results("
-            SELECT user_email, display_name, ID
-            FROM {$wpdb->users} u
-            INNER JOIN {$wpdb->usermeta} um ON u.ID = um.user_id
-            WHERE um.meta_key = '{$wpdb->prefix}capabilities'
-            AND um.meta_value LIKE '%administrator%' ", ARRAY_A);
-        set_transient('cached_admin_info', $admin_info, WEEK_IN_SECONDS);
-    }
 
-    return $admin_info;
-}
+
+
 function forum_new_post_notification($post_id)
 {
     global $wpdb;
-    $batch_size = 50;
-    if (get_post_type($post_id) !== 'forum') {
+
+    $send_notification = get_field('send_notification_to_members', $post_id);
+    if (!$send_notification) {
         return;
     }
 
-    if (!get_field('send_notification_to_members', $post_id) ||
-        get_post_meta($post_id, 'forum_notification_sent', true) ||
-        get_post_status($post_id) !== 'publish' ||
-        wp_is_post_revision($post_id)) {
+    if (get_post_meta($post_id, 'forum_notification_sent', true)) {
         return;
     }
-
-    $forum_post_id = (int) get_post_meta($post_id, 'forum', true);
-    if (!$forum_post_id) {
+    $post_status = get_post_status($post_id);
+    if ($post_status !== 'publish') {
         return;
     }
+    if (!wp_is_post_revision($post_id)) {
+        $isForumTopic = get_post_meta($post_id, 'forum', true);
+        if ($isForumTopic) {
+            $forum_post_id = (int) $isForumTopic;
+        } else {
+            return;
+        }
+        $meta_values = get_field('relevant_main_theme_network', $forum_post_id);
+        if ($meta_values && is_array($meta_values)) {
+            foreach ($meta_values as $meta_value) {
+                $theme_name = get_the_title($forum_post_id);
 
-    $meta_values = get_field('relevant_main_theme_network', $forum_post_id);
-    if (!$meta_values) {
-        return;
-    }
+                $table_name = $wpdb->prefix . 'wa_join';
+                $user_ids = $wpdb->get_col($wpdb->prepare("SELECT user_id FROM $table_name WHERE join_id = %s", $meta_value));
 
-    if (!is_array($meta_values)) {
-        $meta_values = array($meta_values);
-    }
-    $theme_name = get_the_title($forum_post_id);
-    $post_title = get_the_title($post_id);
-    $post_excerpt = wp_strip_all_tags(wp_trim_words(get_the_excerpt($post_id), 100));
-    $post_link = get_permalink($post_id);
-    $site_name = get_bloginfo('name');
-    $subject = "New forum discussion in the $theme_name theme on weADAPT";
+                if (!empty($user_ids)) {
+                    $users_table_name = $wpdb->prefix . 'users';
+                    $user_ids_placeholder = implode(',', array_fill(0, count($user_ids), '%d'));
+                    $query_user_emails = $wpdb->prepare("SELECT ID, user_email, display_name FROM $users_table_name WHERE ID IN ($user_ids_placeholder)", $user_ids);
+                    $user_emails_results = $wpdb->get_results($query_user_emails);
 
-    $table_name = $wpdb->prefix . 'wa_join';
-    $user_ids = $wpdb->get_col($wpdb->prepare(
-        "SELECT user_id FROM $table_name WHERE join_id IN (%s)",
-        implode(',', $meta_values)
-    ));
+                    $post_title = get_the_title($post_id);
+                    $post_excerpt = get_the_excerpt($post_id);
+                    $post_excerpt = wp_strip_all_tags($post_excerpt);
+                    $post_excerpt = mb_strimwidth($post_excerpt, 0, 100, '...');
+                    $post_link = get_permalink($post_id);
+                    $site_name = get_bloginfo('name');
+                    $theme_name = get_the_title($forum_post_id);
+                    $theme_link = get_permalink($meta_value);
+                    $post_type = get_post_type($post_id);
 
-    if (empty($user_ids)) {
-        return;
-    }
+                    $post_type_labels = array(
+                        'forum' => 'Forum Topic'
+                    );
 
-    $total_users = count($user_ids);
-    $batches = ceil($total_users / $batch_size);
+                    $post_type_label = isset($post_type_labels[$post_type]) ? $post_type_labels[$post_type] : 'Post';
+                    $subject = "New forum discussion in the $theme_name theme on weADAPT";
 
-    for ($i = 0; $i < $batches; $i++) {
-        $batch_user_ids = array_slice($user_ids, $i * $batch_size, $batch_size);
+                    foreach ($user_emails_results as $user) {
+                        $recipient_email = $user->user_email;
+                        $display_name = $user->display_name;
 
-        foreach ($batch_user_ids as $user_id) {
-            $user_info = get_userdata($user_id);
-            if ($user_info) {
-                $display_name = $user_info->display_name;
-                $message = "Hi $display_name,<br><br>";
-                $message .= "We wanted to inform you of a new Forum Discussion in the <b>$theme_name</b> theme you are a member of.<br><br>
-                Title: $post_title<br>
-                Content: $post_excerpt<br><br>
-                Reply to the conversation and engage with other members here:<br>
-                <a href='$post_link'>$post_title</a><br><br>
-                Thank you for your continued participation and contributions to our community.<br><br>
-                If you do not want to receive any more notifications, you can unsubscribe from this theme by following this link and clicking on 'Unsubscribe Theme':<br>
-                <a href='#'>$theme_name</a><br><br>
-                Best Regards,<br>
-                $site_name";
+                        $message = "Hi $display_name, <br><br>";
+                        $message .= "We wanted to inform you of a new Forum Discussion in the <b>$theme_name</b> theme you are a member of.<br><br>
+                        Title: $post_title <br>
+                        Content: $post_excerpt <br><br>
+                        Reply to the conversation and engage with other members here:<br>
+                        <a href='$post_link'>$post_title</a><br><br>
+                        Thank you for your continued participation and contributions to our community.<br><br>
+                        If you do not want to receive any more notifications, you can unsubscribe from this theme by following this link and clicking on 'Unsubscribe Theme':<br>
+                        <a href='$theme_link'>Unsubscribe Theme</a><br><br>
+                        Best Regards,<br>
+                        $site_name";
 
-                send_email_immediately(array($user_id), $subject, $message);
+                        $headers = array('Content-Type: text/html; charset=UTF-8');
+                        //wp_mail($recipient_email, $subject, $message, $headers);
+                    }
+                }
             }
         }
-         sleep(1); 
+        update_post_meta($post_id, 'forum_notification_sent', true);
     }
-
-    update_post_meta($post_id, 'forum_notification_sent', true);
 }
-add_action('acf/save_post', 'forum_new_post_notification', 10, 1);
 
+add_action('acf/save_post', 'forum_new_post_notification', 10, 1);
 
 function handle_create_post()
 {
@@ -361,7 +354,6 @@ function handle_create_post()
 }
 add_action('admin_post_nopriv_create_post', 'handle_create_post');
 add_action('admin_post_create_post', 'handle_create_post');
-
 function notify_admins_of_pending_posts($post_id, $post_type)
 {
     global $wpdb;
@@ -389,6 +381,7 @@ function notify_admins_of_pending_posts($post_id, $post_type)
 
         $message .= "Best Regards,<br>
         $site_name,<br>";
+
     } elseif ($post_type == 'theme') {
         $theme_id = get_field('relevant_main_theme_network', $post_id);
         if (!$theme_id) {
@@ -409,21 +402,26 @@ function notify_admins_of_pending_posts($post_id, $post_type)
         return;
     }
 
+    // Query the database for administrators and their names
     $admins_info = $wpdb->get_results("
         SELECT user_email, display_name
         FROM {$wpdb->users} u
         INNER JOIN {$wpdb->usermeta} um ON u.ID = um.user_id
         WHERE um.meta_key = '{$wpdb->prefix}capabilities'
-        AND um.meta_value LIKE '%administrator%' ", ARRAY_A);
+        AND um.meta_value LIKE '%administrator%'
+    ", ARRAY_A);
+
     if (empty($admins_info)) {
         return;
     }
+
     $headers = array('Content-Type: text/html; charset=UTF-8');
+
     foreach ($admins_info as $admin) {
         $admin_email = $admin['user_email'];
         $admin_name = $admin['display_name'];
         $personalized_message = sprintf(__('Dear %s,', 'weadapt'), esc_html($admin_name)) . "<br><br>" . $message;
-        send_email_immediately($admin_email, $subject, $personalized_message, $headers);
+        //wp_mail($admin_email, $subject, $personalized_message, $headers);
         theme_mail_save_to_db(array($admin_email), $subject, $personalized_message);
     }
 }
@@ -453,10 +451,10 @@ function create_forum_post_on_theme_creation($new_status, $old_status, $post)
     if ($post->post_type == 'theme' && $old_status == 'auto-draft' && $new_status == 'publish') {
 
         $forum_post = array(
-            'post_title'    => $post->post_title,
-            'post_content'  => 'This is a forum linked to the theme: ' . $post->post_title,
-            'post_status'   => 'publish',
-            'post_type'     => 'forums'
+            'post_title' => $post->post_title,
+            'post_content' => 'This is a forum linked to the theme: ' . $post->post_title,
+            'post_status' => 'publish',
+            'post_type' => 'forums'
         );
         $forum_post_id = wp_insert_post($forum_post);
         if ($forum_post_id != 0) {
@@ -481,7 +479,8 @@ function notify_admin_on_edit($new_status, $old_status, $post)
         return;
     }
 
-    if (($old_status === 'publish' && in_array($new_status, array('pending', 'draft'))) ||
+    if (
+        ($old_status === 'publish' && in_array($new_status, array('pending', 'draft'))) ||
         ($old_status === 'draft' && $new_status === 'pending')
     ) {
 
@@ -515,7 +514,7 @@ function notify_admin_on_edit($new_status, $old_status, $post)
         $message .= '<a href="' . get_edit_post_link($post->ID) . '">' . __('Publish/Edit', 'your-text-domain') . '</a>';
 
         foreach ($admin_emails as $admin_email) {
-            wp_mail($admin_email, $subject, $message);
+            //wp_mail($admin_email, $subject, $message);
         }
 
         theme_mail_save_to_db($admin_emails, $subject, $message);
@@ -539,7 +538,7 @@ add_action('save_post', function ($post_id) {
 function get_editors_by_theme($theme)
 {
     $args = array(
-        'role'    => 'editor',
+        'role' => 'editor',
         'meta_key' => 'user_theme',
         'meta_value' => $theme,
     );
@@ -620,7 +619,7 @@ function notify_editors_after_publish($post_id, $new_theme)
             $message .= sprintf(' — <a href="%s">%s</a>', get_edit_post_link($post_id), __('Publish / Edit / Delete it', 'weadapt'));
 
             theme_mail_save_to_db($users, $subject, $message);
-            send_email_immediately($users, $subject, $message);
+            //send_email_immediately($users, $subject, $message);
         }
 
         $valid_contributors = get_field('people_contributors', $post_id) ?: array();
@@ -673,7 +672,7 @@ function notify_editors_after_publish($post_id, $new_theme)
                 $subject,
                 $message
             );
-            send_email_immediately($valid_contributors, $subject, $message);
+            //send_email_immediately($valid_contributors, $subject, $message);
             update_post_meta($post_id, '_notification_sent', true);
         }
     }
@@ -684,34 +683,20 @@ function notify_editors_after_publish($post_id, $new_theme)
         if ($notification_sent) {
             return;
         }
-        $users = [];
 
+        $users = array();
         if (is_array($main_theme_network = get_field('relevant_main_theme_network', $post_id))) {
-            $users = []; 
-            if (is_array($main_theme_network = get_field('relevant_main_theme_network', $post_id))) {
-
-                foreach ($main_theme_network as $theme_network) {
-                    if ($main_theme_network_editors = get_field('people_editors', $theme_network)) {
-            
-                        if ($published_for_the_first_time) {
-                            $admins = get_blog_administrators(false, 1);
-                            if (is_array($admins)) {
-                                $admins = array_filter($admins, function ($user_id) {
-                                    return user_can($user_id, 'administrator');
-                                });
-                                $users = array_merge($users, $main_theme_network_editors, $admins);
-                            }
-                        } else {
-                            $users = array_merge($users, $main_theme_network_editors);
-                        }
+            foreach ($main_theme_network as $theme_network) {
+                if ($main_theme_network_editors = get_field('people_editors', $theme_network)) {
+                    if ($published_for_the_first_time) {
+                        $admins = get_blog_administrators(false, 1);
+                        $users = array_merge($users, $main_theme_network_editors, $admins);
+                    } else {
+                        $users = array_merge($users, $main_theme_network_editors);
                     }
                 }
             }
-
-            $users = array_unique($users); 
         }
-
-        $users = array_unique($users);
         if ($published_for_the_first_time) {
             $valid_contributors = get_field('people_contributors', $post_id) ?: array();
             $people_creator = get_field('people_creator', $post_id) ?: array();
@@ -765,11 +750,15 @@ function notify_editors_after_publish($post_id, $new_theme)
                     $subject,
                     $message
                 );
-                send_email_immediately($valid_contributors, $subject, $message);
+                //send_email_immediately($valid_contributors, $subject, $message);
+
                 update_post_meta($post_id, '_notification_sent', true);
             }
 
             // an article has been published on weadapt
+            $admins = get_blog_administrators(false, 1);
+            $users = array_merge($users, $admins);
+            $users = array_unique($users);
             if (!empty($users)) {
                 if ($post->post_type == 'article' || $post->post_type == 'event' || $post->post_type == 'organisation') {
                     $subject = sprintf(
@@ -804,17 +793,19 @@ function notify_editors_after_publish($post_id, $new_theme)
                     $message .= sprintf(' — <a href="%s">%s</a>', get_edit_post_link($post_id), __('Publish / Edit / Delete it', 'weadapt'));
 
                     theme_mail_save_to_db($users, $subject, $message);
-                    send_email_immediately($users, $subject, $message);
+                    //send_email_immediately($users, $subject, $message);
                 }
             }
         }
         // related to your theme/network 
         if ($published_for_the_first_time) {
-            $related_themes_networks = get_field('relevant_themes_networks', $post);     
+
+            $related_themes_networks = get_field('relevant_themes_networks', $post);
+
             if (!empty($related_themes_networks)) {
-                error_log('related $', $related_themes_networks );
                 foreach ($related_themes_networks as $theme_network_ID) {
                     $theme_network_editors = get_field('people_editors', $theme_network_ID);
+
                     if (!empty($theme_network_editors)) {
                         $theme_name = get_the_title($theme_network_ID);
                         $theme_editors_user_ids = [];
@@ -825,7 +816,9 @@ function notify_editors_after_publish($post_id, $new_theme)
                                 $theme_editors_user_ids[] = $editor_id;
                             }
                         }
+
                         $theme_editors_user_ids = array_unique($theme_editors_user_ids);
+
 
                         if (!empty($theme_editors_user_ids)) {
                             $subject = sprintf(
@@ -873,11 +866,11 @@ function notify_editors_after_publish($post_id, $new_theme)
                                 __('Go to the content', 'weadapt')
                             );
                             theme_mail_save_to_db(
-                                $theme_editors_user_ids,
+                                $theme_editors_user_ids, // Ensure user IDs are passed
                                 $subject,
                                 $message
                             );
-                            send_email_immediately($theme_editors_user_ids, $subject, $message);
+                            //send_email_immediately($theme_editors_user_ids, $subject, $message);
                         }
                     }
                 }
@@ -935,6 +928,272 @@ function update_theme_meta($post_id, $post = null, $update = null)
 }
 
 add_action('acf/save_post', 'update_theme_meta', 10, 3);
+// Add action to initialize custom dashboard widgets
+add_action('wp_dashboard_setup', 'add_custom_dashboard_widgets');
+
+function add_custom_dashboard_widgets() {
+    wp_add_dashboard_widget(    
+        'monthly_downloads_widget',
+        'Top 10 Articles by Downloads This Month',
+        'monthly_downloads_widget_display'
+    );
+    wp_add_dashboard_widget(
+        'total_downloads_widget',
+        'Top 10 Articles by Total Downloads',
+        'total_downloads_widget_display'
+    );
+}
+
+function get_top_articles_by_monthly_downloads($limit = 10, $offset = 0) {
+    global $wpdb;
+    $query = $wpdb->prepare("
+        SELECT pm1.post_id, SUM(pm2.meta_value) as total_downloads
+        FROM {$wpdb->postmeta} pm1
+        JOIN {$wpdb->postmeta} pm2 ON pm1.meta_value = pm2.post_id
+        WHERE pm1.meta_key = 'document_list_0_file'
+        AND pm2.meta_key = '_download_count_month'
+        GROUP BY pm1.post_id
+        ORDER BY total_downloads DESC
+        LIMIT %d OFFSET %d
+    ", $limit, $offset);
+    
+    // Print query for debugging
+    error_log($query);
+
+    $results = $wpdb->get_results($query);
+
+    // Print results for debugging
+    error_log(print_r($results, true));
+
+    return $results;
+}
+
+
+function get_top_articles_by_total_downloads($limit = 10, $offset = 0) {
+    global $wpdb;
+    $results = $wpdb->get_results($wpdb->prepare("
+        SELECT pm1.post_id, SUM(pm2.meta_value) as total_downloads
+        FROM {$wpdb->postmeta} pm1
+        JOIN {$wpdb->postmeta} pm2 ON pm1.meta_value = pm2.post_id
+        WHERE pm1.meta_key = 'document_list_0_file'
+        AND pm2.meta_key = '_download_count'
+        GROUP BY pm1.post_id
+        ORDER BY total_downloads DESC
+        LIMIT %d OFFSET %d
+    ", $limit, $offset));
+    return $results;
+}
+
+function monthly_downloads_widget_display() {
+    $top_articles = get_top_articles_by_monthly_downloads();
+    echo '<table class="widefat">';
+    echo '<thead><tr><th>Article Title</th><th>Total Downloads This Month</th></tr></thead>';
+    echo '<tbody id="monthly-downloads-table">';
+    if (!empty($top_articles)) {
+        $displayed_articles = [];
+        foreach ($top_articles as $article) {
+            if (!in_array($article->post_id, $displayed_articles)) {
+                $post_title = get_the_title($article->post_id);
+                $post_url = get_permalink($article->post_id);
+                echo '<tr>';
+                echo '<td><a href="' . esc_url($post_url) . '">' . esc_html($post_title) . '</a></td>';
+                echo '<td>' . intval($article->total_downloads) . '</td>';
+                echo '</tr>';
+                $displayed_articles[] = $article->post_id;
+            }
+        }
+    } else {
+        echo '<tr><td colspan="2">No articles found.</td></tr>';
+    }
+    echo '</tbody>';
+    echo '</table>';
+    echo '<button id="load-more-monthly" data-offset="10">Load More</button>';
+}
+
+function total_downloads_widget_display() {
+    $top_articles = get_top_articles_by_total_downloads();
+    echo '<table class="widefat">';
+    echo '<thead><tr><th>Article Title</th><th>Total Downloads</th></tr></thead>';
+    echo '<tbody id="total-downloads-table">';
+    if (!empty($top_articles)) {
+        $displayed_articles = [];
+        foreach ($top_articles as $article) {
+            if (!in_array($article->post_id, $displayed_articles)) {
+                $post_title = get_the_title($article->post_id);
+                $post_url = get_permalink($article->post_id);
+                echo '<tr>';
+                echo '<td><a href="' . esc_url($post_url) . '">' . esc_html($post_title) . '</a></td>';
+                echo '<td>' . intval($article->total_downloads) . '</td>';
+                echo '</tr>';
+                $displayed_articles[] = $article->post_id;
+            }
+        }
+    } else {
+        echo '<tr><td colspan="2">No articles found.</td></tr>';
+    }
+    echo '</tbody>';
+    echo '</table>';
+    echo '<button id="load-more-total" data-offset="10">Load More</button>';
+}
+
+function enqueue_dashboard_scripts($hook) {
+    if ('index.php' != $hook) {
+        return;
+    }
+    // Enqueue a script here. Replace 'YOUR_SCRIPT_URL' with the actual script URL.
+    wp_enqueue_script('dashboard-ajax-script', 'YOUR_SCRIPT_URL', array('jquery'), null, true);
+    wp_localize_script('dashboard-ajax-script', 'ajax_object', array(
+        'ajax_url' => admin_url('admin-ajax.php'),
+        'nonce' => wp_create_nonce('dashboard-ajax-nonce')
+    ));
+
+    $inline_js = "
+    jQuery(document).ready(function($) {
+        $('#load-more-monthly').on('click', function() {
+            var button = $(this);
+            var offset = button.data('offset');
+            console.log('Loading more monthly articles with offset:', offset);
+
+            $.ajax({
+                type: 'POST',
+                url: ajax_object.ajax_url,
+                data: {
+                    action: 'load_more_monthly',
+                    offset: offset,
+                    security: ajax_object.nonce
+                },
+                success: function(response) {
+                    console.log('Response:', response);
+                    $('#monthly-downloads-table').append(response);
+                    button.data('offset', offset + 10);
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX Error:', status, error);
+                }
+            });
+        });
+
+        $('#load-more-total').on('click', function() {
+            var button = $(this);
+            var offset = button.data('offset');
+            console.log('Loading more total articles with offset:', offset);
+
+            $.ajax({
+                type: 'POST',
+                url: ajax_object.ajax_url,
+                data: {
+                    action: 'load_more_total',
+                    offset: offset,
+                    security: ajax_object.nonce
+                },
+                success: function(response) {
+                    console.log('Response:', response);
+                    $('#total-downloads-table').append(response);
+                    button.data('offset', offset + 10);
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX Error:', status, error);
+                }
+            });
+        });
+    });
+    ";
+    wp_add_inline_script('dashboard-ajax-script', $inline_js);
+}
+add_action('admin_enqueue_scripts', 'enqueue_dashboard_scripts');
+
+add_action('wp_ajax_load_more_monthly', 'load_more_monthly');
+function load_more_monthly() {
+    check_ajax_referer('dashboard-ajax-nonce', 'security');
+    if (!isset($_POST['offset']) || !is_numeric($_POST['offset'])) {
+        wp_send_json_error('Invalid offset.');
+    }
+
+    $offset = intval($_POST['offset']);
+    $top_articles = get_top_articles_by_monthly_downloads(10, $offset);
+
+    if (!empty($top_articles)) {
+        foreach ($top_articles as $article) {
+            $post_title = get_the_title($article->post_id);
+            $post_url = get_permalink($article->post_id);
+            echo '<tr>';
+            echo '<td><a href="' . esc_url($post_url) . '">' . esc_html($post_title) . '</a></td>';
+            echo '<td>' . intval($article->total_downloads) . '</td>';
+            echo '</tr>';
+        }
+    } else {
+        echo '<tr><td colspan="2">No more articles found.</td></tr>';
+    }
+
+    wp_die();
+}
+
+add_action('wp_ajax_load_more_total', 'load_more_total');
+function load_more_total() {
+    check_ajax_referer('dashboard-ajax-nonce', 'security');
+    if (!isset($_POST['offset']) || !is_numeric($_POST['offset'])) {
+        wp_send_json_error('Invalid offset.');
+    }
+
+    $offset = intval($_POST['offset']);
+    $top_articles = get_top_articles_by_total_downloads(10, $offset);
+
+    if (!empty($top_articles)) {
+        foreach ($top_articles as $article) {
+            $post_title = get_the_title($article->post_id);
+            $post_url = get_permalink($article->post_id);
+            echo '<tr>';
+            echo '<td><a href="' . esc_url($post_url) . '">' . esc_html($post_title) . '</a></td>';
+            echo '<td>' . intval($article->total_downloads) . '</td>';
+            echo '</tr>';
+        }
+    } else {
+        echo '<tr><td colspan="2">No more articles found.</td></tr>';
+    }
+
+    wp_die();
+}
+
+add_action('admin_menu', 'register_migration_menu_page');
+
+function register_migration_menu_page() {
+    add_menu_page(
+        'Forum to Network Migration', // Page title
+        'Forum Migration',            // Menu title
+        'manage_options',             // Capability
+        'forum-migration',            // Menu slug
+        'migration_menu_page_html',   // Callback function
+        'dashicons-update',           // Icon
+        20                            // Position
+    );
+}
+
+function migration_menu_page_html() {
+    if (!current_user_can('manage_options')) {
+        return;
+    }
+
+    if (isset($_POST['create_table'])) {
+        create_network_forum_relationship_table();
+        echo '<div class="notice notice-success is-dismissible"><p>Table created successfully.</p></div>';
+    }
+
+    if (isset($_POST['migrate_forum_to_network'])) {
+        migrate_forum_to_network_relationship();
+        echo '<div class="notice notice-success is-dismissible"><p>Data migration completed successfully.</p></div>';
+    }
+    
+    ?>
+    <div class="wrap">
+        <h1>Forum to Network Migration</h1>
+        <form method="post" action="">
+            <?php wp_nonce_field('forum_migration_action', 'forum_migration_nonce'); ?>
+            <input type="submit" name="create_table" class="button button-secondary" value="Create Table">
+            <input type="submit" name="migrate_forum_to_network" class="button button-primary" value="Migrate Now">
+        </form>
+    </div>
+    <?php
+}
 
 function create_network_forum_relationship_table() {
     global $wpdb;
@@ -954,22 +1213,30 @@ function create_network_forum_relationship_table() {
 
 function migrate_forum_to_network_relationship() {
     global $wpdb;
+
+    // Verify nonce
     if (!isset($_POST['forum_migration_nonce']) || !wp_verify_nonce($_POST['forum_migration_nonce'], 'forum_migration_action')) {
         error_log('Nonce verification failed.');
         return;
     }
+
+    // Get all network posts
     $network_posts = $wpdb->get_results("
         SELECT p.ID 
         FROM {$wpdb->posts} p
         WHERE p.post_type = 'network'
     ");
 
+    // Iterate through each network post
     foreach ($network_posts as $post) {
         $network_id = $post->ID;
         error_log('Processing network post ID: ' . $network_id);
+
+        // Get the network post details
         $network_post = get_post($network_id);
 
         if ($network_post) {
+            // Create a new forum post with the same details
             $new_forum_post = array(
                 'post_title'    => $network_post->post_title,
                 'post_content'  => $network_post->post_content,
@@ -978,12 +1245,15 @@ function migrate_forum_to_network_relationship() {
                 'post_type'     => 'forums'
             );
 
+            // Insert the new forum post
             $new_forum_id = wp_insert_post($new_forum_post);
 
             if (is_wp_error($new_forum_id)) {
+                error_log('Failed to create forum post for network ID: ' . $network_id . '. Error: ' . $new_forum_id->get_error_message());
             } else {
-                
+                error_log('Created forum post ID: ' . $new_forum_id . ' for network ID: ' . $network_id);
 
+                // Insert into network_forum_relationship table
                 $wpdb->insert(
                     "{$wpdb->prefix}network_forum_relationship",
                     array(
@@ -995,6 +1265,238 @@ function migrate_forum_to_network_relationship() {
                         '%d'
                     )
                 );
+                error_log('Inserted forum ID: ' . $new_forum_id . ' and network ID: ' . $network_id);
+            }
+        } else {
+            error_log('Network post not found for ID: ' . $network_id);
+        }
+    }
+}
+add_action('admin_menu', 'register_user_migration_menu_page');
+
+function register_user_migration_menu_page() {
+    add_menu_page(
+        'User to Member Migration',   // Page title
+        'User Migration',             // Menu title
+        'manage_options',             // Capability
+        'user-migration',             // Menu slug
+        'user_migration_menu_page_html', // Callback function
+        'dashicons-admin-users',      // Icon
+        21                            // Position (appears after the Forum Migration menu)
+    );
+}
+
+function user_migration_menu_page_html() {
+    if (!current_user_can('manage_options')) {
+        return;
+    }
+
+    if (isset($_POST['migrate_user_to_member'])) {
+        migrate_user_to_member_relationship();
+        echo '<div class="notice notice-success is-dismissible"><p>User migration completed successfully.</p></div>';
+    }
+
+    if (isset($_POST['delete_migrated_members'])) {
+        delete_migrated_members();
+        echo '<div class="notice notice-success is-dismissible"><p>All migrated members have been deleted successfully.</p></div>';
+    }
+
+    if (isset($_POST['convert_address_to_location'])) {
+        convert_address_to_location();
+        echo '<div class="notice notice-success is-dismissible"><p>Address conversion to location completed successfully.</p></div>';
+    }
+    
+    ?>
+    <div class="wrap">
+        <h1>User to Member Migration</h1>
+        <form method="post" action="">
+            <?php wp_nonce_field('user_migration_action', 'user_migration_nonce'); ?>
+            <input type="submit" name="migrate_user_to_member" class="button button-primary" value="Migrate Now">
+            <input type="submit" name="delete_migrated_members" class="button button-secondary" value="Delete Migrated Members">
+            <input type="submit" name="convert_address_to_location" class="button button-tertiary" value="Convert Address to Location">
+        </form>
+    </div>
+    <?php
+}
+
+
+function migrate_user_to_member_relationship() {
+    global $wpdb;
+
+    // Verify nonce
+    if (!isset($_POST['user_migration_nonce']) || !wp_verify_nonce($_POST['user_migration_nonce'], 'user_migration_action')) {
+        error_log('Nonce verification failed.');
+        return;
+    }
+
+    // Query the database directly for users who match the criteria in wp_usermeta
+    $users = $wpdb->get_results("
+        SELECT u.ID, u.user_login 
+        FROM {$wpdb->users} u
+        INNER JOIN {$wpdb->usermeta} um ON u.ID = um.user_id
+        WHERE um.meta_key = 'primary_blog' AND um.meta_value = '11'
+    ");
+
+    if (empty($users)) {
+        echo '<div class="notice notice-error is-dismissible"><p>No users found to migrate.</p></div>';
+        return;
+    }
+
+    // Process each user
+    foreach ($users as $user) {
+        $user_id = $user->ID;
+        $username = $user->user_login;
+
+        error_log('Processing user ID: ' . $user_id);
+
+        // Fetch user meta directly
+        $first_name = get_user_meta($user_id, 'first_name', true);
+        $last_name = get_user_meta($user_id, 'last_name', true);
+        $full_name = trim($first_name . ' ' . $last_name);
+
+        $address_country = get_user_meta($user_id, 'address_country', true);
+        $address_city = get_user_meta($user_id, 'address_city', true);
+        $address_county = get_user_meta($user_id, 'address_county', true);
+
+        // Create a new member post with the user details
+        $new_member_post = array(
+            'post_title'    => $full_name,
+            'post_status'   => 'publish',
+            'post_author'   => $user_id,
+            'post_type'     => 'members'
+        );
+
+        // Insert the new member post
+        $new_member_id = wp_insert_post($new_member_post);
+
+        if (is_wp_error($new_member_id)) {
+            error_log('Failed to create member post for user ID: ' . $user_id . '. Error: ' . $new_member_id->get_error_message());
+        } else {
+            error_log('Created member post ID: ' . $new_member_id . ' for user ID: ' . $user_id);
+
+            // Insert user meta into the member post as post meta
+            update_post_meta($new_member_id, 'user_id', $user_id);
+            update_post_meta($new_member_id, 'username', $username);
+            update_post_meta($new_member_id, 'full_name', $full_name); // Save the full name
+            
+            if (is_array($address_country)) {
+                $address_country_str = $address_country[1]; 
+            } else {
+                $address_country_str = $address_country;
+            }
+            
+            // Log the country value
+            error_log('Country: ' . $address_country_str);
+            
+            // Save the converted string into post meta
+            update_post_meta($new_member_id, 'address_country', $address_country_str);
+            
+            // Also save city and county as they were
+            update_post_meta($new_member_id, 'address_city', $address_city);
+            update_post_meta($new_member_id, 'address_county', $address_county);
+
+            // Store the ACF field value correctly as an array
+            $acf_value = array('11');
+            add_post_meta($new_member_id, 'publish_to', $acf_value, true);
+            add_post_meta($new_member_id, '_publish_to', 'field_6374a3364bb73', true);
+
+            error_log('Inserted meta data and ACF field for member post ID: ' . $new_member_id);
+        }
+    }
+
+    echo '<div class="notice notice-success is-dismissible"><p>User migration completed successfully.</p></div>';
+}
+
+
+
+function delete_migrated_members() {
+    global $wpdb;
+
+    // Get all member posts
+    $member_posts = $wpdb->get_results("
+        SELECT ID 
+        FROM {$wpdb->posts} 
+        WHERE post_type = 'members'
+    ");
+
+    if (empty($member_posts)) {
+        echo '<div class="notice notice-error is-dismissible"><p>No migrated members found to delete.</p></div>';
+        return;
+    }
+
+    foreach ($member_posts as $post) {
+        $post_id = $post->ID;
+
+        delete_post_meta($post_id, 'user_id');
+        delete_post_meta($post_id, 'username');
+        delete_post_meta($post_id, 'address_country');
+        delete_post_meta($post_id, 'address_city');
+        delete_post_meta($post_id, 'address_county');
+
+        wp_delete_post($post_id, true);
+        error_log('Deleted member post ID: ' . $post_id . ' and associated post meta.');
+    }
+
+    echo '<div class="notice notice-success is-dismissible"><p>All migrated members and their associated post meta have been deleted successfully.</p></div>';
+}
+
+function convert_address_to_location() {
+    $args = array(
+        'post_type' => 'members',
+        'post_status' => 'publish',
+        'numberposts' => -1,
+    );
+
+    $members = get_posts($args);
+
+    foreach ($members as $member) {
+        $post_id = $member->ID;
+        error_log('Processing member post ID: ' . $post_id);
+
+        // Retrieve the address meta fields from the post
+        $country = get_post_meta($post_id, 'address_country', true);
+        $city = get_post_meta($post_id, 'address_city', true);
+        $county = get_post_meta($post_id, 'address_county', true);
+
+        error_log('Retrieved address fields for member post ID: ' . $post_id);
+        error_log('Country: ' . $country);
+        error_log('City: ' . $city);
+        error_log('County: ' . $county);
+
+
+        // Ensure that the retrieved values are strings
+        $country = is_array($country) ? implode(', ', $country) : $country;
+        $city = is_array($city) ? implode(', ', $city) : $city;
+        $county = is_array($county) ? implode(', ', $county) : $county;
+
+        if ($country && $city && $county) {
+            // Build the query URL
+            $query_url = "https://nominatim.openstreetmap.org/search.php?county=" . urlencode($county) . "&country=" . urlencode($country) . "&format=jsonv2";
+            error_log('Query URL: ' . $query_url);
+            // Make the HTTP request
+            $response = wp_remote_get($query_url);
+
+            if (is_wp_error($response)) {
+                continue; // Skip to the next member if there's an error with the request
+            }
+
+            $body = wp_remote_retrieve_body($response);
+            $data = json_decode($body, true);
+
+            if (!empty($data) && isset($data[0]['lat']) && isset($data[0]['lon'])) {
+                $lat = floatval($data[0]['lat']);
+                $lng = floatval($data[0]['lon']);
+
+                $acf_value = array(
+                    'zoom' => 14,
+                    'lat' => $lat,
+                    'lng' => $lng,
+                );
+
+                
+           
+                add_post_meta($post_id, 'location_members', $acf_value, true);
+                add_post_meta($post_id, '_location_members', 'field_65fcef62959d4', true);
             }
         }
     }

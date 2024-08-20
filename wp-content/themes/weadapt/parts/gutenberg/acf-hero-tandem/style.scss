@@ -1,7 +1,7 @@
 @import '__settings/init';
 
 .hero-tandem {
-	background: url('/tandem-bg.jpg') center center no-repeat;
+	background-color: var(--color--bg-hero);
 	background-size: cover;
 	overflow: hidden;
 	color: $static-color--white;
