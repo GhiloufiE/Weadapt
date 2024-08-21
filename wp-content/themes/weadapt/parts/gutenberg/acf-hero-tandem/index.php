@@ -29,7 +29,8 @@ $attr = $block_object->attr(' has-image');
 			</div>
 
 			<div class="col-12 col-lg-6 hero-tandem__col alignment-right">
-				<svg class="hero-tandem__svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 441.3333 441.3333">
+				<img src="<?php echo get_theme_file_uri('/assets/images/diagram.png'); ?>" style="    float: right;" />
+				<!-- <svg class="hero-tandem__svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 441.3333 441.3333">
 					<g class="circle">
 						<path
 							d="M286.8916,605.4951A219.6667,219.6667,0,1,1,442.22,541.1562,218.2292,218.2292,0,0,1,286.8916,605.4951Z"
@@ -148,7 +149,7 @@ $attr = $block_object->attr(' has-image');
 								points="190.165 116.959 202.11 107.959 203.933 122.804 190.165 116.959"></polygon>
 						</g>
 					</g>
-				</svg>
+				</svg> -->
 				<div class="hero-tandem__tooltip"></div>
 			</div>
 		</div>
@@ -212,22 +213,14 @@ $attr = $block_object->attr(' has-image');
 							<div class="tandem-second-circle">
 								<!-- <p>Scope & review risks, vurnerability & impact</p> -->
 								<div class="tandem-second-in-cercle">
-									<svg class="curved2" viewBox="0 0 300 500">
-										<path id="curve2"
-											d="M73.2,148.6c4-6.1,65.5-96.8,178.6-95.6c111.3,1.2,170.8,90.3,175.1,97"
-											transform="translate(-100, 0)" />
-										<text text-anchor="middle" dominant-baseline="middle">
-											<textPath href="#curve" startOffset="50%">
-												Integrate new knowledge and partners
-											</textPath>
-										</text>
-									</svg>
 									<div class="tandem-inside-red-circle">
-										<p>
-											<span style="font-weight: 800">Monitor, </span> <br />
-											as confidence, Monitor, relationships knowledge, &
-											capacity increase
-										</p>
+										<a href="https://google.com">
+											<p>
+												<span style="font-weight: 800">Monitor, </span><br />
+												as confidence, Monitor, relationships knowledge, &
+												capacity increase
+											</p>
+										</a>
 									</div>
 									<!-- ---------------- svg arrow --------------------- -->
 									<img class="red-two-arrow"
@@ -277,16 +270,6 @@ $attr = $block_object->attr(' has-image');
 							<div class="tandem-third-circle">
 								<!-- <p>Scope & review risks, vurnerability & impact</p> -->
 								<div class="tandem-third-in-cercle">
-									<svg class="curved2" viewBox="0 0 300 500">
-										<path id="curve2"
-											d="M73.2,148.6c4-6.1,65.5-96.8,178.6-95.6c111.3,1.2,170.8,90.3,175.1,97"
-											transform="translate(-100, 0)" />
-										<text text-anchor="middle" dominant-baseline="middle">
-											<textPath href="#curve2" startOffset="50%">
-												Co-explore
-											</textPath>
-										</text>
-									</svg>
 									<div class="tandem-inside-red-circle">
 										<p>Challenges & goals</p>
 									</div>
@@ -309,25 +292,14 @@ $attr = $block_object->attr(' has-image');
 								</div>
 							</div>
 						</div>
-
 						<div class="tandem-fourth-circle">
+
 							<!-- <p>Scope & review risks, vurnerability & impact</p> -->
 							<div class="tandem-fourth-in-cercle">
-								<img class="curved2"
-									src="<?php echo get_theme_file_uri('/assets/images/svg/p8lzjd5oqom007arvs.svg'); ?>" />
-								<?php
-								// Define your dynamic text
-								$dynamicText = "Co-designnnn";
-
-								// Load the SVG file content
-								$svgFile = file_get_contents(get_template_directory() . '/assets/images/svg/curved-text-arrow-right.svg');
-
-								// Replace the placeholder with dynamic text
-								$svgFile = str_replace('<!--DYNAMIC_TEXT-->', $dynamicText, $svgFile);
-
-								// Output the SVG with the dynamic text
-								echo $svgFile;
-								?>
+								<?php $dynamicText = "teest housssem";
+								$svgFile = file_get_contents(get_template_directory() . '/assets/images/svg/circle-text.svg');
+								$svgFile = str_replace('<!--text-->', $dynamicText, $svgFile);
+								echo $svgFile;?>
 								<div class="tandem-inside-red-circle">
 									<p>Co-design solutions</p>
 								</div>
@@ -354,9 +326,12 @@ $attr = $block_object->attr(' has-image');
 					<div class="tandem-right-content">
 						<img src="<?php echo get_theme_file_uri('/assets/images/svg/right-arrow.svg'); ?>" />
 					</div>
+	 
+				 
+
+
 				</div>
 				<div class="color-indicator"></div>
-
 				<div class="tandem-container-nav-zoom">
 					<button>
 						<p style="margin-bottom: 0rem;">Zoom out</p>
