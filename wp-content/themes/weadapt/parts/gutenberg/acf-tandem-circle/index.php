@@ -116,7 +116,7 @@ $attr = $block_object->attr(' has-image');
 								src="<?php echo get_theme_file_uri('/assets/images/svg/arrow-left.svg'); ?>" />
 							<div class="tandem-middle-content-rectangle">
 								<div class="tandem-middle-content-rectangle-widh">
-									<span>Cross-cutting components</span>
+									<p>Cross-cutting components</p>
 									<li>Begin early co-design of MEL framework</li>
 									<li>Tailored communication of climate information & risks</li>
 									<li>Co-develop capacities of providers & users</li>
@@ -157,10 +157,7 @@ $attr = $block_object->attr(' has-image');
 
 							<!-- <p>Scope & review risks, vurnerability & impact</p> -->
 							<div class="tandem-fourth-in-cercle">
-								<?php $dynamicText = "teest housssem";
-								$svgFile = file_get_contents(get_template_directory() . '/assets/images/svg/circle-text.svg');
-								$svgFile = str_replace('<!--text-->', $dynamicText, $svgFile);
-								echo $svgFile;?>
+								
 								<div class="tandem-inside-red-circle">
 									<p>Co-design solutions</p>
 								</div>
