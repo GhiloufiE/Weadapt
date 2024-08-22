@@ -116,7 +116,7 @@ $attr = $block_object->attr(' has-image');
 								src="<?php echo get_theme_file_uri('/assets/images/svg/arrow-left.svg'); ?>" />
 							<div class="tandem-middle-content-rectangle">
 								<div class="tandem-middle-content-rectangle-widh">
-									<p>Cross-cutting components</p>
+									<span>Cross-cutting components</span>
 									<li>Begin early co-design of MEL framework</li>
 									<li>Tailored communication of climate information & risks</li>
 									<li>Co-develop capacities of providers & users</li>
@@ -223,6 +223,7 @@ $attr = $block_object->attr(' has-image');
 		</div>
 	</div>
 </section>
+<script src="https://d3js.org/d3.v7.min.js"></script>
 <script src="https://d3js.org/d3.v7.min.js"></script>
 <script>
 	var zoomTargets = {
@@ -482,18 +483,22 @@ $attr = $block_object->attr(' has-image');
 	}
 
 	function initZoomHandlers() {
-		d3.selectAll('.tandem-nav button[data-target]').on('click', function () {
-			var targetClass = d3.select(this).attr('data-target');
-			zoomToTarget(targetClass);
-		});
+     d3.selectAll('.tandem-nav button[data-target]').on('click', function () {
+        var targetClass = d3.select(this).attr('data-target');
+        zoomToTarget(targetClass);
+    });
 
-		d3.select('.tandem-container-nav-zoom button').on('click', resetZoom);
+     Object.keys(zoomTargets).forEach(function(targetClass) {
+        d3.select(zoomTargets[targetClass].element).on('click', function() {
+            zoomToTarget(targetClass);
+        });
+    });
 
-		// Initially hide the zoom out button
-		d3.select('.tandem-container-nav-zoom button').style('display', 'none');
-	}
+     d3.select('.tandem-container-nav-zoom button').on('click', resetZoom);
 
-	window.addEventListener('resize', debounce(handleResize, 100));
+     d3.select('.tandem-container-nav-zoom button').style('display', 'none');
+}
 
-	initZoomHandlers();
+// Initialize the handlers when the script loads
+initZoomHandlers();
 </script>
