@@ -11,28 +11,28 @@ $block_object = new Block($block);
 $name = $block_object->name();
 $attr = $block_object->attr(' has-image');
 ?>
-	<?php echo load_inline_styles(__DIR__, $name); ?>
-	<?php load_inline_dependencies('/parts/gutenberg/core-heading/', 'core-heading'); ?>
-	<?php load_inline_dependencies('/parts/gutenberg/core-paragraph/', 'core-paragraph'); ?>
-	<?php load_inline_dependencies('/parts/gutenberg/core-button/', 'core-button'); ?>
+<?php echo load_inline_styles(__DIR__, $name); ?>
+<?php load_inline_dependencies('/parts/gutenberg/core-heading/', 'core-heading'); ?>
+<?php load_inline_dependencies('/parts/gutenberg/core-paragraph/', 'core-paragraph'); ?>
+<?php load_inline_dependencies('/parts/gutenberg/core-button/', 'core-button'); ?>
 <link rel="stylesheet" src="<?php echo get_template_directory_uri(); ?>/parts/gutenberg/acf-tandem-circle/style.css" />
 <section>
 	<div class="tandem-container">
 		<div class="tandem-full-content">
-		<div class="tandem-container-nav" >
+			<div class="tandem-container-nav">
 				<div class="tandem-container-nav-title">
 				</div>
 			</div>
 			<div class="tandem-first-content-wrapper">
-			<h2 style="text-align:center; position:relative; top: 0;
-    width: 100%;
-    z-index: 1000;">Enhanced legacy & sustainability</h2>
+				<h2 style="text-align:center; position:relative; top: 0;
+	width: 100%;
+	z-index: 1000;">Enhanced legacy & sustainability</h2>
 
 				<div class="tandem-first-content">
-					<div class="tandem-left-arrow">
-						<img src="<?php echo get_theme_file_uri('/assets/images/svg/left-arrow.svg'); ?>" />
-					</div>
+				<img class="left-arrow"
+				src="<?php echo get_theme_file_uri('/assets/images/svg/left-arrow.svg'); ?>" />
 					<div class="tandem-inside-content">
+					
 						<!-- -------------------------------- grand-arrow------------------------- -->
 						<img class="first-grand-arrow"
 							src="<?php echo get_theme_file_uri('/assets/images/svg/prime-arrow.svg'); ?>" />
@@ -67,7 +67,7 @@ $attr = $block_object->attr(' has-image');
 								</div>
 							</div>
 						</div>
-
+			
 						<!-- -------------------------------end first circle ---------------------------- -->
 						<div class="tandem-middle-content">
 							<!-- ---------------------- second circle ----------------------------- -->
@@ -180,14 +180,8 @@ $attr = $block_object->attr(' has-image');
 							</div>
 						</div>
 					</div>
-
-					<div class="tandem-right-content">
-						<img src="<?php echo get_theme_file_uri('/assets/images/svg/right-arrow.svg'); ?>" />
-					</div>
-	 
-				 
-
-
+					<img class="right-arrow"
+					src="<?php echo get_theme_file_uri('/assets/images/svg/right-arrow.svg'); ?>" />
 				</div>
 				<div class="color-indicator"></div>
 				<div class="tandem-container-nav-zoom">
@@ -220,7 +214,6 @@ $attr = $block_object->attr(' has-image');
 		</div>
 	</div>
 </section>
-<script src="https://d3js.org/d3.v7.min.js"></script>
 <script src="https://d3js.org/d3.v7.min.js"></script>
 <script>
 	var zoomTargets = {
@@ -480,22 +473,22 @@ $attr = $block_object->attr(' has-image');
 	}
 
 	function initZoomHandlers() {
-     d3.selectAll('.tandem-nav button[data-target]').on('click', function () {
-        var targetClass = d3.select(this).attr('data-target');
-        zoomToTarget(targetClass);
-    });
+		d3.selectAll('.tandem-nav button[data-target]').on('click', function () {
+			var targetClass = d3.select(this).attr('data-target');
+			zoomToTarget(targetClass);
+		});
 
-     Object.keys(zoomTargets).forEach(function(targetClass) {
-        d3.select(zoomTargets[targetClass].element).on('click', function() {
-            zoomToTarget(targetClass);
-        });
-    });
+		Object.keys(zoomTargets).forEach(function (targetClass) {
+			d3.select(zoomTargets[targetClass].element).on('click', function () {
+				zoomToTarget(targetClass);
+			});
+		});
 
-     d3.select('.tandem-container-nav-zoom button').on('click', resetZoom);
+		d3.select('.tandem-container-nav-zoom button').on('click', resetZoom);
 
-     d3.select('.tandem-container-nav-zoom button').style('display', 'none');
-}
+		d3.select('.tandem-container-nav-zoom button').style('display', 'none');
+	}
 
-// Initialize the handlers when the script loads
-initZoomHandlers();
+	// Initialize the handlers when the script loads
+	initZoomHandlers();
 </script>
