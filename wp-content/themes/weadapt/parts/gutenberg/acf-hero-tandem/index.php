@@ -621,18 +621,22 @@ $attr = $block_object->attr(' has-image');
 	}
 
 	function initZoomHandlers() {
-		d3.selectAll('.tandem-nav button[data-target]').on('click', function () {
-			var targetClass = d3.select(this).attr('data-target');
-			zoomToTarget(targetClass);
-		});
+     d3.selectAll('.tandem-nav button[data-target]').on('click', function () {
+        var targetClass = d3.select(this).attr('data-target');
+        zoomToTarget(targetClass);
+    });
 
-		d3.select('.tandem-container-nav-zoom button').on('click', resetZoom);
+     Object.keys(zoomTargets).forEach(function(targetClass) {
+        d3.select(zoomTargets[targetClass].element).on('click', function() {
+            zoomToTarget(targetClass);
+        });
+    });
 
-		// Initially hide the zoom out button
-		d3.select('.tandem-container-nav-zoom button').style('display', 'none');
-	}
+     d3.select('.tandem-container-nav-zoom button').on('click', resetZoom);
 
-	window.addEventListener('resize', debounce(handleResize, 100));
+     d3.select('.tandem-container-nav-zoom button').style('display', 'none');
+}
 
-	initZoomHandlers();
+// Initialize the handlers when the script loads
+initZoomHandlers();
 </script>
