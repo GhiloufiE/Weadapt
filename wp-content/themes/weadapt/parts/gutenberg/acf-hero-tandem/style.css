@@ -437,7 +437,7 @@ div button:hover {
   
 }
 .tandem-middle-content-rectangle p {
-  font-weight: 800;
+
   font-size: 10px;
 }
 .tandem-middle-content-rectangle li {
@@ -932,7 +932,7 @@ div button:hover {
     width: 86%;
   }
   .tandem-middle-content-rectangle p {
-    font-weight: 800;
+ 
     font-size: 6px !important;
 
   }
@@ -1456,7 +1456,6 @@ div button:hover {
     width: 86%;
   }
   .tandem-middle-content-rectangle p {
-    font-weight: 800;
     font-size: 4px !important;
   }
   .tandem-middle-content-rectangle li {

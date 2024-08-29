@@ -9,12 +9,11 @@
  */
 $block_object = new Block($block);
 $name = $block_object->name();
-$attr = $block_object->attr(' has-image');
+$attr = $block_object->attr('has-image');
 ?>
 
 <section <?php echo $attr; ?>>
-	<link rel="stylesheet"
-		src="<?php echo get_template_directory_uri(); ?>/parts/gutenberg/acf-hero-tandem/styles.css" />
+	<link rel="stylesheet" src="<?php echo get_template_directory_uri(); ?>/parts/gutenberg/acf-hero-tandem/styles.css" />
 	<?php echo load_inline_styles(__DIR__, $name); ?>
 	<?php load_inline_dependencies('/parts/gutenberg/core-heading/', 'core-heading'); ?>
 	<?php load_inline_dependencies('/parts/gutenberg/core-paragraph/', 'core-paragraph'); ?>
