@@ -340,12 +340,12 @@ function handle_create_post()
         error_log("Creating post with title: $post_title, type: $post_type");
 
         $post_data = array(
-            'post_title' => $post_title,
+            'post_title'   => $post_title,
             'post_content' => $post_description,
-            'post_status' => 'pending',
-            'post_author' => get_current_user_id(),
-            'post_type' => ($post_type === 'theme') ? 'article' : $post_type,
-            'meta_input' => array(),
+            'post_status'  => 'pending',
+            'post_author'  => get_current_user_id(),
+            'post_type'    => ($post_type === 'theme') ? 'article' : $post_type,
+            'meta_input'   => array(),
         );
 
         if ($post_type == 'forum' && isset($_POST['forum'])) {
@@ -379,9 +379,40 @@ function handle_create_post()
             wp_send_json_error('Error creating post: ' . $post_id->get_error_message());
         } else {
             error_log("Post created successfully with ID: $post_id");
+
+            // Update sub-fields within the parent group field
+            $post_author_id = get_current_user_id();
+            
+            // Debugging: Log current author ID value
+            error_log("Author ID: " . $post_author_id);
+
+            // Retrieve current group field value
+            $group_field_value = get_field('field_637f1ee7327b4', $post_id);
+
+            // Ensure we have a valid array to work with
+            if (!is_array($group_field_value)) {
+                $group_field_value = [];
+            }
+
+            // Update the sub-fields in the group array directly
+            $group_field_value['creator'] = $post_author_id;
+            $group_field_value['publisher'] = $post_author_id;
+            $group_field_value['contributors'] = $post_author_id;
+
+            // Debugging: Log the updated group field values before updating
+            error_log("Updated group field value: " . print_r($group_field_value, true));
+
+            // Update the group field with the modified array
+            update_field('field_637f1ee7327b4', $group_field_value, $post_id);
+
+            // Verify that the values are updated correctly
+            $updated_group_field_value = get_field('field_637f1ee7327b4', $post_id);
+            error_log("Updated group field value after update: " . print_r($updated_group_field_value, true));
+
             if (in_array($post_type, ['forum', 'theme'])) {
                 notify_admins_of_pending_posts($post_id, $post_type);
             }
+            
             wp_send_json_success('Post created successfully');
         }
     } else {
@@ -389,6 +420,9 @@ function handle_create_post()
         wp_send_json_error('Missing required POST fields');
     }
 }
+
+
+
 add_action('admin_post_nopriv_create_post', 'handle_create_post');
 add_action('admin_post_create_post', 'handle_create_post');
 function notify_admins_of_pending_posts($post_id, $post_type)
