@@ -19,12 +19,12 @@ function theme_user_register( $user_id, $userdata ) {
 			get_bloginfo( 'name' )
 		) . '<br><br>';
 
-		$message .= sprintf( ' — <a href="%s">%s</a><br>',
+		$message .= sprintf( '<a href="%s">%s</a><br>',
 			get_author_posts_url( $user_id ),
 			__( 'View user profile', 'weadapt' )
 		);
 
-		$message .= sprintf( ' — <a href="%s">%s</a>',
+		$message .= sprintf( ' <a href="%s">%s</a>',
 			add_query_arg( 'user_id', $user_id, self_admin_url( 'user-edit.php' ) ),
 			__( 'Edit/delete user', 'weadapt' )
 		);

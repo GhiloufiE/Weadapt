@@ -117,8 +117,8 @@ function notify_admins_of_pending_posts($post_id, $post_type)
         return;
     }
 
-    $message .= sprintf(' — <a href="%s">%s</a>', esc_url(get_permalink($post_id)), __('See it', 'weadapt')) . '<br>';
-    $message .= sprintf(' — <a href="%s">%s</a>', esc_url($post_link), __('Publish / Edit / Delete it', 'weadapt')) . '<br><br>';
+    $message .= sprintf('<a href="%s">%s</a>', esc_url(get_permalink($post_id)), __('See it', 'weadapt')) . '<br>';
+    $message .= sprintf(' <a href="%s">%s</a>', esc_url($post_link), __('Publish / Edit / Delete it', 'weadapt')) . '<br><br>';
     $message .= "Best Regards,<br>$site_name,<br>";
 
     // Retrieve administrators' user IDs, emails, and names directly from the database
