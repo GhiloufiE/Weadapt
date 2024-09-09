@@ -471,6 +471,10 @@ function notify_editors_after_publish($post_id, $new_theme)
                 }
             }
         }
+        $admins = get_blog_administrators(false, 1);
+        if ($admins) {
+            $users = array_merge($users, $admins);
+        }
         $users = array_unique($users);
         if (!empty($users)) {
             if ($post->post_type == 'article' || $post->post_type == 'event' || $post->post_type == 'organisation') {
