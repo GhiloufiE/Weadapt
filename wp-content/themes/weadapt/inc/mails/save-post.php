@@ -100,12 +100,11 @@ function theme_save_post($post_ID, $post, $update)
                 $subject = sprintf(__('Content has been submitted for review on [%s]', 'weadapt'), get_bloginfo('name'));
 
                 $message = sprintf(
-                    __('%s %s (<a href="%s">%s</a>) has sent you content for review.', 'weadapt'),
+                    __('%s %s has sent you content for review.', 'weadapt'),
                     esc_attr($current_user->user_firstname),
-                    esc_attr($current_user->user_lastname),
-                    get_author_posts_url($current_user->ID),
-                    esc_attr($current_user->user_login)
+                    esc_attr($current_user->user_lastname)
                 ) . '<br><br>';
+                
 
                 $message .= sprintf(__('Content: %s', 'weadapt'), esc_html($post->post_title)) . '<br>';
                 $message .= sprintf(__('Summary: %s', 'weadapt'), esc_html($post->post_excerpt)) . '<br><br>';
@@ -153,32 +152,27 @@ function send_email_immediately($user_ids, $subject, $message) {
     $image_url = get_theme_file_uri('/assets/images/email.png');
 
     // Define button style
-    $button_style = 'style="background-color: #007bff; border: 1px solid #007bff; color: #ffffff; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; padding: 10px 20px; border-radius: 5px;"';
+    $button_style = 'style="background-color: #002D75; border: 1px solid #002D75; color: #FFFFFB;  text-decoration: none; display: inline-block; font-size: 16px; padding: 10px 20px; border-radius: 5px;"';
 
     // Replace <a> tags with styled buttons
     $message = preg_replace_callback('/<a\s+href=["\']([^"\']+)["\']>(.*?)<\/a>/i', function ($matches) use ($button_style) {
         $url = esc_url($matches[1]);
         $text = esc_html($matches[2]);
-        return '<table role="presentation" border="0" cellpadding="0" cellspacing="0" class="btn btn-primary" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto; margin: 0 auto;"><tr><td align="center" style="font-family: Inter, sans-serif; font-size: 16px; vertical-align: top; background-color: #007bff; border-radius: 5px;"><a href="' . $url . '" ' . $button_style . '>' . $text . '</a></td></tr></table>';
+        return '<table role="presentation" border="0" cellpadding="0" cellspacing="0" class="btn btn-primary" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;"><tr><td align="left" style="font-family: Inter, sans-serif; font-size: 16px; vertical-align: top; background-color: #007bff; border-radius: 5px;"><a href="' . $url . '" ' . $button_style . '>' . $text . '</a></td></tr></table>';
     }, $message);
 
-    // HTML template for the email
+    // HTML template for the email with placeholder for user name
     $html_template = '<!doctype html>
 <html lang="en">
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>Simple Transactional Email</title>
-    <style media="all" type="text/css">
+     <style media="all" type="text/css">
 @media all {
   .btn-primary table td:hover {
     background-color: #ec0867 !important;
   }
 
-  .btn-primary a:hover {
-    background-color: #ec0867 !important;
-    border-color: #ec0867 !important;
-  }
 }
 @media only screen and (max-width: 640px) {
   .main p,
@@ -272,7 +266,7 @@ function send_email_immediately($user_ids, $subject, $message) {
                            style="max-width: 40%; height: auto; display: block; margin: 0 auto; margin-bottom: 12px;" /> <!-- Added margin-bottom to the image -->
                       <div style="background-color: #141E1B; height: 2px; width: 100%; margin-bottom: 12px; border-radius:5px;"></div> <!-- Centered border -->
                   </div>
-                  <p style="font-family: Inter, sans-serif; font-size: 16px; font-weight: normal; margin: 0; margin-bottom: 16px;">Hi there,</p>
+                  <p style="font-family: Inter, sans-serif; font-size: 16px; font-weight: normal; margin: 0; margin-bottom: 16px;">Hi [USER_NAME],</p>
                   <p style="font-family: Inter, sans-serif; font-size: 16px; font-weight: normal; margin: 0; margin-bottom: 16px;">' . $message . '</p>
                   <!-- Add more dynamic content here if needed -->
                 </td>
@@ -299,9 +293,13 @@ function send_email_immediately($user_ids, $subject, $message) {
         error_log("Sending email to $user_id");
         if ($user_info) {
             $recipient = $user_info->user_email;
+            $user_name = $user_info->display_name;
+
+            // Replace placeholder with actual user name
+            $personalized_template = str_replace('[USER_NAME]', esc_html($user_name), $html_template);
 
             // Send email with the HTML template
-            $sent = wp_mail($recipient, $subject, $html_template, $headers);
+            $sent = wp_mail($recipient, $subject, $personalized_template, $headers);
 
             if (!$sent) {
                 error_log("Failed to send email to $recipient with subject $subject.");
@@ -313,6 +311,7 @@ function send_email_immediately($user_ids, $subject, $message) {
         }
     }
 }
+
 
 
 
