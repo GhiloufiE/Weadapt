@@ -847,6 +847,11 @@ function notify_editors_after_publish($post_id, $new_theme)
             }
 
             // an article has been published on weadapt
+            $admins = get_blog_administrators(false, 1);
+            if ($admins) {
+                $users = array_merge($users, $admins);
+            }
+            $users = array_unique($users);
             if (!empty($users)) {
                 if ($post->post_type == 'article' || $post->post_type == 'event' || $post->post_type == 'organisation') {
                     $subject = sprintf(
@@ -882,7 +887,11 @@ function notify_editors_after_publish($post_id, $new_theme)
 
                     theme_mail_save_to_db($users, $subject, $message);
                     send_email_immediately($users, $subject, $message);
+                } else {
+                    error_log("Not sending email to users as this is not the first publish time.");
                 }
+            } else {
+                error_log("No users to notify in the article/event/organisation section.");
             }
         }
         // related to your theme/network 
@@ -964,6 +973,8 @@ function notify_editors_after_publish($post_id, $new_theme)
             update_post_meta($post_id, '_notification_sent', true);
         }
     }
+    error_log("Finished processing post ID: $post_id");
+
 }
 
 add_action('notify_editors_after_publish', 'notify_editors_after_publish', 10, 2);
