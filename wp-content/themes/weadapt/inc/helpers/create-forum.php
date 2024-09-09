@@ -137,7 +137,7 @@ function notify_admins_of_pending_posts($post_id, $post_type)
     foreach ($admins_info as $admin) {
         $admin_id = $admin['user_id']; // Admin ID
         $admin_name = $admin['display_name'];
-        $personalized_message = sprintf(__('Dear %s,', 'weadapt'), esc_html($admin_name)) . "<br><br>" . $message;
+        $personalized_message = "". $message;
 
         // Use send_email_immediately with the admin ID
         send_email_immediately($admin_id, $subject, $personalized_message);
