@@ -210,6 +210,23 @@ function add_low_quality_image_warning_script()
 add_action('wp_footer', 'add_low_quality_image_warning_script');
 
 
+function get_admin_info()
+{
+    global $wpdb;
+    $admin_info = get_transient('cached_admin_info');
+    if ($admin_info === false) {
+        $admin_info = $wpdb->get_results("
+            SELECT user_email, display_name, ID
+            FROM {$wpdb->users} u
+            INNER JOIN {$wpdb->usermeta} um ON u.ID = um.user_id
+            WHERE um.meta_key = '{$wpdb->prefix}capabilities'
+            AND um.meta_value LIKE '%administrator%' ", ARRAY_A);
+        set_transient('cached_admin_info', $admin_info, WEEK_IN_SECONDS);
+    }
+
+    return $admin_info;
+}
+
 function forum_new_post_notification($post_id)
 {
     global $wpdb;
