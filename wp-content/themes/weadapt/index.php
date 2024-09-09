@@ -50,5 +50,39 @@ $show_filters     = isset( $args['show_filters'] ) ? wp_validate_boolean( $args[
 	</div>
 </main>
 
+<button id="back-to-top" class="wp-block-button__link has-background">Add forum discussion</button>
+<style>
+#back-to-top {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  display: none;
+  padding: 10px;
+  font-size: 16px;
+  text-align: center;
+  cursor: pointer;
+  z-index: 1000;
+}
+
+#back-to-top:hover {
+  background-color: #fff; /* Optional hover effect */
+}
+</style>
+<script>
+
+window.onscroll = function() {
+  var button = document.getElementById("back-to-top");
+  if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
+    button.style.display = "block";
+  } else {
+    button.style.display = "none";
+  }
+};
+
+document.getElementById("back-to-top").addEventListener("click", function(event){
+  event.preventDefault();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+</script>
 <?php
 get_footer();
