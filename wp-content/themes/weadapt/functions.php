@@ -396,18 +396,18 @@ function notify_admin_on_edit($new_status, $old_status, $post)
         $author_id = $post->post_author;
         $author_info = get_userdata($author_id);
 
-        $subject = sprintf(__('Content has been submitted for review on %s', 'WeAdapt'), $website_name);
+        $subject = sprintf(__('Content has been submitted for review on %s', 'weadapt'), $website_name);
         $message = sprintf(
-            __('%1$s %2$s (%3$s) has sent you content for review.', 'WeAdapt'),
+            __('%1$s %2$s (%3$s) has sent you content for review.', 'weadapt'),
             $author_info->first_name,
             $author_info->last_name,
             $author_info->user_login
         );
         $message .= '<br>';
-        $message .= __('Content:', 'WeAdapt') . ' ' . get_the_title($post->ID) . '<br>';
-        $message .= __('Summary:', 'WeAdapt') . ' ' . wp_strip_all_tags($summary) . '<br>';
-        $message .= '<a href="' . get_permalink($post->ID) . '">' . __('Go to the content', 'WeAdapt') . '</a><br>';
-        $message .= '<a href="' . get_edit_post_link($post->ID) . '">' . __('Publish/Edit', 'WeAdapt') . '</a>';
+        $message .= __('Content:', 'weadapt') . ' ' . get_the_title($post->ID) . '<br>';
+        $message .= __('Summary:', 'weadapt') . ' ' . wp_strip_all_tags($summary) . '<br>';
+        $message .= '<a href="' . get_permalink($post->ID) . '">' . __('Go to the content', 'weadapt') . '</a><br>';
+        $message .= '<a href="' . get_edit_post_link($post->ID) . '">' . __('Publish/Edit', 'weadapt') . '</a>';
 
         foreach ($admin_emails as $admin_email) {
             wp_mail($admin_email, $subject, $message);
@@ -512,8 +512,8 @@ function notify_editors_after_publish($post_id, $new_theme)
                 $message .= '<br>';
             }
 
-            $message .= sprintf(' — <a href="%s">%s</a>', get_permalink($post_id), __('See it', 'weadapt')) . '<br>';
-            $message .= sprintf(' — <a href="%s">%s</a>', get_edit_post_link($post_id), __('Publish / Edit / Delete it', 'weadapt'));
+            $message .= sprintf('  <a href="%s">%s</a>', get_permalink($post_id), __('See it', 'weadapt')) . '<br>';
+            $message .= sprintf('  <a href="%s">%s</a>', get_edit_post_link($post_id), __('Publish / Edit / Delete it', 'weadapt'));
 
             theme_mail_save_to_db($users, $subject, $message);
             send_email_immediately($users, $subject, $message);
@@ -554,12 +554,12 @@ function notify_editors_after_publish($post_id, $new_theme)
             }
 
             $message .= sprintf(
-                ' — <a href="%s">%s</a>',
+                '  <a href="%s">%s</a>',
                 get_permalink($post_id),
                 __('See it', 'weadapt')
             ) . '<br>';
             $message .= sprintf(
-                ' — <a href="%s">%s</a>',
+                '  <a href="%s">%s</a>',
                 get_edit_post_link($post_id),
                 __('Edit it', 'weadapt')
             );
@@ -646,12 +646,12 @@ function notify_editors_after_publish($post_id, $new_theme)
                 }
 
                 $message .= sprintf(
-                    ' — <a href="%s">%s</a>',
+                    '  <a href="%s">%s</a>',
                     get_permalink($post_id),
                     __('See it', 'weadapt')
                 ) . '<br>';
                 $message .= sprintf(
-                    ' — <a href="%s">%s</a>',
+                    '  <a href="%s">%s</a>',
                     get_edit_post_link($post_id),
                     __('Edit it', 'weadapt')
                 );
@@ -701,8 +701,8 @@ function notify_editors_after_publish($post_id, $new_theme)
                         $message .= '<br>';
                     }
 
-                    $message .= sprintf(' — <a href="%s">%s</a>', get_permalink($post_id), __('See it', 'weadapt')) . '<br>';
-                    $message .= sprintf(' — <a href="%s">%s</a>', get_edit_post_link($post_id), __('Publish / Edit / Delete it', 'weadapt'));
+                    $message .= sprintf('  <a href="%s">%s</a>', get_permalink($post_id), __('See it', 'weadapt')) . '<br>';
+                    $message .= sprintf('  <a href="%s">%s</a>', get_edit_post_link($post_id), __('Publish / Edit / Delete it', 'weadapt'));
 
                     theme_mail_save_to_db($users, $subject, $message);
                     send_email_immediately($users, $subject, $message);
