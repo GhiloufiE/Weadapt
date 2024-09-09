@@ -148,17 +148,30 @@ function theme_save_post($post_ID, $post, $update)
 add_action('save_post', 'theme_save_post', 50, 3);
 function send_email_immediately($user_ids, $subject, $message)
 {
+     if (!is_array($user_ids)) {
+        $user_ids = (array) $user_ids;  
+    }
+
     foreach ($user_ids as $user_id) {
         $user_info = get_userdata($user_id);
+        error_log("Sending email to $user_id");
         if ($user_info) {
             $recipient = $user_info->user_email;
             $headers = array('Content-Type: text/html; charset=UTF-8');
-            $sent = wp_mail($recipient, $subject, $message, $headers);
+            
+             $sent = wp_mail($recipient, $subject, $message, $headers);
+
+             if (!$sent) {
+                error_log("Failed to send email to $recipient with subject $subject.");
+            } else {
+                error_log("Email sent to $recipient with subject $subject.");
+            }
         } else {
-            return;
+            error_log("User with ID $user_id not found.");
         }
     }
 }
+
 
 
 function on_pending_organisation($ID, $post)
