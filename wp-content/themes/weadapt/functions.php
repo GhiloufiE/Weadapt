@@ -396,18 +396,18 @@ function notify_admin_on_edit($new_status, $old_status, $post)
         $author_id = $post->post_author;
         $author_info = get_userdata($author_id);
 
-        $subject = sprintf(__('Content has been submitted for review on %s', 'your-text-domain'), $website_name);
+        $subject = sprintf(__('Content has been submitted for review on %s', 'WeAdapt'), $website_name);
         $message = sprintf(
-            __('%1$s %2$s (%3$s) has sent you content for review.', 'your-text-domain'),
+            __('%1$s %2$s (%3$s) has sent you content for review.', 'WeAdapt'),
             $author_info->first_name,
             $author_info->last_name,
             $author_info->user_login
         );
         $message .= '<br>';
-        $message .= __('Content:', 'your-text-domain') . ' ' . get_the_title($post->ID) . '<br>';
-        $message .= __('Summary:', 'your-text-domain') . ' ' . wp_strip_all_tags($summary) . '<br>';
-        $message .= '<a href="' . get_permalink($post->ID) . '">' . __('Go to the content', 'your-text-domain') . '</a><br>';
-        $message .= '<a href="' . get_edit_post_link($post->ID) . '">' . __('Publish/Edit', 'your-text-domain') . '</a>';
+        $message .= __('Content:', 'WeAdapt') . ' ' . get_the_title($post->ID) . '<br>';
+        $message .= __('Summary:', 'WeAdapt') . ' ' . wp_strip_all_tags($summary) . '<br>';
+        $message .= '<a href="' . get_permalink($post->ID) . '">' . __('Go to the content', 'WeAdapt') . '</a><br>';
+        $message .= '<a href="' . get_edit_post_link($post->ID) . '">' . __('Publish/Edit', 'WeAdapt') . '</a>';
 
         foreach ($admin_emails as $admin_email) {
             wp_mail($admin_email, $subject, $message);
@@ -470,6 +470,10 @@ function notify_editors_after_publish($post_id, $new_theme)
                     }
                 }
             }
+        }
+        $admins = get_blog_administrators(false, 1);
+        if ($admins) {
+            $users = array_merge($users, $admins);
         }
         $users = array_unique($users);
         if (!empty($users)) {
