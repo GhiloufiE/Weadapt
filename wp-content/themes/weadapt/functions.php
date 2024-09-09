@@ -209,22 +209,7 @@ function add_low_quality_image_warning_script()
 }
 add_action('wp_footer', 'add_low_quality_image_warning_script');
 
-function get_admin_info()
-{
-    global $wpdb;
-    $admin_info = get_transient('cached_admin_info');
-    if ($admin_info === false) {
-        $admin_info = $wpdb->get_results("
-            SELECT user_email, display_name, ID
-            FROM {$wpdb->users} u
-            INNER JOIN {$wpdb->usermeta} um ON u.ID = um.user_id
-            WHERE um.meta_key = '{$wpdb->prefix}capabilities'
-            AND um.meta_value LIKE '%administrator%' ", ARRAY_A);
-        set_transient('cached_admin_info', $admin_info, WEEK_IN_SECONDS);
-    }
 
-    return $admin_info;
-}
 function forum_new_post_notification($post_id)
 {
     global $wpdb;
@@ -324,10 +309,8 @@ function handle_create_post()
 {
     global $wpdb;
     
-    error_log("handle_create_post triggered");
-
+    // Nonce verification
     if (!isset($_POST['_wpnonce']) || !wp_verify_nonce($_POST['_wpnonce'], 'create_post_nonce')) {
-        error_log("Nonce verification failed.");
         wp_send_json_error('Nonce verification failed');
         return;
     }
@@ -336,8 +319,6 @@ function handle_create_post()
         $post_title = sanitize_text_field($_POST['post_title']);
         $post_description = sanitize_textarea_field($_POST['post_description']);
         $post_type = sanitize_text_field($_POST['post_type']);
-
-        error_log("Creating post with title: $post_title, type: $post_type");
 
         $post_data = array(
             'post_title' => $post_title,
@@ -350,28 +331,39 @@ function handle_create_post()
 
         if ($post_type == 'forum' && isset($_POST['forum'])) {
             $forum_id = intval($_POST['forum']);
+            error_log("Processing forum post with forum ID: $forum_id");
+
             $forum_true_id = $wpdb->get_var($wpdb->prepare("SELECT forum_id FROM {$wpdb->prefix}theme_forum_relationship WHERE theme_id = %d", $forum_id));
             if ($forum_true_id !== null) {
-                error_log("Adding forum ID $forum_true_id to post meta.");
                 $post_data['meta_input']['forum'] = $forum_true_id;
+                error_log("Mapped forum ID: $forum_true_id");
+            } else {
+                error_log("No forum ID found for theme forum relationship with theme ID: $forum_id");
             }
 
             $network_true_id = $wpdb->get_var($wpdb->prepare("SELECT forum_id FROM {$wpdb->prefix}network_forum_relationship WHERE network_id = %d", $forum_id));
             if ($network_true_id !== null) {
-                error_log("Adding network forum ID $network_true_id to post meta.");
                 $post_data['meta_input']['network_forum'] = $network_true_id;
+                error_log("Mapped network forum ID: $network_true_id");
+            } else {
+                error_log("No network forum ID found for network forum relationship with network ID: $forum_id");
             }
         }
 
         if ($post_type == 'theme' && isset($_POST['forum'])) {
             $forum_id = intval($_POST['forum']);
+            error_log("Processing theme post with forum ID: $forum_id");
+
             $forum_true_id = $wpdb->get_var($wpdb->prepare("SELECT forum_id FROM {$wpdb->prefix}theme_forum_relationship WHERE theme_id = %d", $forum_id));
             if ($forum_true_id !== null) {
-                error_log("Adding relevant main theme network ID $forum_true_id to post meta.");
                 $post_data['meta_input']['relevant_main_theme_network'] = $forum_true_id;
+                error_log("Mapped relevant main theme network ID: $forum_true_id");
+            } else {
+                error_log("No relevant main theme network ID found for theme forum relationship with theme ID: $forum_id");
             }
         }
 
+        // Insert post
         $post_id = wp_insert_post($post_data);
 
         if (is_wp_error($post_id)) {
@@ -385,7 +377,7 @@ function handle_create_post()
             wp_send_json_success('Post created successfully');
         }
     } else {
-        error_log("Missing required POST fields.");
+        error_log("Missing required POST fields");
         wp_send_json_error('Missing required POST fields');
     }
 }
@@ -438,21 +430,26 @@ function notify_admins_of_pending_posts($post_id, $post_type)
         return;
     }
 
+    // Query the database for administrators and their names
     $admins_info = $wpdb->get_results("
         SELECT user_email, display_name
         FROM {$wpdb->users} u
         INNER JOIN {$wpdb->usermeta} um ON u.ID = um.user_id
         WHERE um.meta_key = '{$wpdb->prefix}capabilities'
-        AND um.meta_value LIKE '%administrator%' ", ARRAY_A);
+        AND um.meta_value LIKE '%administrator%'
+    ", ARRAY_A);
+
     if (empty($admins_info)) {
         return;
     }
+
     $headers = array('Content-Type: text/html; charset=UTF-8');
+
     foreach ($admins_info as $admin) {
         $admin_email = $admin['user_email'];
         $admin_name = $admin['display_name'];
         $personalized_message = sprintf(__('Dear %s,', 'weadapt'), esc_html($admin_name)) . "<br><br>" . $message;
-        send_email_immediately($admin_email, $subject, $personalized_message, $headers);
+        wp_mail($admin_email, $subject, $personalized_message, $headers);
         theme_mail_save_to_db(array($admin_email), $subject, $personalized_message);
     }
 }

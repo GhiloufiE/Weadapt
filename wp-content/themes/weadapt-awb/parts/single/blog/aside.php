@@ -14,7 +14,9 @@ $theme_network    = ! empty( $relevant['themes_networks'] ) ? $relevant['themes_
 $people = get_field( 'people' );
 
 $contributors_IDs = ! empty( $people['contributors'] ) ? $people['contributors'] : [];
-get_part('components/featured-resource/index');
+?>
+<div class="featured-desktop"><?php
+get_part('components/featured-resource/index');?></div><?php
 if ( ! empty( $contributors_IDs ) ) {
 	?><h2 class="featured-resource__title widget-title">Contributors</h2><?php
 	foreach ( $contributors_IDs as $contributors_ID ) {
@@ -50,3 +52,18 @@ get_part('components/cpt-widget/index', [
 	'cpt_IDs'   => $theme_network,
 	'buttons'   => [ 'join', 'share' ]
 ]);
+?>
+
+<style>
+@media only screen and (min-width: 1024px) {
+    .featured-desktop {
+        display: block;
+    }
+}
+
+@media only screen and (max-width: 1023px) {
+    .featured-desktop {
+        display: none;
+    }
+}
+</style>

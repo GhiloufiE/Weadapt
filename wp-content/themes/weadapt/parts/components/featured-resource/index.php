@@ -9,7 +9,6 @@
 $document_item = $document_list[0];
 
 if ( ! empty( $file_ID = $document_item['file'] ) ) : ?>
-
 <div class="featured-resource">
     <?php load_inline_styles( __DIR__, 'featured-resource' ); ?>
     <?php load_blocks_script( 'featured-resource', 'weadapt/featured-resource' ); ?>
