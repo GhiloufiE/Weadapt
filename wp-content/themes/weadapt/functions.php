@@ -529,8 +529,8 @@ function notify_editors_after_publish($post_id, $new_theme)
             );
 
             $message = __('Your content has been reviewed and is now published. We will share it on our social media channels where relevant. Please feel free to share it with your network as well! ', 'weadapt') . '<br><br>';
-            $message .= esc_html($post->post_title) . '<br>';
-            $message .= esc_html($post->post_excerpt) . '<br><br>';
+            $message .= esc_html($post->post_title)  ;
+            $message .= esc_html($post->post_excerpt)  ;
 
             if (!empty($people_creator)) {
                 $post_author_ID = $people_creator[0];
@@ -622,8 +622,8 @@ function notify_editors_after_publish($post_id, $new_theme)
                 );
 
                 $message = __('Your content has now been reviewed and published. It will be shared on our social media channels where relevant. Please do re-share! ', 'weadapt') . '<br><br>';
-                $message .= esc_html($post->post_title) . '<br>';
-                $message .= esc_html($post->post_excerpt) . '<br><br>';
+                $message .= esc_html($post->post_title)  ;
+                $message .= esc_html($post->post_excerpt)  ;
 
                 if (!empty($people_creator)) {
                     $post_author_ID = $people_creator[0];
@@ -752,13 +752,13 @@ function notify_editors_after_publish($post_id, $new_theme)
                                     esc_attr($post_author->user_login),
                                     get_bloginfo('name'),
                                     esc_html($theme_name)
-                                ) . '<br><br>';
+                                ) ;
                             } else {
                                 $message = sprintf(
                                     __('Content has been published on %s which is related to your theme / network: %s.', 'weadapt'),
                                     get_bloginfo('name'),
                                     esc_html($theme_name)
-                                ) . '<br><br>';
+                                )  ;
                             }
 
                             $post_excerpt = get_the_excerpt($post);
@@ -769,11 +769,11 @@ function notify_editors_after_publish($post_id, $new_theme)
                             $message .= sprintf(
                                 __('Content: %s', 'weadapt'),
                                 esc_html($post->post_title)
-                            ) . '<br>';
+                            ) ;
                             $message .= sprintf(
                                 __('Summary: %s', 'weadapt'),
                                 esc_html($post_excerpt)
-                            ) . '<br><br>';
+                            )  ;
                             $message .= sprintf(
                                 '<a href="%s">%s</a>',
                                 get_permalink($post),
