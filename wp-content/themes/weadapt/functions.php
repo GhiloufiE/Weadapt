@@ -481,7 +481,7 @@ function notify_editors_after_publish($post_id, $new_theme)
         if (!empty($users)) {
             if ($post->post_type == 'article' || $post->post_type == 'event' || $post->post_type == 'organisation') {
                 $subject = sprintf(
-                    __('An %s has been publishedeee on %s', 'weadapt'),
+                    __('An %s has been published on %s', 'weadapt'),
                     ucfirst($post->post_type),
                     get_bloginfo('name')
                 );
