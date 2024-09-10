@@ -39,13 +39,13 @@ function theme_save_post($post_ID, $post, $update)
                         get_bloginfo('name'),
                         get_permalink($theme_network_ID),
                         get_the_title($theme_network_ID)
-                    ) . '<br><br>';
+                    )  ;
                 } else {
                     $message .= sprintf(
                         __('A forum topic has been submitted for review on <a href="%s">%s</a>: ', 'weadapt'),
                         get_bloginfo('url'),
                         get_bloginfo('name')
-                    ) . '<br><br>';
+                    )  ;
                 }
 
                 $message .= sprintf(
@@ -108,8 +108,8 @@ function theme_save_post($post_ID, $post, $update)
                 ) . '<br><br>';
                 
 
-                $message .= sprintf(__('Content: %s', 'weadapt'), esc_html($post->post_title)) . '<br>';
-                $message .= sprintf(__('Summary: %s', 'weadapt'), esc_html($post->post_excerpt)) . '<br><br>';
+                $message .= sprintf(__('Content: %s', 'weadapt'), esc_html($post->post_title))  ;
+                $message .= sprintf(__('Summary: %s', 'weadapt'), esc_html($post->post_excerpt)) ;
                 $message .= sprintf('<a href="%s">%s</a>', get_permalink($post_ID), __('Visit the content', 'weadapt'));
                 $message .= "<br>Best Regards,<br>WeAdapt";
                 $draft_tags = wp_get_post_terms($post_ID, 'tags', ['hide_empty' => false]);
@@ -349,8 +349,8 @@ function on_pending_organisation($ID, $post)
             esc_attr($current_user->user_login)
         ) . '<br><br>';
 
-        $message .= sprintf(__('Organisation: %s', 'weadapt'), esc_html($post->post_title)) . '<br>';
-        $message .= sprintf(__('Summary: %s', 'weadapt'), esc_html($post->post_excerpt)) . '<br><br>';
+        $message .= sprintf(__('Organisation: %s', 'weadapt'), esc_html($post->post_title)) ;
+        $message .= sprintf(__('Summary: %s', 'weadapt'), esc_html($post->post_excerpt))  ;
         $message .= sprintf('<a href="%s">%s</a>', get_permalink($ID), __('Go to the organisation', 'weadapt'));
 
         theme_mail_save_to_db($users, $subject, $message);
