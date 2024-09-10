@@ -166,7 +166,7 @@ function send_email_immediately($user_ids, $subject, $message) {
     }, $message);
 
     // Wrap all buttons in a flex container
-    $button_container = '<div style="display: flex; gap: 10px; margin-top: 20px;">' . implode('', $buttons) . '</div>';
+    $button_container = '<div style="display: flex; gap: 10px; margin-top: 30px; margin-bottom:10px;">' . implode('', $buttons) . '</div>';
 
     // Insert the buttons before "Best Regards,"
     $message = preg_replace('/(Best Regards,)/i', $button_container . '<br>$1', $message);
@@ -311,6 +311,7 @@ function send_email_immediately($user_ids, $subject, $message) {
         }
     }
 }
+
 
 
 
