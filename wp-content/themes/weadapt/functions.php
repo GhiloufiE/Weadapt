@@ -671,7 +671,12 @@ function notify_editors_after_publish($post_id, $new_theme)
                     );
                 }
 
-                $message = esc_html($post->post_title) . '<br>' . esc_html($post->post_excerpt) . '<br><br>';
+                $message =  '<strong>' . __('Title: ', 'weadapt') . '</strong>' .  esc_html($post->post_title) . '<br>' ;
+                $post_excerpt = get_the_excerpt($post);
+            $post_excerpt = wp_strip_all_tags($post_excerpt);
+            $post_excerpt = mb_strimwidth($post_excerpt, 0, 100, '...');
+
+            $message .= '<p>' . sprintf(__('Summary: %s', 'weadapt'), esc_html($post_excerpt)) . '</p>';
                 if ($published_for_the_first_time) {
                     if ($post_author_IDs = get_field('people_creator', $post_id)) {
                         $post_author_ID = $post_author_IDs[0];
@@ -679,9 +684,9 @@ function notify_editors_after_publish($post_id, $new_theme)
                         $author_organisations = get_field('organisations', $post_author);
 
                         if ($author_organisations) {
-                            $message .= sprintf('by %s from %s', $post_author->display_name, get_the_title($author_organisations[0]));
+                            $message .= sprintf('Published by %s from %s', $post_author->display_name, get_the_title($author_organisations[0]));
                         } else {
-                            $message .= sprintf('by %s', $post_author->display_name);
+                            $message .= sprintf('Published by %s', $post_author->display_name);
                         }
                         $message .= '<br>';
                     }
