@@ -154,25 +154,34 @@ function send_email_immediately($user_ids, $subject, $message) {
     // Define button style
     $button_style = 'style="background-color: #002D75; border: 1px solid #002D75; color: #FFFFFB; text-decoration: none; display: inline-block; font-size: 16px; padding: 10px 20px; border-radius: 5px;"';
 
-    // Replace <a> tags with styled buttons inside a flex container
-    $message = preg_replace_callback('/<a\s+href=["\']([^"\']+)["\']>(.*?)<\/a>/i', function ($matches) use ($button_style) {
+    // Collect buttons in an array
+    $buttons = [];
+
+    // Replace <a> tags with styled buttons and collect them
+    $message = preg_replace_callback('/<a\s+href=["\']([^"\']+)["\']>(.*?)<\/a>/i', function ($matches) use ($button_style, &$buttons) {
         $url = esc_url($matches[1]);
         $text = esc_html($matches[2]);
-        return '<div style="display: inline-block; margin-right: 10px;"><table role="presentation" border="0" cellpadding="0" cellspacing="0" class="btn btn-primary" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;"><tr><td align="left" style="font-family: Inter, sans-serif; font-size: 16px; vertical-align: top; background-color: #007bff; border-radius: 5px;"><a href="' . $url . '" ' . $button_style . '>' . $text . '</a></td></tr></table></div>';
+        $buttons[] = '<a href="' . $url . '" ' . $button_style . '>' . $text . '</a>';
+        return ''; // Remove the original link
     }, $message);
 
-    // HTML template for the email with placeholder for user name
+    // Wrap all buttons in a flex container
+    $button_container = '<div style="display: flex; gap: 10px; margin-top: 20px;">' . implode('', $buttons) . '</div>';
+
+    // Insert the buttons before "Best Regards,"
+    $message = preg_replace('/(Best Regards,)/i', $button_container . '<br>$1', $message);
+
+    // HTML template for the email with placeholders
     $html_template = '<!doctype html>
 <html lang="en">
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-     <style media="all" type="text/css">
+    <style media="all" type="text/css">
 @media all {
   .btn-primary table td:hover {
     background-color: #ec0867 !important;
   }
-
 }
 @media only screen and (max-width: 640px) {
   .main p,
@@ -180,32 +189,26 @@ function send_email_immediately($user_ids, $subject, $message) {
 .main span {
     font-size: 16px !important;
   }
-
   .wrapper {
     padding: 8px !important;
   }
-
   .content {
     padding: 0 !important;
   }
-
   .container {
     padding: 0 !important;
     padding-top: 8px !important;
     width: 100% !important;
   }
-
   .main {
     border-left-width: 0 !important;
     border-radius: 0 !important;
     border-right-width: 0 !important;
   }
-
   .btn table {
     max-width: 100% !important;
     width: 100% !important;
   }
-
   .btn a {
     font-size: 16px !important;
     max-width: 100% !important;
@@ -216,7 +219,6 @@ function send_email_immediately($user_ids, $subject, $message) {
   .ExternalClass {
     width: 100%;
   }
-
   .ExternalClass,
 .ExternalClass p,
 .ExternalClass span,
@@ -225,7 +227,6 @@ function send_email_immediately($user_ids, $subject, $message) {
 .ExternalClass div {
     line-height: 100%;
   }
-
   .apple-link a {
     color: inherit !important;
     font-family: inherit !important;
@@ -234,7 +235,6 @@ function send_email_immediately($user_ids, $subject, $message) {
     line-height: inherit !important;
     text-decoration: none !important;
   }
-
   #MessageViewBody a {
     color: inherit;
     text-decoration: none;
@@ -268,7 +268,7 @@ function send_email_immediately($user_ids, $subject, $message) {
                   </div>
                   <p style="font-family: Inter, sans-serif; font-size: 16px; font-weight: normal; margin: 0; margin-bottom: 16px;">Dear [USER_NAME],</p>
                   <p style="font-family: Inter, sans-serif; font-size: 16px; font-weight: normal; margin: 0; margin-bottom: 16px;">' . $message . '</p>
-                  <!-- Add more dynamic content here if needed -->
+                   <!-- Insert additional signature or footer here -->
                 </td>
               </tr>
               <!-- END MAIN CONTENT AREA -->
@@ -311,6 +311,7 @@ function send_email_immediately($user_ids, $subject, $message) {
         }
     }
 }
+
 
 
 
