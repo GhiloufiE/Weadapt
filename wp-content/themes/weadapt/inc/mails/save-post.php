@@ -97,20 +97,23 @@ function theme_save_post($post_ID, $post, $update)
             }
 
             $users = array_unique($users);
-
+            $post_excerpt = get_the_excerpt($post);
+            $post_excerpt = wp_strip_all_tags($post_excerpt);
+            $post_excerpt = mb_strimwidth($post_excerpt, 0, 100, '...');
             if (!empty($users)) {
                 $subject = sprintf(__('Content has been submitted for review on [%s]', 'weadapt'), get_bloginfo('name'));
 
                 $message = sprintf(
-                    __('%s %s has sent you content for review.', 'weadapt'),
+                    __(' <strong> %s %s </strong> has sent you content for review.', 'weadapt'),
                     esc_attr($current_user->user_firstname),
                     esc_attr($current_user->user_lastname)
                 ) . '<br><br>';
                 
 
-                $message .= sprintf(__('Content: %s', 'weadapt'), esc_html($post->post_title))  ;
-                $message .= sprintf(__('Summary: %s', 'weadapt'), esc_html($post->post_excerpt)) ;
+                $message .= sprintf(__('<strong> Title : </strong> %s', 'weadapt'), esc_html($post->post_title))  ;
+                $message .= sprintf(__('<br> <br> <strong>Summary : </strong>  %s  ', 'weadapt'), esc_html($post_excerpt)) ;
                 $message .= sprintf('<a href="%s">%s</a>', get_permalink($post_ID), __('Visit the content', 'weadapt'));
+                $message .= '<a href="' . get_edit_post_link($post->ID) . '">' . __('Publish/Edit', 'weadapt') . '</a>';
                 $message .= "<br>Best Regards,<br>WeAdapt";
                 $draft_tags = wp_get_post_terms($post_ID, 'tags', ['hide_empty' => false]);
 

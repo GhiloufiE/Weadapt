@@ -620,9 +620,12 @@ function notify_editors_after_publish($post_id, $new_theme)
                     ucfirst($post->post_type),
                     get_bloginfo('name')
                 );
-
+                $post_excerpt = get_the_excerpt($post);
+                $post_excerpt = wp_strip_all_tags($post_excerpt);
+                $post_excerpt = mb_strimwidth($post_excerpt, 0, 100, '...');
                 $message = __('Your content has now been reviewed and published. It will be shared on our social media channels where relevant. Please do re-share! ', 'weadapt') . '<br><br>';
-                $message .= '<strong>' . __('Title: ', 'weadapt') . '</strong>' . esc_html($post->post_title) ; 
+                $message .= '<strong>' . __('Title: ', 'weadapt') . '</strong>' . esc_html($post->post_title) ;
+                $message .= sprintf(__('<br> <br> <strong>Summary : </strong>  %s  ', 'weadapt'), esc_html($post_excerpt)) ; 
                 $message .= esc_html($post->post_excerpt);
                 if (!empty($people_creator)) {
                     $post_author_ID = $people_creator[0];
@@ -671,12 +674,12 @@ function notify_editors_after_publish($post_id, $new_theme)
                     );
                 }
 
-                $message =  '<strong>' . __('Title: ', 'weadapt') . '</strong>' .  esc_html($post->post_title) . '<br>' ;
-                $post_excerpt = get_the_excerpt($post);
+            $message  =esc_html($subject) .  '<br> <br> <strong>' . __('Title: ', 'weadapt') . '</strong>' .  esc_html($post->post_title) . '<br><br>' ;
+            $post_excerpt = get_the_excerpt($post);
             $post_excerpt = wp_strip_all_tags($post_excerpt);
             $post_excerpt = mb_strimwidth($post_excerpt, 0, 100, '...');
 
-            $message .= '<p>' . sprintf(__('Summary: %s', 'weadapt'), esc_html($post_excerpt)) . '</p>';
+            $message .= sprintf(__('<strong> Summary: </strong>%s', 'weadapt'), esc_html($post_excerpt));
                 if ($published_for_the_first_time) {
                     if ($post_author_IDs = get_field('people_creator', $post_id)) {
                         $post_author_ID = $post_author_IDs[0];
@@ -688,11 +691,11 @@ function notify_editors_after_publish($post_id, $new_theme)
                         } else {
                             $message .= sprintf('Published by %s', $post_author->display_name);
                         }
-                        $message .= '<br>';
+                        
                     }
 
-                    $message .= sprintf('  <a href="%s">%s</a>', get_permalink($post_id), __('See it', 'weadapt')) . '<br>';
-                    $message .= sprintf('  <a href="%s">%s</a>', get_edit_post_link($post_id), __('Publish / Edit / Delete it', 'weadapt'));
+                    $message .= sprintf('  <a href="%s">%s</a>', get_permalink($post_id), __('View the content', 'weadapt')) . '<br>';
+                    $message .= sprintf('  <a href="%s">%s</a>', get_edit_post_link($post_id), __('Edit / Delete it', 'weadapt'));
                     $message .= "<br>Best Regards,<br>WeAdapt";
                     theme_mail_save_to_db($users, $subject, $message);
                     send_email_immediately($users, $subject, $message);
