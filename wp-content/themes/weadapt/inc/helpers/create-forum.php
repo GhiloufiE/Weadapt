@@ -96,7 +96,7 @@ function notify_admins_of_pending_posts($post_id, $post_type)
         $subject = sprintf(__('New Forum Topic Awaiting Review on %s', 'weadapt'), $site_name);
 
         $message = sprintf(
-            __('A new forum topic titled <b>%s</b> in the forum <b>%s</b> is pending review.<br><br>', 'weadapt'),
+            __('A new forum topic titled <b>%s</b> in the forum <b>%s</b> is pending review.', 'weadapt'),
             esc_html($post_title),
             esc_html($forum_name)
         );

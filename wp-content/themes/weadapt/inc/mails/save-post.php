@@ -65,11 +65,13 @@ function theme_save_post($post_ID, $post, $update)
                             $post_author->display_name,
                             get_the_title($author_organisations[0])
                         );
+                        $message .= "<br>Best Regards,<br>WeAdapt";
                     } else {
                         $message .= sprintf(
                             'by %s',
                             $post_author->display_name
                         );
+                        $message .= "<br>Best Regards,<br>WeAdapt";
                     }
                 }
 
@@ -109,7 +111,7 @@ function theme_save_post($post_ID, $post, $update)
                 $message .= sprintf(__('Content: %s', 'weadapt'), esc_html($post->post_title)) . '<br>';
                 $message .= sprintf(__('Summary: %s', 'weadapt'), esc_html($post->post_excerpt)) . '<br><br>';
                 $message .= sprintf('<a href="%s">%s</a>', get_permalink($post_ID), __('Visit the content', 'weadapt'));
-
+                $message .= "<br>Best Regards,<br>WeAdapt";
                 $draft_tags = wp_get_post_terms($post_ID, 'tags', ['hide_empty' => false]);
 
                 if (!empty($draft_tags)) {
