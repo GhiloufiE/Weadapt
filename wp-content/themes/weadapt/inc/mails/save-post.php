@@ -108,7 +108,7 @@ function theme_save_post($post_ID, $post, $update)
 
                 $message .= sprintf(__('Content: %s', 'weadapt'), esc_html($post->post_title)) . '<br>';
                 $message .= sprintf(__('Summary: %s', 'weadapt'), esc_html($post->post_excerpt)) . '<br><br>';
-                $message .= sprintf('<a href="%s">%s</a>', get_permalink($post_ID), __('Go to the content', 'weadapt'));
+                $message .= sprintf('<a href="%s">%s</a>', get_permalink($post_ID), __('Visit the content', 'weadapt'));
 
                 $draft_tags = wp_get_post_terms($post_ID, 'tags', ['hide_empty' => false]);
 

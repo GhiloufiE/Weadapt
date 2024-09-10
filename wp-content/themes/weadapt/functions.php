@@ -408,7 +408,7 @@ function notify_admin_on_edit($new_status, $old_status, $post)
         $message .= '<br>';
         $message .= __('Content:', 'weadapt') . ' ' . get_the_title($post->ID) . '<br>';
         $message .= __('Summary:', 'weadapt') . ' ' . wp_strip_all_tags($summary) . '<br>';
-        $message .= '<a href="' . get_permalink($post->ID) . '">' . __('Go to the content', 'weadapt') . '</a><br>';
+        $message .= '<a href="' . get_permalink($post->ID) . '">' . __('Visit the content', 'weadapt') . '</a><br>';
         $message .= '<a href="' . get_edit_post_link($post->ID) . '">' . __('Publish/Edit', 'weadapt') . '</a>';
 
         foreach ($admin_emails as $admin_email) {
