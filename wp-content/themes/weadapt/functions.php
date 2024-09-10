@@ -481,7 +481,7 @@ function notify_editors_after_publish($post_id, $new_theme)
         if (!empty($users)) {
             if ($post->post_type == 'article' || $post->post_type == 'event' || $post->post_type == 'organisation') {
                 $subject = sprintf(
-                    __('An %s has been published on %s', 'weadapt'),
+                    __('An %s has been publishedeee on %s', 'weadapt'),
                     ucfirst($post->post_type),
                     get_bloginfo('name')
                 );
@@ -622,30 +622,13 @@ function notify_editors_after_publish($post_id, $new_theme)
                 );
 
                 $message = __('Your content has now been reviewed and published. It will be shared on our social media channels where relevant. Please do re-share! ', 'weadapt') . '<br><br>';
-                $message .= esc_html($post->post_title)  ;
-                $message .= esc_html($post->post_excerpt)  ;
-
+                $message .= '<strong>' . __('Title: ', 'weadapt') . '</strong>' . esc_html($post->post_title) ; 
+                $message .= esc_html($post->post_excerpt);
                 if (!empty($people_creator)) {
                     $post_author_ID = $people_creator[0];
                     $post_author = new WP_User($post_author_ID);
-                    $author_organisations = get_field('organisations', $post_author);
-
-                    if ($author_organisations) {
-                        $message .= sprintf(
-                            'by %s from %s',
-                            $post_author->display_name,
-                            get_the_title($author_organisations[0])
-                        );
-                    } else {
-                        $message .= sprintf(
-                            'by %s',
-                            $post_author->display_name
-                        );
-                    }
-
-                    $message .= '<br>';
+                    $author_organisations = get_field('organisations', $post_author); 
                 }
-
                 $message .= sprintf(
                     '  <a href="%s">%s</a>',
                     get_permalink($post_id),
