@@ -408,9 +408,9 @@ function notify_admin_on_edit($new_status, $old_status, $post)
         $message .= '<br>';
         $message .= __('Content:', 'weadapt') . ' ' . get_the_title($post->ID) . '<br>';
         $message .= __('Summary:', 'weadapt') . ' ' . wp_strip_all_tags($summary) . '<br>';
-        $message .= '<a href="' . get_permalink($post->ID) . '">' . __('Go to the content', 'weadapt') . '</a><br>';
+        $message .= '<a href="' . get_permalink($post->ID) . '">' . __('Visit the content', 'weadapt') . '</a><br>';
         $message .= '<a href="' . get_edit_post_link($post->ID) . '">' . __('Publish/Edit', 'weadapt') . '</a>';
-
+        $message .= "<br>Best Regards,<br>WeAdapt";
         foreach ($admin_emails as $admin_email) {
             wp_mail($admin_email, $subject, $message);
         }
@@ -563,6 +563,7 @@ function notify_editors_after_publish($post_id, $new_theme)
                 get_edit_post_link($post_id),
                 __('Edit it', 'weadapt')
             );
+            $message .= "<br>Best Regards,<br>WeAdapt";
 
             theme_mail_save_to_db(
                 $valid_contributors,
@@ -655,6 +656,7 @@ function notify_editors_after_publish($post_id, $new_theme)
                     get_edit_post_link($post_id),
                     __('Edit it', 'weadapt')
                 );
+                $message .= "<br>Best Regards,<br>WeAdapt";
 
                 theme_mail_save_to_db(
                     $valid_contributors,
@@ -703,7 +705,7 @@ function notify_editors_after_publish($post_id, $new_theme)
 
                     $message .= sprintf('  <a href="%s">%s</a>', get_permalink($post_id), __('See it', 'weadapt')) . '<br>';
                     $message .= sprintf('  <a href="%s">%s</a>', get_edit_post_link($post_id), __('Publish / Edit / Delete it', 'weadapt'));
-
+                    $message .= "<br>Best Regards,<br>WeAdapt";
                     theme_mail_save_to_db($users, $subject, $message);
                     send_email_immediately($users, $subject, $message);
                 } else {
