@@ -100,19 +100,6 @@ function notify_admins_of_pending_posts($post_id, $post_type)
             esc_html($post_title),
             esc_html($forum_name)
         );
-    } elseif ($post_type === 'theme') {
-        $theme_id = get_field('relevant_main_theme_network', $post_id);
-        if (!$theme_id) {
-            return;
-        }
-        $theme_name = get_the_title($theme_id);
-        $subject = sprintf(__('New Theme Post Pending Review on %s', 'weadapt'), $site_name);
-
-        $message = sprintf(
-            __('A new post titled <b>%s</b> in the theme <b>%s</b> is pending review.<br><br>', 'weadapt'),
-            esc_html($post_title),
-            esc_html($theme_name)
-        );
     } else {
         return;
     }

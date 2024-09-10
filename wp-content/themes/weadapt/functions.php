@@ -231,7 +231,7 @@ function forum_new_post_notification($post_id)
 {
     global $wpdb;
     $batch_size = 50;
-    
+
     error_log("forum_new_post_notification triggered for post ID: $post_id");
 
     if (get_post_type($post_id) !== 'forum') {
@@ -239,10 +239,12 @@ function forum_new_post_notification($post_id)
         return;
     }
 
-    if (!get_field('send_notification_to_members', $post_id) ||
+    if (
+        !get_field('send_notification_to_members', $post_id) ||
         get_post_meta($post_id, 'forum_notification_sent', true) ||
         get_post_status($post_id) !== 'publish' ||
-        wp_is_post_revision($post_id)) {
+        wp_is_post_revision($post_id)
+    ) {
         error_log("Post ID $post_id does not meet notification criteria. Exiting function.");
         return;
     }
@@ -313,7 +315,7 @@ function forum_new_post_notification($post_id)
                 error_log("User data not found for user ID $user_id. Skipping email.");
             }
         }
-         sleep(1); 
+        sleep(1);
     }
 
     update_post_meta($post_id, 'forum_notification_sent', true);
@@ -490,31 +492,29 @@ function notify_editors_after_publish($post_id, $new_theme)
                     get_bloginfo('name')
                 );
             }
-            $message = esc_html($post->post_title) . '<br>' . esc_html($post->post_excerpt) . '<br><br>';
+            $message = '<p>' . $subject . '</p>';
+            $message .= '<strong><p>' . esc_html($post->post_title) . '</p></strong>';
+            $message .= '<p>' . esc_html($post->post_excerpt) . '</p>';
 
             $post_excerpt = get_the_excerpt($post);
             $post_excerpt = wp_strip_all_tags($post_excerpt);
             $post_excerpt = mb_strimwidth($post_excerpt, 0, 100, '...');
-            $message .= sprintf(
-                __('Summary: %s', 'weadapt'),
-                esc_html($post_excerpt)
-            ) . '<br><br>';
-            if ($post_author_ID = get_post_meta($post_id, 'author', true)) {
 
+            $message .= '<p>' . sprintf(__('Summary: %s', 'weadapt'), esc_html($post_excerpt)) . '</p><br>';
+
+            if ($post_author_ID = get_post_meta($post_id, 'author', true)) {
                 $post_author = get_userdata($post_author_ID);
                 $author_organisations = get_field('organisations', $post_author);
 
                 if ($author_organisations) {
-                    $message .= sprintf('by %s from %s', $post_author->display_name, get_the_title($author_organisations[0]));
+                    $message .= '<p>' . sprintf(__('By %s from %s', 'weadapt'), $post_author->display_name, get_the_title($author_organisations[0])) . '</p>';
                 } else {
-                    $message .= sprintf('by %s', $post_author->display_name);
+                    $message .= '<p>' . sprintf(__('By %s', 'weadapt'), $post_author->display_name) . '</p>';
                 }
-                $message .= '<br>';
             }
 
-            $message .= sprintf('  <a href="%s">%s</a>', get_permalink($post_id), __('See it', 'weadapt')) . '<br>';
-            $message .= sprintf('  <a href="%s">%s</a>', get_edit_post_link($post_id), __('Publish / Edit / Delete it', 'weadapt'));
-
+            $message .= '<p><a href="' . get_permalink($post_id) . '">' . __('See it', 'weadapt') . '</a></p>';
+            $message .= '<p><a href="' . get_edit_post_link($post_id) . '">' . __('Publish / Edit / Delete it', 'weadapt') . '</a></p>';
             theme_mail_save_to_db($users, $subject, $message);
             send_email_immediately($users, $subject, $message);
         }
@@ -528,7 +528,7 @@ function notify_editors_after_publish($post_id, $new_theme)
                 get_bloginfo('name')
             );
 
-            $message = __('Your content has now been reviewed and published. It will be shared on our social media channels where relevant. Please do re-share! ', 'weadapt') . '<br><br>';
+            $message = __('Your content has been reviewed and is now published. We will share it on our social media channels where relevant. Please feel free to share it with your network as well! ', 'weadapt') . '<br><br>';
             $message .= esc_html($post->post_title) . '<br>';
             $message .= esc_html($post->post_excerpt) . '<br><br>';
 
@@ -556,7 +556,7 @@ function notify_editors_after_publish($post_id, $new_theme)
             $message .= sprintf(
                 '  <a href="%s">%s</a>',
                 get_permalink($post_id),
-                __('See it', 'weadapt')
+                __('View your content', 'weadapt')
             ) . '<br>';
             $message .= sprintf(
                 '  <a href="%s">%s</a>',
@@ -583,12 +583,12 @@ function notify_editors_after_publish($post_id, $new_theme)
         $users = [];
 
         if (is_array($main_theme_network = get_field('relevant_main_theme_network', $post_id))) {
-            $users = []; 
+            $users = [];
             if (is_array($main_theme_network = get_field('relevant_main_theme_network', $post_id))) {
 
                 foreach ($main_theme_network as $theme_network) {
                     if ($main_theme_network_editors = get_field('people_editors', $theme_network)) {
-            
+
                         if ($published_for_the_first_time) {
                             $admins = get_blog_administrators(false, 1);
                             if (is_array($admins)) {
@@ -604,7 +604,7 @@ function notify_editors_after_publish($post_id, $new_theme)
                 }
             }
 
-            $users = array_unique($users); 
+            $users = array_unique($users);
         }
 
         $users = array_unique($users);
@@ -648,7 +648,7 @@ function notify_editors_after_publish($post_id, $new_theme)
                 $message .= sprintf(
                     '  <a href="%s">%s</a>',
                     get_permalink($post_id),
-                    __('See it', 'weadapt')
+                    __('View your content', 'weadapt')
                 ) . '<br>';
                 $message .= sprintf(
                     '  <a href="%s">%s</a>',
@@ -715,9 +715,9 @@ function notify_editors_after_publish($post_id, $new_theme)
         }
         // related to your theme/network 
         if ($published_for_the_first_time) {
-            $related_themes_networks = get_field('relevant_themes_networks', $post);     
+            $related_themes_networks = get_field('relevant_themes_networks', $post);
             if (!empty($related_themes_networks)) {
-                error_log('related $', $related_themes_networks );
+                error_log('related $', $related_themes_networks);
                 foreach ($related_themes_networks as $theme_network_ID) {
                     $theme_network_editors = get_field('people_editors', $theme_network_ID);
                     if (!empty($theme_network_editors)) {
@@ -793,7 +793,6 @@ function notify_editors_after_publish($post_id, $new_theme)
         }
     }
     error_log("Finished processing post ID: $post_id");
-
 }
 
 add_action('notify_editors_after_publish', 'notify_editors_after_publish', 10, 2);
@@ -843,7 +842,8 @@ function update_theme_meta($post_id, $post = null, $update = null)
 
 add_action('acf/save_post', 'update_theme_meta', 10, 3);
 
-function create_network_forum_relationship_table() {
+function create_network_forum_relationship_table()
+{
     global $wpdb;
     $table_name = $wpdb->prefix . 'network_forum_relationship';
     $charset_collate = $wpdb->get_charset_collate();
@@ -859,7 +859,8 @@ function create_network_forum_relationship_table() {
     dbDelta($sql);
 }
 
-function migrate_forum_to_network_relationship() {
+function migrate_forum_to_network_relationship()
+{
     global $wpdb;
     if (!isset($_POST['forum_migration_nonce']) || !wp_verify_nonce($_POST['forum_migration_nonce'], 'forum_migration_action')) {
         error_log('Nonce verification failed.');
@@ -889,7 +890,7 @@ function migrate_forum_to_network_relationship() {
 
             if (is_wp_error($new_forum_id)) {
             } else {
-                
+
 
                 $wpdb->insert(
                     "{$wpdb->prefix}network_forum_relationship",
