@@ -1,0 +1,64 @@
+{
+    "key": "group_6463237020aec",
+    "title": "People",
+    "fields": [
+        {
+            "key": "field_646323702c17d",
+            "label": "",
+            "name": "people",
+            "aria-label": "",
+            "type": "group",
+            "instructions": "",
+            "required": 1,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "layout": "block",
+            "sub_fields": [
+                {
+                    "key": "field_646323703b1e2",
+                    "label": "Contributors*",
+                    "name": "contributors",
+                    "aria-label": "",
+                    "type": "user",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "role": "",
+                    "return_format": "id",
+                    "multiple": 1,
+                    "allow_null": 0,
+                    "bidirectional": 0,
+                    "bidirectional_target": []
+                }
+            ]
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "post_type",
+                "operator": "==",
+                "value": "solutions-portal"
+            }
+        ]
+    ],
+    "menu_order": 5,
+    "position": "side",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": true,
+    "description": "5 [solutions-portal]",
+    "show_in_rest": 0,
+    "modified": 1716805850
+}

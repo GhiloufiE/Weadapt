@@ -1,0 +1,62 @@
+{
+    "key": "group_63749880a2e40",
+    "title": "Publish to",
+    "fields": [
+        {
+            "key": "field_6374a3364bb73",
+            "label": "<span>Filtered by code!!!<\/span>",
+            "name": "publish_to",
+            "aria-label": "",
+            "type": "checkbox",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "choices": {
+                "1": "weADAPT",
+                "2": "Adaptation At Altitude",
+                "3": "Can-Adapt",
+                "4": "Adaptation Without Borders",
+                "8": "Water Adaptation Community",
+                "10": "MAIA"
+            },
+            "default_value": [],
+            "return_format": "value",
+            "allow_custom": 0,
+            "layout": "vertical",
+            "toggle": 1,
+            "save_custom": 0,
+            "custom_choice_button_text": "Add new choice"
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "post_type",
+                "operator": "==",
+                "value": "page"
+            }
+        ],
+        [
+            {
+                "param": "post_type",
+                "operator": "!=",
+                "value": "page"
+            }
+        ]
+    ],
+    "menu_order": 5,
+    "position": "side",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": true,
+    "description": "5 [single]",
+    "show_in_rest": 0,
+    "modified": 1701849001
+}
