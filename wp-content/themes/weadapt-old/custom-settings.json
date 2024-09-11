@@ -1,0 +1,35 @@
+{
+	"jquery" : true,
+	"menus": {
+		"header-top-menu": "Header Top Navigation",
+		"header-main-menu": "Header Main Navigation",
+		"header-main-menu-logged-in": "Header Main Navigation Logged In"
+	},
+	"sidebars": {
+		"content-area-bottom": "Content Area Bottom",
+		"footer-area-1": "Footer Area 1",
+		"footer-area-2": "Footer Area 2",
+		"footer-area-3": "Footer Area 3",
+		"footer-area-4": "Footer Area 4"
+	},
+	"thumbnails": [
+		[
+			"mini-thumbnail",
+			40,
+			40,
+			true
+		],
+		[
+			"content-thumbnail",
+			662,
+			9999,
+			false
+		],
+		[
+			"cpt-list-item",
+			174,
+			174,
+			true
+		]
+	]
+}

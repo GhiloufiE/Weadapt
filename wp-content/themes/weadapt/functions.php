@@ -373,6 +373,9 @@ function create_forum_post_on_theme_creation($new_status, $old_status, $post)
 }
 function notify_admin_on_edit($new_status, $old_status, $post)
 {
+    // Log the post status change for debugging
+    error_log('Post ID: ' . $post->ID . ' | Old Status: ' . $old_status . ' | New Status: ' . $new_status);
+
     $ignored_old_statuses = array('auto-draft', 'inherit', 'new', 'draft', 'future', 'pending', 'trash');
     if (in_array($old_status, $ignored_old_statuses)) {
         return;
@@ -388,7 +391,7 @@ function notify_admin_on_edit($new_status, $old_status, $post)
             return;
         }
         global $wpdb;
-        $admin_emails = $wpdb->get_col("SELECT DISTINCT user_email FROM $wpdb->users u 
+        $admin_users = $wpdb->get_results("SELECT DISTINCT u.ID, u.user_email FROM $wpdb->users u 
                                         JOIN $wpdb->usermeta um ON u.ID = um.user_id 
                                         WHERE um.meta_key = '{$wpdb->prefix}capabilities' 
                                         AND um.meta_value LIKE '%\"administrator\"%'");
@@ -400,29 +403,28 @@ function notify_admin_on_edit($new_status, $old_status, $post)
 
         $subject = sprintf(__('Content has been submitted for review on %s', 'weadapt'), $website_name);
         $message = sprintf(
-            __('%1$s %2$s (%3$s) has sent you content for review.', 'weadapt'),
+            __('%1$s %2$s (%3$s) has sent you content for review. <br>', 'weadapt'),
             $author_info->first_name,
             $author_info->last_name,
             $author_info->user_login
         );
         $message .= '<br>';
-        $message .= __('Content:', 'weadapt') . ' ' . get_the_title($post->ID) . '<br>';
-        $message .= __('Summary:', 'weadapt') . ' ' . wp_strip_all_tags($summary) . '<br>';
-        $message .= '<a href="' . get_permalink($post->ID) . '">' . __('Visit the content', 'weadapt') . '</a><br>';
+        $message .= __('<strong> Title: </strong>', 'weadapt') . ' ' . get_the_title($post->ID) . '<br>';
+        $message .= __('<br> <strong> Summary: </strong> ', 'weadapt') . ' ' . wp_strip_all_tags($summary);
+        $message .= '<a href="' . get_permalink($post->ID) . '">' . __('Visit the content', 'weadapt') . '</a>';
         $message .= '<a href="' . get_edit_post_link($post->ID) . '">' . __('Publish/Edit', 'weadapt') . '</a>';
         $message .= "<br>Best Regards,<br>WeAdapt";
-        foreach ($admin_emails as $admin_email) {
-            wp_mail($admin_email, $subject, $message);
+
+        foreach ($admin_users as $admin_user) {
+            send_email_immediately($admin_user->ID, $subject, $message);
         }
 
-        theme_mail_save_to_db($admin_emails, $subject, $message);
+        theme_mail_save_to_db(array_column($admin_users, 'user_email'), $subject, $message);
         set_transient($transient_key, true, 10);
         update_post_meta($post->ID, '_notify_admin_on_edit_sent', true);
     }
 }
 add_action('transition_post_status', 'notify_admin_on_edit', 10, 3);
-
-
 add_action('save_post', function ($post_id) {
     delete_post_meta($post_id, '_notify_admin_on_edit_sent');
 });

@@ -431,89 +431,102 @@ $section_fields = get_section_fields();
 	let zoomOrder = ['red', 'orange', 'green', 'blue', 'rectangle']; // Define the order of targets
 	let currentTargetIndex = -1; // Initialize the current target index
 
-	function zoomToTarget(targetClass) {
-		// Check if the gradient overlay already exists for the current target
-		if (d3.select('.tandem-first-content').select(`.gradient-overlay.${targetClass}`).node()) {
-			return; // If it exists, don't reapply the gradient
-		}
+	window.onload = function() {
+  
+    initZoomHandlers();
+};
 
-		// Update the current target index
-		currentTargetIndex = zoomOrder.indexOf(targetClass);
-		if (currentTargetIndex === -1) return; // Invalid target class
+function zoomToTarget(targetClass) {
+    // Check if the gradient overlay already exists for the current target
+    if (d3.select('.tandem-first-content').select(`.gradient-overlay.${targetClass}`).node()) {
+        return; // If it exists, don't reapply the gradient
+    }
+  // Hide all target sections first
+ 	 d3.selectAll('.red-content, .orange-content, .green-content, .blue-content, .rectangle-content').style('display', 'none');
+ 	 d3.selectAll('.red-cards, .orange-cards, .green-cards, .blue-cards, .rectangle-cards').style('display', 'none');
 
-		// Show the navigation arrows
-		d3.select('.arrow-left').style('display', 'block');
-		d3.select('.arrow-right').style('display', 'block');
+    // Update the current target index
+    currentTargetIndex = zoomOrder.indexOf(targetClass);
+    if (currentTargetIndex === -1) return; // Invalid target class
+
+    // Show the navigation arrows
+    d3.select('.arrow-left').style('display', 'block');
+    d3.select('.arrow-right').style('display', 'block');
+
+    // Clear any previous overlays
+    d3.select('.tandem-first-content')
+        .select('.gradient-overlay')
+        .transition()
+        .duration(0)
+        .style('opacity', 0)
+        .on('end', function() {
+            d3.select(this).remove();
+        });
+
+    var lastTransform = calculateTransform(targetClass);
+    if (!lastTransform) return;
+
+    applyTransform(lastTransform, 100, targetClass); // Use a longer transition for smoothness
+
+    function handleMutation() {
+        lastTransform = calculateTransform(targetClass);
+        if (lastTransform) {
+            applyTransform(lastTransform, 50, targetClass); // Reapply with a smooth transition
+        }
+    }
+
+    setTimeout(function() {
+        addGradientOverlay(targetClass, lastTransform, 0);
+    }, 0);
+
+    var observer = new MutationObserver(handleMutation);
+    observer.observe(d3.select('.tandem-first-content').node(), {
+        attributes: true,
+        childList: true,
+        subtree: true
+    });
+    setTimeout(function() {
+        observer.disconnect();
+    }, 200);
+
+    // Show the zoom out button when zoomed in
+    d3.select('.tandem-container-nav-zoom button').style('display', 'flex');
+
+    // Update the color indicator based on the targetClass
+    var colors = {
+        red: '#B94343',
+        orange: '#F6B552',
+        green: '#679F5A',
+        blue: '#7BC9CC',
+        rectangle: '#C5E4FF'
+    };
+
+    d3.select('.color-indicator')
+        .transition()
+        .duration(300)
+        .style('background-color', colors[targetClass]);
+
+    d3.selectAll('.tandem-nav button').each(function() {
+        var button = d3.select(this);
+        var buttonTarget = button.attr('data-target');
+        var img = button.select('img.svg-nav');
+
+        if (buttonTarget === targetClass) {
+            img.attr('src', svgMappings[buttonTarget]);
+        } else {
+            // Reset to the original SVG if it's not the selected button
+            var originalSrc = themeUri + buttonTarget + '-nav.svg';
+            img.attr('src', originalSrc);
+        }
+    });
+
+  
+    // Show the section corresponding to the clicked target (e.g., .red-content, .orange-content, etc.)
+    d3.select('.' + targetClass + '-content').style('display', 'block');
+    d3.select('.' + targetClass + '-cards').style('display', 'block');
+}
 
 
-
-		// Clear any previous overlays
-		d3.select('.tandem-first-content')
-			.select('.gradient-overlay')
-			.transition()
-			.duration(0)
-			.style('opacity', 0)
-			.on('end', function() {
-				d3.select(this).remove();
-			});
-
-		var lastTransform = calculateTransform(targetClass);
-		if (!lastTransform) return;
-
-		applyTransform(lastTransform, 100, targetClass); // Use a longer transition for smoothness
-
-		function handleMutation() {
-			lastTransform = calculateTransform(targetClass);
-			if (lastTransform) {
-				applyTransform(lastTransform, 50, targetClass); // Reapply with a smooth transition
-			}
-		}
-
-		setTimeout(function() {
-			addGradientOverlay(targetClass, lastTransform, 0);
-		}, 0);
-
-		var observer = new MutationObserver(handleMutation);
-		observer.observe(d3.select('.tandem-first-content').node(), {
-			attributes: true,
-			childList: true,
-			subtree: true
-		});
-		setTimeout(function() {
-			observer.disconnect();
-		}, 200);
-
-		// Show the zoom out button when zoomed in
-		d3.select('.tandem-container-nav-zoom button').style('display', 'flex');
-
-		// Update the color indicator based on the targetClass
-		var colors = {
-			red: '#B94343',
-			orange: '#F6B552',
-			green: '#679F5A',
-			blue: '#7BC9CC',
-			rectangle: '#C5E4FF'
-		};
-
-		d3.select('.color-indicator')
-			.transition()
-			.duration(300)
-			.style('background-color', colors[targetClass]);
-
-		d3.selectAll('.tandem-nav button').each(function() {
-			var button = d3.select(this);
-			var buttonTarget = button.attr('data-target');
-			var img = button.select('img.svg-nav');
-
-			if (buttonTarget === targetClass) {
-				img.attr('src', svgMappings[buttonTarget]);
-			} else {
-				// Reset to the original SVG if it's not the selected button
-				var originalSrc = themeUri + buttonTarget + '-nav.svg';
-				img.attr('src', originalSrc);
-			}
-		});
-	}
 
 	function resetZoom() {
 		d3.select('.arrow-left').style('display', 'none');
