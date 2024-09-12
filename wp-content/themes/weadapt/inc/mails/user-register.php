@@ -37,7 +37,7 @@ function theme_user_register( $user_id, $userdata ) {
         error_log( 'Attempting to send email to: ' . print_r( $users, true ) );
         error_log( 'Email subject: ' . $subject );
         error_log( 'Email message: ' . $message );
-		wp_mail($users,$subject,$message);
+		//wp_mail($users,$subject,$message);
         send_email_immediately($users, $subject, $message,null);
     }
 }

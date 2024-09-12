@@ -220,26 +220,27 @@ function theme_ajax_create() {
 			die_json_message( 'error', $user_ID->get_error_message() );
 		} else {
 			$new_user_additional_mail['subject'] = 'Welcome to the weADAPT Community';
-			$new_user_additional_mail['message'] = "<p>[" . get_bloginfo( 'name' ) . "] Login Details</p>" .
-				"<p>Username: " . $user_name . "<br />Password: " . $user_pass . "</p><br />" .
-				"<p>Dear User,</p><br />" .
-				"<p>Welcome to the <a href=\"https://weadapt.org/\">weADAPT</a> community!</p><br />" .
-				"<p>On <a href=\"https://weadapt.org/\">weADAPT</a> and its <a href=\"https://weadapt.org/microsites/\">microsites</a> you can <b>learn</b> about climate adaptation issues, <b>share</b> your knowledge and experience, and <b>connect</b> with researchers, practitioners and decision-makers around the world.</p><br />" .
-				"<p>We encourage you to upload a portrait image and fill in information on your profile page as this will make it more easily searchable and ensure you see relevant content on the platform.</p><br />" .
-				"<p><b>Sharing</b> information on <a href=\"https://weadapt.org/\">weADAPT</a> and its <a href=\"https://weadapt.org/microsites/\">microsites</a> is simple - just follow these step-by-step guidelines for <a href=\"https://weadapt.org/faq-how-do-i-add-content-on-weadapt/\">adding articles, case studies, events and blogs</a>.</p><br />" .
-				"<p>To keep up to date with the latest news and content you can join us on <a href=\"https://www.linkedin.com/in/weadapt/\">LinkedIn</a>, <a href=\"https://twitter.com/weadapt1\">Twitter/X</a> or <a href=\"https://www.facebook.com/weadaptgroup\">Facebook</a>, and <a href=\"http://weadapt.us5.list-manage.com/subscribe?u=cc005a6482e49ead5ff67daa1&id=be94db1743\">subscribe to our newsletter</a>.</p><br />" .
-				"<p>We use these outlets to share your content widely and give it the greatest visibility.</p><br />" .
-				"<p>If you require assistance or would like training on the use of the platform, please get in touch with us at <a href=\"mailto:info@weadapt.org\">info@weadapt.org</a>.</p><br />" .
-				"<p>You can also refer to our Frequently Asked Questions (FAQ) page</p><br />" .
-				"<p>We welcome your <a href=\"mailto:info@weadapt.org\">feedback</a>!</p><br />" .
-				"<p>Kind regards,</p>" .
-				"<p>The weADAPT Team</p>";
-
-			$send = theme_mail(
-				$user_email,
+			$new_user_additional_mail['message'] = "
+				<p><strong>" . get_bloginfo('name') . " Login Details</strong></p>
+				<p><strong>Username:</strong> $user_name<br><strong>Password:</strong> $user_pass</p>
+ 				<p>Welcome to the <a href=\"https://weadapt.org/\">weADAPT</a> community!</p>
+				<p>On <a href=\"https://weadapt.org/\">weADAPT</a> and its <a href=\"https://weadapt.org/microsites/\">microsites</a>, you can <strong>learn</strong> about climate adaptation, <strong>share</strong> your knowledge, and <strong>connect</strong> with experts worldwide.</p>
+				<p>We encourage you to upload a profile picture and complete your profile for better visibility on the platform.</p>
+				<p><strong>Sharing</strong> content on <a href=\"https://weadapt.org/\">weADAPT</a> is simple. Follow the <a href=\"https://weadapt.org/faq-how-do-i-add-content-on-weadapt/\">step-by-step guide</a> to add articles, case studies, events, and blogs.</p>
+				<p>Stay updated with the latest news by joining us on <a href=\"https://www.linkedin.com/in/weadapt/\">LinkedIn</a>, <a href=\"https://twitter.com/weadapt1\">Twitter/X</a>, <a href=\"https://www.facebook.com/weadaptgroup\">Facebook</a>, and subscribing to our <a href=\"http://weadapt.us5.list-manage.com/subscribe?u=cc005a6482e49ead5ff67daa1&id=be94db1743\">newsletter</a>.</p>
+				<p>We share your content across these platforms to maximize visibility.</p>
+				<p>Need help or training? Contact us at <a href=\"mailto:info@weadapt.org\">info@weadapt.org</a>, or check out our <a href=\"https://weadapt.org/faq\">FAQ page</a>.</p>
+				<p>We welcome your <a href=\"mailto:info@weadapt.org\">feedback</a>!</p>
+				<p>Kind regards,<br>The weADAPT Team</p>
+			";
+			
+			$send = send_email_immediately(
+				$user_ID,
 				$new_user_additional_mail['subject'],
-				$new_user_additional_mail['message']
+				$new_user_additional_mail['message'],
+				null
 			);
+			
 
 			if ( ! $send ) {
 				die_json_message( 'error', esc_html__( 'The email could not be sent. Your site may not be correctly configured to send emails.', 'weadapt' ) );
