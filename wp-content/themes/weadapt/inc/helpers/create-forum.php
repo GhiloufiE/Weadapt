@@ -127,7 +127,7 @@ function notify_admins_of_pending_posts($post_id, $post_type)
         $personalized_message = "". $message;
 
         // Use send_email_immediately with the admin ID
-        send_email_immediately($admin_id, $subject, $personalized_message);
+        send_email_immediately($admin_id, $subject, $personalized_message, $post_id);
         theme_mail_save_to_db(array($admin['user_email']), $subject, $personalized_message); // Save to DB using email
     }
 }
