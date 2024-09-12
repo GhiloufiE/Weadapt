@@ -9,12 +9,12 @@ function send_email_immediately($user_ids, $subject, $message, $post_id) {
     if (is_array($publish_to)) {
         // Create an associative array that maps blog names to their corresponding image URLs
         $blog_image_map = [
-            'weADAPT' => get_theme_file_uri('/assets/images/weadapt.png'),
-            'Adaptation At Altitude' => get_theme_file_uri('/assets/images/adaptation-alt.jpeg'),
-            'Can-Adapt' => get_theme_file_uri('/assets/images/can-adapt.jpeg'),
-            'Adaptation Without Borders' => get_theme_file_uri('/assets/images/adaptation-without-borders.jpeg'),
-            'Water Adaptation Community' => get_theme_file_uri('/assets/images/weadapt.png'),
-            'MAIA' => get_theme_file_uri('/assets/images/maia.jpeg'),
+            'weADAPT' => get_theme_file_uri('/assets/images/weadapt.webp'),
+            'Adaptation At Altitude' => get_theme_file_uri('/assets/images/adaptation-alt.webp'),
+            'Can-Adapt' => get_theme_file_uri('/assets/images/can-adapt.webp'),
+            'Adaptation Without Borders' => get_theme_file_uri('/assets/images/adaptation-without-borders.webp'),
+            'Water Adaptation Community' => get_theme_file_uri('/assets/images/weadapt.webp'),
+            'MAIA' => get_theme_file_uri('/assets/images/maia.webp'),
             'Agora' => get_theme_file_uri('/assets/images/agora.webp'),
         ];
 
@@ -53,7 +53,7 @@ function send_email_immediately($user_ids, $subject, $message, $post_id) {
 }
 
 function generate_button_style() {
-    return 'style="background-color: #002D75; border: 1px solid #002D75; color: #FFFFFB; text-decoration: none; display: inline-block; font-size: 16px; padding: 10px 20px; border-radius: 5px; margin-left: 1rem;"';
+    return 'style="background-color: #002D75; border: 1px solid #002D75; color: #FFFFFB; text-decoration: none; display: inline-block; font-size: 16px; padding: 10px 20px; border-radius: 5px; margin-right:1rem;"';
 }
 
 function extract_buttons_from_message(&$message, $button_style) {
@@ -78,14 +78,11 @@ function insert_buttons_into_message($message, $button_container) {
 function generate_email_template($image_urls, $message) {
   // Ensure the images are displayed at a max-width of 40% and do not stretch
   $image_size_style = '
-    width: 100%;
-    max-width: 25%;  
-    object-fit: contain;
-    margin-right: 1rem;
-    margin-bottom: 12px;';
-
+     max-width: 30%;  
+ ';
+    
   // Create a container for the images that expands horizontally
-  $image_html = '<div class="image-wrapper" style="text-align: center; display: flex; flex-wrap: nowrap; justify-content: space-around; width: auto;">';
+  $image_html = '<div class="image-wrapper" style="text-align: center; display: flex; flex-wrap:wrap;  justify-content: space-around; width: 100%; max-width: 100%;">';
   
   foreach ($image_urls as $image_url) {
       $image_html .= '<img src="' . esc_url($image_url) . '" alt="Blog Image" style="' . $image_size_style . '" />';
@@ -119,9 +116,9 @@ function generate_email_template($image_urls, $message) {
     .container {
         padding: 0 !important;
         padding-top: 8px !important;
-        width: auto !important; /* Ensure width expands to fit the content */
-        min-width: 640px; /* Prevent collapsing on smaller screens */
-        overflow-x: auto; /* Enable scrolling if necessary */
+        width: 100% !important;
+        max-width: 640px; /* Ensure width expands to fit the content */
+        overflow-x: hidden; /* Prevent horizontal scrolling */
     }
     .main {
         border-left-width: 0 !important;
@@ -136,6 +133,16 @@ function generate_email_template($image_urls, $message) {
         font-size: 16px !important;
         max-width: 100% !important;
         width: 100% !important;
+    }
+    .image-wrapper {
+        display: block !important; /* Ensure images stack on mobile */
+        width: 100% !important;
+        text-align: center !important;
+    }
+    .image-wrapper img {
+        max-width: 50% !important; /* Reduce image size on mobile */
+        width: 100% !important;
+        margin-bottom: 8px !important;
     }
   }
   @media all {
@@ -166,6 +173,12 @@ function generate_email_template($image_urls, $message) {
       font-weight: inherit;
       line-height: inherit;
     }
+    .wrapper {
+      width: 100%; /* Make the wrapper as wide as the image wrapper */
+      max-width: 100%; 
+      padding: 20px; /* Remove extra padding to ensure full-width */
+       
+    }
   }
 </style>
 </head>
@@ -173,12 +186,12 @@ function generate_email_template($image_urls, $message) {
 <table role="presentation" border="0" cellpadding="0" cellspacing="0" class="body" style="width: 100%; background-color: #f4f5f6;">
   <tr>
     <td style="font-family: Inter, sans-serif; font-size: 16px;">&nbsp;</td>
-    <td class="container" style="width: auto; margin: 0 auto; padding: 0; padding-top: 24px; min-width: 640px;">
+    <td class="container" style="width: auto; margin: 0 auto; padding: 0; padding-top: 24px; display:flex; max-width: 640px;">
       <div class="content" style="box-sizing: border-box; display: block; margin: 0 auto; width: auto; padding: 0;">
         <span class="preheader" style="display: none;">' . $message . '</span>
-        <table role="presentation" border="0" cellpadding="0" cellspacing="0" class="main" style="background: #ffffff; border: 1px solid #eaebed; border-radius: 16px; width: 100%; min-width: 640px;">
+        <table role="presentation" border="0" cellpadding="0" cellspacing="0" class="main" style="background: #ffffff; border: 1px solid #eaebed; border-radius: 16px; width: 100%; max-width: 640px;">
           <tr>
-            <td class="wrapper" style="padding: 24px;">
+            <td class="wrapper">
               <div style="text-align: center; margin-bottom: 24px;">'
                 . $image_html . 
                 '<div style="background-color: #141E1B; height: 2px; margin-bottom: 12px; width: 100%; border-radius:5px;"></div>
@@ -196,7 +209,6 @@ function generate_email_template($image_urls, $message) {
 </body>
 </html>';
 }
-
 
 
 
