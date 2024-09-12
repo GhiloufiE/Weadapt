@@ -310,7 +310,7 @@ function forum_new_post_notification($post_id)
                 $site_name";
 
                 error_log("Sending notification to user ID $user_id for post ID $post_id.");
-                send_email_immediately(array($user_id), $subject, $message);
+                send_email_immediately(array($user_id), $subject, $message, $post_id);
             } else {
                 error_log("User data not found for user ID $user_id. Skipping email.");
             }
@@ -461,7 +461,7 @@ function notify_editors_after_publish($post_id, $new_theme)
             $message .= '<p><a href="' . get_permalink($post_id) . '">' . __('See it', 'weadapt') . '</a></p>';
             $message .= '<p><a href="' . get_edit_post_link($post_id) . '">' . __('Publish / Edit / Delete it', 'weadapt') . '</a></p>';
             theme_mail_save_to_db($users, $subject, $message);
-            send_email_immediately($users, $subject, $message);
+            send_email_immediately($users, $subject, $message, $post_id);
         }
 
         $valid_contributors = get_field('people_contributors', $post_id) ?: array();
@@ -515,7 +515,7 @@ function notify_editors_after_publish($post_id, $new_theme)
                 $subject,
                 $message
             );
-            send_email_immediately($valid_contributors, $subject, $message);
+            send_email_immediately($valid_contributors, $subject, $message, $post_id);
             update_post_meta($post_id, '_notification_sent', true);
         }
     }
@@ -594,7 +594,7 @@ function notify_editors_after_publish($post_id, $new_theme)
                     $subject,
                     $message
                 );
-                send_email_immediately($valid_contributors, $subject, $message);
+                send_email_immediately($valid_contributors, $subject, $message, $post_id);
                 update_post_meta($post_id, '_notification_sent', true);
             }
 
@@ -660,7 +660,7 @@ function notify_editors_after_publish($post_id, $new_theme)
                     $message .= sprintf('  <a href="%s">%s</a>', get_edit_post_link($post_id), __('Edit / Delete it', 'weadapt'));
                     $message .= "<br>Best Regards,<br>WeAdapt";
                     theme_mail_save_to_db($users, $subject, $message);
-                    send_email_immediately($users, $subject, $message);
+                    send_email_immediately($users, $subject, $message, $post_id);
                 } else {
                     error_log("Not sending email to users as this is not the first publish time.");
                 }
@@ -737,7 +737,7 @@ function notify_editors_after_publish($post_id, $new_theme)
                                 $subject,
                                 $message
                             );
-                            send_email_immediately($theme_editors_user_ids, $subject, $message);
+                            send_email_immediately($theme_editors_user_ids, $subject, $message, $post_id);
                         }
                     }
                 }

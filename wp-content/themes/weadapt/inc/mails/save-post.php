@@ -76,7 +76,7 @@ function theme_save_post($post_ID, $post, $update)
                 }
 
                 theme_mail_save_to_db($users, $subject, $message);
-                send_email_immediately($users, $subject, $message);
+                send_email_immediately($users, $subject, $message, $post_ID);
                 set_transient($transient_key, true, HOUR_IN_SECONDS);
             }
         }
@@ -121,7 +121,7 @@ function theme_save_post($post_ID, $post, $update)
                 $message .= "<br>Best Regards,<br>WeAdapt";
         
                 foreach ($users as $user) {
-                    send_email_immediately($user, $subject, $message);
+                    send_email_immediately($user, $subject, $message, $post_ID);
                     error_log('Email sent to ' . $user . ' with subject ' . $subject);
                 }
         
@@ -154,7 +154,7 @@ function theme_save_post($post_ID, $post, $update)
                 $message .= "<br>Best Regards,<br>WeAdapt";
     
                 foreach ($users as $user) {
-                    send_email_immediately($user, $subject, $message);
+                    send_email_immediately($user, $subject, $message, $post_ID);
                     error_log('Email sent to ' . $user . ' with subject ' . $subject);
                 }
     
@@ -207,7 +207,7 @@ function on_pending_organisation($ID, $post)
         $message .= sprintf('<a href="%s">%s</a>', get_permalink($ID), __('Go to the organisation', 'weadapt'));
 
         theme_mail_save_to_db($users, $subject, $message);
-        send_email_immediately($users, $subject, $message);
+        send_email_immediately($users, $subject, $message, $post_ID);
         set_transient($transient_key, true, HOUR_IN_SECONDS);
     }
 }
