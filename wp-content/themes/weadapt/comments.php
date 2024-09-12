@@ -117,17 +117,19 @@ endif;
 ?>
 <div id="comments" class="wp-block-comments comments">
 	<h2 class="wp-block-comments-title">
-		<?php
-			 $post_type = get_post_type();
+	<?php
+			$post_type = get_post_type();
 			$comments_count = wp_count_comments( get_the_ID() );
-			// translators: %s is replaced with the comments number
-			if ( 'forum' === $post_type && ! empty( $post_forum_ID = get_field( 'forum' ) ) ) {
-			printf( _n( '(%s) Replies', '(%s) Replies', $comments_count->approved, 'weadapt' ), number_format_i18n( $comments_count->approved ) );
-			}else{
-			printf( _n( '(%s) Comment', '(%s) Comments', $comments_count->approved, 'weadapt' ), number_format_i18n( $comments_count->approved ) );
+			if ( $comments_count->approved > 0 ) {
+				if ( 'forum' === $post_type && ! empty( $post_forum_ID = get_field( 'forum' ) ) ) {
+					printf( _n( '(%s) Replies', '(%s) Replies', $comments_count->approved, 'weadapt' ), number_format_i18n( $comments_count->approved ) );
+				} else {
+					printf( _n( '(%s) Comment', '(%s) Comments', $comments_count->approved, 'weadapt' ), number_format_i18n( $comments_count->approved ) );
+				}
+			} else {
+				echo 'Comments';
 			}
-			
-	?>
+		?>
 	</h2>
 
 	<?php

@@ -125,7 +125,38 @@ $section_fields = get_section_fields();
 <link rel="stylesheet" src="<?php echo get_template_directory_uri(); ?>/parts/gutenberg/acf-tandem-circle/style.css" />
 <section <?php echo $attr; ?>>
 	<?php load_inline_dependencies('/parts/gutenberg/core-heading/', 'core-heading'); ?>
-
+<style>
+.rectangle-content{
+	display:none; 
+}
+.blue-content{
+	display:none; 
+}
+.green-content{
+	display:none; 
+}
+.orange-content{
+	display:none; 
+}
+.red-content{
+	display:block; 
+}
+.rectangle-cards{
+	display:none; 
+}
+.blue-cards{
+	display:none; 
+}
+.green-cards{
+	display:none; 
+}
+.orange-cards{
+	display:none; 
+}
+.red-cards{
+	display:block; 
+}
+</style>
 	<div class="tandem-container">
 		<div class="tandem-full-content">
 			<div class="tandem-first-content-wrapper">

@@ -172,8 +172,10 @@ function theme_ajax_create() {
 	}
 	else {
 		// reCaptcha
-		$google_recaptcha_secret_key = get_field( 'google_recaptcha_secret_key', 'options' );
-
+		//$google_recaptcha_secret_key = get_field( 'google_recaptcha_secret_key', 'options' );
+// Skip reCaptcha for localhost
+	if ( ! in_array( $_SERVER['REMOTE_ADDR'], ['127.0.0.1', '::1'] ) ) {
+    $google_recaptcha_secret_key = get_field( 'google_recaptcha_secret_key', 'options' );
 		if ( ! empty( $google_recaptcha_secret_key ) ) {
 			$recaptcha_response = wp_remote_post( 'https://www.google.com/recaptcha/api/siteverify', [
 				'body' => [
@@ -192,7 +194,7 @@ function theme_ajax_create() {
 			if ( ! isset( $recaptcha_result['success'] ) || ! wp_validate_boolean( $recaptcha_result['success'] ) ) {
 				die_json_message( 'error', __( 'reCAPTCHA verification failed!', 'weadapt' ) );
 			}
-		}
+		}}
 
 		$user_first_name   = sanitize_text_field( trim( $_POST['user_first_name'] ), 1 );
 		$user_last_name    = sanitize_text_field( trim( $_POST['user_last_name'] ), 1 );

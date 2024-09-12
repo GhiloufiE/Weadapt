@@ -10,11 +10,11 @@
 	$selected_categories = ! empty( $options['categories'] ) ? $options['categories'] : [];
 	$selected_sort       = ! empty( $options['sort_by'] ) ? $options['sort_by'] : $initial_empty_sort_by;
 	$selected_post_types = ! empty( $options['post_types'] ) ? explode( ',', $options['post_types'] ) : [];
-	$query_args          = ! empty( $options['args'] ) ? $options['args'] : [];
+	$query_args['query_post_types'] = ['theme', 'network', 'blog', 'article', 'course', 'event', 'case-study'];
 	$query_type          = ! empty( $args['query_type'] ) ? $args['query_type'] : 'wp_query';
-
 	$categories = [];
 	$post_types = [];
+	
 
 	$sort_by = ['Newest', 'Oldest', 'A-Z', 'Z-A'];
 
