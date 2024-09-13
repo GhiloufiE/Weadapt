@@ -424,19 +424,34 @@ function notify_editors_after_publish($post_id, $new_theme)
         }
         $users = array_unique($users);
         if (!empty($users)) {
-            if ($post->post_type == 'article' || $post->post_type == 'event' || $post->post_type == 'organisation') {
-                $subject = sprintf(
-                    __('An %s has been published on %s', 'weadapt'),
-                    ucfirst($post->post_type),
-                    get_bloginfo('name')
-                );
-            } else {
-                $subject = sprintf(
-                    __('A %s has been published on %s', 'weadapt'),
-                    ucfirst($post->post_type),
-                    get_bloginfo('name')
-                );
-            }
+           // Determine the initial part of the subject based on post type
+if ($post->post_type == 'article' || $post->post_type == 'event' || $post->post_type == 'organisation') {
+    $subject = sprintf(
+        __('An %s has been published on ', 'weadapt'),
+        ucfirst($post->post_type)
+    );
+} else {
+    $subject = sprintf(
+        __('A %s has been published on ', 'weadapt'),
+        ucfirst($post->post_type)
+    );
+}
+
+// Fetching publish_to meta and adding blog names to the subject
+$publish_to = get_post_meta($post_id, 'publish_to', true);
+if (is_array($publish_to)) {
+    $blog_names = []; // Temporary array to store blog names
+    foreach ($publish_to as $blog_id) {
+        $blog_name = get_blog_details($blog_id)->blogname;
+        $blog_names[] = $blog_name; // Add each blog name to the array
+    }
+    // Join blog names with a ", " separator
+    $subject .= implode(', ', $blog_names);
+} else {
+    // If no array, fallback to blog name
+    $subject .= get_bloginfo('name');
+}
+
             $message = '<p>' . $subject . '</p>';
             $message .= '<strong><p>' . esc_html($post->post_title) . '</p></strong>';
             $message .= '<p>' . esc_html($post->post_excerpt) . '</p>';
@@ -606,13 +621,28 @@ function notify_editors_after_publish($post_id, $new_theme)
             $users = array_unique($users);
             if (!empty($users)) {
                 if ($post->post_type == 'article' || $post->post_type == 'event' || $post->post_type == 'organisation') {
-                    $subject = sprintf(
-                        __('An %s has been published on %s', 'weadapt'),
-                        ucfirst($post->post_type),
-                        get_bloginfo('name')
-                    );
-                } else {
                     // Initial subject formatting
+                    $subject = sprintf(
+                        __('An %s has been published on ', 'weadapt'),
+                        ucfirst($post->post_type)
+                    );
+                
+                    // Fetching publish_to meta and adding blog names to the subject
+                    $publish_to = get_post_meta($post_id, 'publish_to', true);
+                    if (is_array($publish_to)) {
+                        $blog_names = []; // Temporary array to store blog names
+                        foreach ($publish_to as $blog_id) {
+                            $blog_name = get_blog_details($blog_id)->blogname;
+                            $blog_names[] = $blog_name; // Add each blog name to the array
+                        }
+                        // Join blog names with a ", " separator
+                        $subject .= implode(', ', $blog_names);
+                    } else {
+                        // If no array, fallback to blog name
+                        $subject .= get_bloginfo('name');
+                    }
+                } else {
+                    // Initial subject formatting for other post types
                     $subject = sprintf(
                         __('A %s has been published on ', 'weadapt'),
                         ucfirst($post->post_type)
@@ -626,13 +656,14 @@ function notify_editors_after_publish($post_id, $new_theme)
                             $blog_name = get_blog_details($blog_id)->blogname;
                             $blog_names[] = $blog_name; // Add each blog name to the array
                         }
-                        // Join blog names with a "/" separator
-                        $subject .= implode(' , ', $blog_names);
+                        // Join blog names with a ", " separator
+                        $subject .= implode(', ', $blog_names);
                     } else {
                         // If no array, fallback to blog name
                         $subject .= get_bloginfo('name');
                     }
                 }
+                
                 
                 
 
