@@ -424,33 +424,33 @@ function notify_editors_after_publish($post_id, $new_theme)
         }
         $users = array_unique($users);
         if (!empty($users)) {
-           // Determine the initial part of the subject based on post type
-if ($post->post_type == 'article' || $post->post_type == 'event' || $post->post_type == 'organisation') {
-    $subject = sprintf(
-        __('An %s has been published on ', 'weadapt'),
-        ucfirst($post->post_type)
-    );
-} else {
-    $subject = sprintf(
-        __('A %s has been published on ', 'weadapt'),
-        ucfirst($post->post_type)
-    );
-}
+            // Determine the initial part of the subject based on post type
+            if ($post->post_type == 'article' || $post->post_type == 'event' || $post->post_type == 'organisation') {
+                $subject = sprintf(
+                    __('An %s has been published on ', 'weadapt'),
+                    ucfirst($post->post_type)
+                );
+            } else {
+                $subject = sprintf(
+                    __('A %s has been published on ', 'weadapt'),
+                    ucfirst($post->post_type)
+                );
+            }
 
-// Fetching publish_to meta and adding blog names to the subject
-$publish_to = get_post_meta($post_id, 'publish_to', true);
-if (is_array($publish_to)) {
-    $blog_names = []; // Temporary array to store blog names
-    foreach ($publish_to as $blog_id) {
-        $blog_name = get_blog_details($blog_id)->blogname;
-        $blog_names[] = $blog_name; // Add each blog name to the array
-    }
-    // Join blog names with a ", " separator
-    $subject .= implode(', ', $blog_names);
-} else {
-    // If no array, fallback to blog name
-    $subject .= get_bloginfo('name');
-}
+            // Fetching publish_to meta and adding blog names to the subject
+            $publish_to = get_post_meta($post_id, 'publish_to', true);
+            if (is_array($publish_to)) {
+                $blog_names = []; // Temporary array to store blog names
+                foreach ($publish_to as $blog_id) {
+                    $blog_name = get_blog_details($blog_id)->blogname;
+                    $blog_names[] = $blog_name; // Add each blog name to the array
+                }
+                // Join blog names with a ", " separator
+                $subject .= implode(', ', $blog_names);
+            } else {
+                // If no array, fallback to blog name
+                $subject .= get_bloginfo('name');
+            }
 
             $message = '<p>' . $subject . '</p>';
             $message .= '<strong><p>' . esc_html($post->post_title) . '</p></strong>';
@@ -489,8 +489,8 @@ if (is_array($publish_to)) {
             );
 
             $message = __('Your content has been reviewed and is now published. We will share it on our social media channels where relevant. Please feel free to share it with your network as well! ', 'weadapt') . '<br><br>';
-            $message .= esc_html($post->post_title)  ;
-            $message .= esc_html($post->post_excerpt)  ;
+            $message .= esc_html($post->post_title);
+            $message .= esc_html($post->post_excerpt);
 
             if (!empty($people_creator)) {
                 $post_author_ID = $people_creator[0];
@@ -584,13 +584,13 @@ if (is_array($publish_to)) {
                 $post_excerpt = wp_strip_all_tags($post_excerpt);
                 $post_excerpt = mb_strimwidth($post_excerpt, 0, 100, '...');
                 $message = __('Your content has now been reviewed and published. It will be shared on our social media channels where relevant. Please do re-share! ', 'weadapt') . '<br><br>';
-                $message .= '<strong>' . __('Title: ', 'weadapt') . '</strong>' . esc_html($post->post_title) ;
-                $message .= sprintf(__('<br> <br> <strong>Summary : </strong>  %s  ', 'weadapt'), esc_html($post_excerpt)) ; 
+                $message .= '<strong>' . __('Title: ', 'weadapt') . '</strong>' . esc_html($post->post_title);
+                $message .= sprintf(__('<br> <br> <strong>Summary : </strong>  %s  ', 'weadapt'), esc_html($post_excerpt));
                 $message .= esc_html($post->post_excerpt);
                 if (!empty($people_creator)) {
                     $post_author_ID = $people_creator[0];
                     $post_author = new WP_User($post_author_ID);
-                    $author_organisations = get_field('organisations', $post_author); 
+                    $author_organisations = get_field('organisations', $post_author);
                 }
                 $message .= sprintf(
                     '  <a href="%s">%s</a>',
@@ -621,58 +621,49 @@ if (is_array($publish_to)) {
             $users = array_unique($users);
             if (!empty($users)) {
                 if ($post->post_type == 'article' || $post->post_type == 'event' || $post->post_type == 'organisation') {
-                    // Initial subject formatting
                     $subject = sprintf(
                         __('An %s has been published on ', 'weadapt'),
                         ucfirst($post->post_type)
                     );
-                
-                    // Fetching publish_to meta and adding blog names to the subject
                     $publish_to = get_post_meta($post_id, 'publish_to', true);
                     if (is_array($publish_to)) {
-                        $blog_names = []; // Temporary array to store blog names
+                        $blog_names = []; 
                         foreach ($publish_to as $blog_id) {
                             $blog_name = get_blog_details($blog_id)->blogname;
-                            $blog_names[] = $blog_name; // Add each blog name to the array
+                            $blog_names[] = $blog_name; 
                         }
-                        // Join blog names with a ", " separator
                         $subject .= implode(', ', $blog_names);
                     } else {
-                        // If no array, fallback to blog name
                         $subject .= get_bloginfo('name');
                     }
                 } else {
-                    // Initial subject formatting for other post types
                     $subject = sprintf(
                         __('A %s has been published on ', 'weadapt'),
                         ucfirst($post->post_type)
                     );
-                
-                    // Fetching publish_to meta and adding blog names to the subject
+
                     $publish_to = get_post_meta($post_id, 'publish_to', true);
                     if (is_array($publish_to)) {
-                        $blog_names = []; // Temporary array to store blog names
+                        $blog_names = [];
                         foreach ($publish_to as $blog_id) {
                             $blog_name = get_blog_details($blog_id)->blogname;
-                            $blog_names[] = $blog_name; // Add each blog name to the array
+                            $blog_names[] = $blog_name; 
                         }
-                        // Join blog names with a ", " separator
                         $subject .= implode(', ', $blog_names);
                     } else {
-                        // If no array, fallback to blog name
                         $subject .= get_bloginfo('name');
                     }
                 }
-                
-                
-                
 
-            $message  =esc_html($subject) .  '<br> <br> <strong>' . __('Title: ', 'weadapt') . '</strong>' .  esc_html($post->post_title) . '<br><br>' ;
-            $post_excerpt = get_the_excerpt($post);
-            $post_excerpt = wp_strip_all_tags($post_excerpt);
-            $post_excerpt = mb_strimwidth($post_excerpt, 0, 100, '...');
 
-            $message .= sprintf(__('<strong> Summary: </strong>%s', 'weadapt'), esc_html($post_excerpt));
+
+
+                $message  = esc_html($subject) .  '<br> <br> <strong>' . __('Title: ', 'weadapt') . '</strong>' .  esc_html($post->post_title) . '<br><br>';
+                $post_excerpt = get_the_excerpt($post);
+                $post_excerpt = wp_strip_all_tags($post_excerpt);
+                $post_excerpt = mb_strimwidth($post_excerpt, 0, 100, '...');
+
+                $message .= sprintf(__('<strong> Summary: </strong>%s', 'weadapt'), esc_html($post_excerpt));
                 if ($published_for_the_first_time) {
                     if ($post_author_IDs = get_field('people_creator', $post_id)) {
                         $post_author_ID = $post_author_IDs[0];
@@ -684,7 +675,6 @@ if (is_array($publish_to)) {
                         } else {
                             $message .= sprintf('Published by %s', $post_author->display_name);
                         }
-                        
                     }
 
                     $message .= sprintf('  <a href="%s">%s</a>', get_permalink($post_id), __('View the content', 'weadapt')) . '<br>';
@@ -736,13 +726,13 @@ if (is_array($publish_to)) {
                                     esc_attr($post_author->user_login),
                                     get_bloginfo('name'),
                                     esc_html($theme_name)
-                                ) ;
+                                );
                             } else {
                                 $message = sprintf(
                                     __('Content has been published on %s which is related to your theme / network: %s.', 'weadapt'),
                                     get_bloginfo('name'),
                                     esc_html($theme_name)
-                                )  ;
+                                );
                             }
 
                             $post_excerpt = get_the_excerpt($post);
@@ -753,11 +743,11 @@ if (is_array($publish_to)) {
                             $message .= sprintf(
                                 __('Content: %s', 'weadapt'),
                                 esc_html($post->post_title)
-                            ) ;
+                            );
                             $message .= sprintf(
                                 __('Summary: %s', 'weadapt'),
                                 esc_html($post_excerpt)
-                            )  ;
+                            );
                             $message .= sprintf(
                                 '<a href="%s">%s</a>',
                                 get_permalink($post),

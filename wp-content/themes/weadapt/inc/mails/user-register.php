@@ -30,14 +30,8 @@ function theme_user_register( $user_id, $userdata ) {
             __( 'Edit/delete user', 'weadapt' )
         );
 
-        // Save email to DB
         theme_mail_save_to_db( $users, $subject, $message );
 
-        // Debug log for email sending
-        error_log( 'Attempting to send email to: ' . print_r( $users, true ) );
-        error_log( 'Email subject: ' . $subject );
-        error_log( 'Email message: ' . $message );
-		//wp_mail($users,$subject,$message);
         send_email_immediately($users, $subject, $message,null);
     }
 }

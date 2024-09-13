@@ -2,12 +2,9 @@
 function send_email_immediately($user_ids, $subject, $message, $post_id) {
     $user_ids = (array) $user_ids;
     
-    // Fetch blog IDs from post meta
     $publish_to = get_post_meta($post_id, 'publish_to', true);
 
-    // Check if publish_to contains an array of blog IDs
     if (is_array($publish_to)) {
-        // Create an associative array that maps blog names to their corresponding image URLs
         $blog_image_map = [
             'weADAPT' => get_theme_file_uri('/assets/images/weadapt.webp'),
             'Adaptation At Altitude' => get_theme_file_uri('/assets/images/adaptation-alt.webp'),
@@ -18,25 +15,20 @@ function send_email_immediately($user_ids, $subject, $message, $post_id) {
             'Agora' => get_theme_file_uri('/assets/images/agora.webp'),
         ];
 
-        // Array to hold image URLs for the blogs in the current message
         $image_urls = [];
         $blog_names = [];
 
-        // Loop through each blog ID and get the corresponding blog name and image URL
         foreach ($publish_to as $blog_id) {
             $blog_name = get_blog_details($blog_id)->blogname;
             $blog_names[] = $blog_name;
 
-            // Check if there's an image URL for this blog in the map
             if (isset($blog_image_map[$blog_name])) {
                 $image_urls[] = $blog_image_map[$blog_name];
             } else {
-                // Fallback to a default image if the blog name is not found in the map
                 $image_urls[] = get_theme_file_uri('/assets/images/weadapt.png');
             }
         }
     } else {
-        // Default image in case there's no publish_to meta
         $image_urls[] = get_theme_file_uri('/assets/images/weadapt.png');
     }
 
@@ -44,8 +36,6 @@ function send_email_immediately($user_ids, $subject, $message, $post_id) {
     $buttons = extract_buttons_from_message($message, $button_style);
     $button_container = generate_button_container($buttons);
     $message = insert_buttons_into_message($message, $button_container);
-
-    // Pass the image URLs array to the email template
     $html_template = generate_email_template($image_urls, $message);
 
     $headers = array('Content-Type: text/html; charset=UTF-8');
