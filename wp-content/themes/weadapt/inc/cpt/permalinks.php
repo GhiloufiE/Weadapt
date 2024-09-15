@@ -1,16 +1,13 @@
 <?php
 
-
 /**
  * Rewrite Rules
  */
 add_action('init', function() {
 	global $wp_rewrite;
 
-
 	// Author Base Url
 	$wp_rewrite->author_base = 'member';
-
 
 	// Add 'knowledge-base/post_name' Rewrite Rules
 	foreach ( get_allowed_post_types( [
@@ -22,9 +19,8 @@ add_action('init', function() {
 		'event'
 	] ) as $post_type ) {
 		$wp_rewrite->add_rewrite_tag("%$post_type%", '([^/]+)', "$post_type=");
-		$wp_rewrite->add_permastruct($post_type, "knowledge-base/%$post_type%" );
+		$wp_rewrite->add_permastruct($post_type, "knowledge-base/%$post_type%");
 	}
-
 
 	// Add 'knowledge-base/main_theme_network/post_name' Rewrite Rules
 	$wp_rewrite->add_rewrite_tag("%main_theme_network%", '([^/]+)', "main_theme_network=");
@@ -38,22 +34,6 @@ add_action('init', function() {
 		$wp_rewrite->add_permastruct( $post_type, "knowledge-base/%main_theme_network%/%$post_type%" );
 	}
 
-
-	// Add 'placemarks/maps/view/post_id' Rewrite Rule
-	foreach ( get_allowed_post_types( [
-		'case-study'
-	] ) as $post_type ) {
-		$wp_rewrite->add_rewrite_tag("%$post_type%", '([^/]+)', "$post_type=");
-		$wp_rewrite->add_permastruct($post_type, "placemarks/maps/view/%$post_type%" );
-
-		$map_page_ID = url_to_postid( get_home_url( null, '/placemarks/maps/' ) );
-
-		if ( $map_page_ID ) {
-			add_rewrite_rule('placemarks/maps/weather-station/([0-9]+)/?$', 'index.php?page_id=' . $map_page_ID . '&cip_station_id=$matches[1]', 'top');
-		}
-	}
-
-
 	// Add main_theme_network Query Var
 	add_filter( 'query_vars', function( $vars ){
 		$vars[] = 'main_theme_network';
@@ -61,8 +41,46 @@ add_action('init', function() {
 
 		return $vars;
 	} );
-} );
 
+	// Conditionally add rewrite rules for posts without a main_theme_network
+	add_rewrite_rule_for_non_main_theme_network_posts();
+});
+
+/**
+ * Conditionally add rewrite rules for posts that don't have a %main_theme_network%.
+ */
+function add_rewrite_rule_for_non_main_theme_network_posts() {
+    $args = array(
+        'post_type'      => array( 'article', 'event' ),
+        'posts_per_page' => -1,
+        'meta_query'     => array(
+            'relation' => 'OR',
+            array(
+                'key'     => 'relevant_main_theme_network',
+                'compare' => 'NOT EXISTS', // No main_theme_network field
+            ),
+            array(
+                'key'     => 'relevant_main_theme_network',
+                'value'   => '', // Empty value for main_theme_network
+                'compare' => '='
+            )
+        )
+    );
+
+    $posts_without_main_theme_network = get_posts( $args );
+
+    // Only add rewrite rules if there are posts without a main_theme_network
+    if ( ! empty( $posts_without_main_theme_network ) ) {
+        foreach ($posts_without_main_theme_network as $post) {
+            // Dynamically add rules for each post without a main_theme_network
+            add_rewrite_rule(
+                '^knowledge-base/' . $post->post_name . '/?$',
+                'index.php?post_type=' . $post->post_type . '&name=' . $post->post_name,
+                'top'
+            );
+        }
+    }
+}
 
 /**
  * Fix Custom Permalinks (knowledge-base) 404 Error
@@ -105,34 +123,29 @@ add_filter('rewrite_rules_array', function($rules) {
 /**
  * Custom Permalinks
  */
-add_filter('post_type_link', function( $post_link, $post, $leavename, $sample ) {
-    
-    // Blog, Articles, Courses, Events
-    if ( false !== strpos( $post_link, '/%main_theme_network%/' ) ) {
-        $main_theme_networks = get_field( 'relevant_main_theme_network', $post->ID );
+add_filter('post_type_link', function($post_link, $post, $leavename, $sample) {
+    if ($post->post_type == 'article' || $post->post_type == 'event') {
+        // Check if post has a 'relevant_main_theme_network'
+        $main_theme_networks = get_field('relevant_main_theme_network', $post->ID);
 
-        if ( ! empty( $main_theme_networks ) && is_array( $main_theme_networks ) ) {
-            // Get the first non-empty main theme network
-            foreach ( $main_theme_networks as $main_theme_network_ID ) {
-                if ( ! empty( $main_theme_network_ID ) ) {
-                    $main_theme_network = get_post( $main_theme_network_ID );
-                    if ( $main_theme_network ) {
-                        $post_link = str_replace( '%main_theme_network%', $main_theme_network->post_name, $post_link );
-                        break;
+        // If main theme networks exist and is an array
+        if (!empty($main_theme_networks) && is_array($main_theme_networks)) {
+            foreach ($main_theme_networks as $main_theme_network_ID) {
+                if (!empty($main_theme_network_ID)) {
+                    $main_theme_network = get_post($main_theme_network_ID);
+                    if ($main_theme_network) {
+                        // Replace %main_theme_network% with the actual post name of the main theme network
+                        $post_link = str_replace('%main_theme_network%', $main_theme_network->post_name, $post_link);
+                        return $post_link;
                     }
                 }
             }
         }
-        
-		if ( false !== strpos( $post_link, '/%main_theme_network%' ) ) {
-			$post_type = get_post_type( $post ); // Assuming $post is available in the scope
-			if ( 'article' === $post_type || 'event' === $post_type ) {
-				$post_link = str_replace( '/%main_theme_network%', '/' . $post_type, $post_link );
-			} else {
-				$post_link = str_replace( '/%main_theme_network%', '', $post_link );
-			}
-		}
+
+        // If there is no main theme network, remove the placeholder
+        $post_link = str_replace('/%main_theme_network%', '', $post_link);
     }
 
     return $post_link;
 }, 10, 4);
+
