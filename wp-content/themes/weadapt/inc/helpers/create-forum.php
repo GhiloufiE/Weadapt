@@ -1,77 +1,112 @@
-<?php 
+<?php
 function handle_create_post()
 {
     global $wpdb;
+
+    // Verify nonce
     if (!isset($_POST['_wpnonce']) || !wp_verify_nonce($_POST['_wpnonce'], 'create_post_nonce')) {
+        error_log('Nonce verification failed');
         wp_send_json_error('Nonce verification failed');
         return;
     }
 
-    if (isset($_POST['post_title']) && isset($_POST['post_description']) && isset($_POST['post_type'])) {
-        $post_title = sanitize_text_field($_POST['post_title']);
-        $post_description = sanitize_textarea_field($_POST['post_description']);
-        $post_type = sanitize_text_field($_POST['post_type']);
-
-        $post_data = array(
-            'post_title'   => $post_title,
-            'post_content' => $post_description,
-            'post_status'  => 'pending',
-            'post_author'  => get_current_user_id(),
-            'post_type'    => ($post_type === 'theme') ? 'article' : $post_type,
-            'meta_input'   => array(),
-        );
-
-        $network_true_id = null;
-        $forum_true_id = null;
-
-        if ($post_type == 'forum' && isset($_POST['forum'])) {
-            $forum_id = intval($_POST['forum']);
-            $forum_true_id = $wpdb->get_var($wpdb->prepare("SELECT forum_id FROM {$wpdb->prefix}theme_forum_relationship WHERE theme_id = %d", $forum_id));
-            if ($forum_true_id !== null) {
-                $post_data['meta_input']['forum'] = $forum_true_id;
-            }
-            $network_true_id = $wpdb->get_var($wpdb->prepare("SELECT forum_id FROM {$wpdb->prefix}network_forum_relationship WHERE network_id = %d", $forum_id));
-            if ($network_true_id !== null) {
-                $post_data['meta_input']['network_forum'] = $network_true_id;
-            }
-        }
-
-        if ($post_type == 'theme' && isset($_POST['forum'])) {
-            $forum_id = intval($_POST['forum']);
-
-            $forum_true_id = $wpdb->get_var($wpdb->prepare("SELECT forum_id FROM {$wpdb->prefix}theme_forum_relationship WHERE theme_id = %d", $forum_id));
-            if ($forum_true_id !== null) {
-                $post_data['meta_input']['relevant_main_theme_network'] = $forum_true_id;
-            }
-        }
-        $post_id = wp_insert_post($post_data);
-
-        if (is_wp_error($post_id)) {
-            wp_send_json_error('Error creating post: ' . $post_id->get_error_message());
-        } else {
-            $post_author_id = get_current_user_id();
-            $group_field_value = get_field('field_637f1ee7327b4', $post_id);
-            if (!is_array($group_field_value)) {
-                $group_field_value = [];
-            }
-            $group_field_value['creator'] = $post_author_id;
-            $group_field_value['publisher'] = $post_author_id;
-            $group_field_value['contributors'] = $post_author_id;
-            update_field('field_637f1ee7327b4', $group_field_value, $post_id);
-            if ($network_true_id !== null) {
-                update_field('field_653b5c7e6d5f5', $network_true_id, $post_id); 
-            } elseif ($forum_true_id !== null) {
-                update_field('field_653b5c7e6d5f5', $forum_true_id, $post_id);
-            }
-            if (in_array($post_type, ['forum', 'theme'])) {
-                notify_admins_of_pending_posts($post_id, $post_type);
-            }
-
-            wp_send_json_success('Post created successfully');
-        }
-    } else {
+    // Check required fields
+    if (!isset($_POST['post_title']) || !isset($_POST['post_description']) || !isset($_POST['post_type'])) {
+        error_log('Missing required POST fields: post_title, post_description, or post_type.');
         wp_send_json_error('Missing required POST fields');
+        return;
     }
+
+    // Sanitize inputs
+    $post_title = sanitize_text_field($_POST['post_title']);
+    $post_description = sanitize_textarea_field($_POST['post_description']);
+    $post_type = sanitize_text_field($_POST['post_type']);
+    
+    // Log post data
+    error_log('Post Data: Title - ' . $post_title . ', Type - ' . $post_type);
+
+    $post_data = array(
+        'post_title'   => $post_title,
+        'post_content' => $post_description,
+        'post_status'  => 'pending',
+        'post_author'  => get_current_user_id(),
+        'post_type'    => ($post_type === 'theme') ? 'article' : $post_type,
+        'meta_input'   => array(),
+    );
+
+    $network_true_id = null;
+    $forum_true_id = null;
+
+    // Handle forum or theme relationships
+    if ($post_type == 'forum' && isset($_POST['forum'])) {
+        $forum_id = intval($_POST['forum']);
+        error_log('Handling forum relationship for forum_id: ' . $forum_id);
+
+        $forum_true_id = $wpdb->get_var($wpdb->prepare("SELECT forum_id FROM wp_theme_forum_relationship WHERE theme_id = %d", $forum_id));
+        if ($forum_true_id !== null) {
+            $post_data['meta_input']['forum'] = $forum_true_id;
+        } else {
+            error_log('Failed to retrieve forum_true_id for forum_id: ' . $forum_id);
+        }
+
+        $network_true_id = $wpdb->get_var($wpdb->prepare("SELECT forum_id FROM wp_network_forum_relationship WHERE network_id = %d", $forum_id));
+        if ($network_true_id !== null) {
+            $post_data['meta_input']['network_forum'] = $network_true_id;
+        } else {
+            error_log('Failed to retrieve network_true_id for forum_id: ' . $forum_id);
+        }
+    }
+
+    if ($post_type == 'theme' && isset($_POST['forum'])) {
+        $forum_id = intval($_POST['forum']);
+        error_log('Handling theme relationship for forum_id: ' . $forum_id);
+
+        $forum_true_id = $wpdb->get_var($wpdb->prepare("SELECT forum_id FROM wp_theme_forum_relationship WHERE theme_id = %d", $forum_id));
+        if ($forum_true_id !== null) {
+            $post_data['meta_input']['relevant_main_theme_network'] = $forum_true_id;
+        } else {
+            error_log('Failed to retrieve forum_true_id for theme_id: ' . $forum_id);
+        }
+    }
+
+    // Insert post
+    $post_id = wp_insert_post($post_data);
+
+    if (is_wp_error($post_id)) {
+        error_log('Error creating post: ' . $post_id->get_error_message());
+        wp_send_json_error('Error creating post: ' . $post_id->get_error_message());
+        return;
+    } else {
+        error_log('Post created successfully with ID: ' . $post_id);
+    }
+
+    // Update fields
+    $post_author_id = get_current_user_id();
+    $group_field_value = get_field('field_637f1ee7327b4', $post_id);
+    if (!is_array($group_field_value)) {
+        error_log('Field field_637f1ee7327b4 not an array, initializing new array.');
+        $group_field_value = [];
+    }
+
+    $group_field_value['creator'] = $post_author_id;
+    $group_field_value['publisher'] = $post_author_id;
+    $group_field_value['contributors'] = $post_author_id;
+
+    update_field('field_637f1ee7327b4', $group_field_value, $post_id);
+
+    if ($network_true_id !== null) {
+        update_field('field_653b5c7e6d5f5', $network_true_id, $post_id);
+    } elseif ($forum_true_id !== null) {
+        update_field('field_653b5c7e6d5f5', $forum_true_id, $post_id);
+    }
+
+    // Send notification
+    if (in_array($post_type, ['forum', 'theme'])) {
+        error_log('Sending notification for post_id: ' . $post_id . ' and post_type: ' . $post_type);
+        notify_admins_of_pending_posts($post_id, $post_type);
+    }
+
+    wp_send_json_success('Post created successfully');
 }
 add_action('admin_post_nopriv_create_post', 'handle_create_post');
 add_action('admin_post_create_post', 'handle_create_post');
@@ -113,7 +148,7 @@ function notify_admins_of_pending_posts($post_id, $post_type)
         SELECT u.ID as user_id, u.user_email, u.display_name
         FROM {$wpdb->users} u
         INNER JOIN {$wpdb->usermeta} um ON u.ID = um.user_id
-        WHERE um.meta_key = '{$wpdb->prefix}capabilities'
+        WHERE um.meta_key = 'wp_capabilities'
         AND um.meta_value LIKE '%administrator%'
     ", ARRAY_A);
 
