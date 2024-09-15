@@ -124,10 +124,14 @@ add_filter('post_type_link', function( $post_link, $post, $leavename, $sample ) 
             }
         }
         
-        // If no valid main theme network was found, remove the placeholder
-        if ( false !== strpos( $post_link, '/%main_theme_network%' ) ) {
-            $post_link = str_replace( '/%main_theme_network%', '', $post_link );
-        }
+		if ( false !== strpos( $post_link, '/%main_theme_network%' ) ) {
+			$post_type = get_post_type( $post ); // Assuming $post is available in the scope
+			if ( 'article' === $post_type || 'event' === $post_type ) {
+				$post_link = str_replace( '/%main_theme_network%', '/' . $post_type, $post_link );
+			} else {
+				$post_link = str_replace( '/%main_theme_network%', '', $post_link );
+			}
+		}
     }
 
     return $post_link;
