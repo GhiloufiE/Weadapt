@@ -140,7 +140,7 @@ if ( ! empty( $overview_data ) ) {
 					    $slug = get_term_by('name', $single_value, $url_part)->slug;
 
 						if( term_exists( $single_value ) || $item['label'] === 'Site locations' ) {
-						    ?> <li><a class="overview-tag" href="/<?php echo $url_part; ?>/<?php echo $slug; ?>"><?php echo $single_value; ?></a></li> <?php
+						    ?> <li><?php echo $single_value; ?></li> <?php
 						} else {
 						    ?> <li><?php echo $single_value; ?></li> <?php
 						}
