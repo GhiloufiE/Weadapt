@@ -15,28 +15,28 @@ if ( ! function_exists( 'enqueue_theme_scripts' ) ) :
 		}
 
 
-		// // Scripts
-		// wp_enqueue_script(
-		// 	'script-load',
-		// 	get_theme_file_uri( '/assets/js/bundle-load.min.js' ),
-		// 	$deps,
-		// 	filemtime( get_theme_file_path( '/assets/js/bundle-load.min.js' ) ),
-		// 	false
-		// );
-		// wp_enqueue_script(
-		// 	'script-global',
-		// 	get_theme_file_uri( '/assets/js/bundle-global.min.js' ),
-		// 	$deps,
-		// 	filemtime( get_theme_file_path( '/assets/js/bundle-global.min.js' ) ),
-		// 	true
-		// );
-		// wp_enqueue_script(
-		// 	'script',
-		// 	get_theme_file_uri( '/assets/js/bundle.min.js' ),
-		// 	$deps,
-		// 	filemtime( get_theme_file_path( '/assets/js/bundle.min.js' ) ),
-		// 	true
-		// );
+		// Scripts
+		wp_enqueue_script(
+			'script-load',
+			get_theme_file_uri( '/assets/js/bundle-load.min.js' ),
+			$deps,
+			filemtime( get_theme_file_path( '/assets/js/bundle-load.min.js' ) ),
+			false
+		);
+		wp_enqueue_script(
+			'script-global',
+			get_theme_file_uri( '/assets/js/bundle-global.min.js' ),
+			$deps,
+			filemtime( get_theme_file_path( '/assets/js/bundle-global.min.js' ) ),
+			true
+		);
+		wp_enqueue_script(
+			'script',
+			get_theme_file_uri( '/assets/js/bundle.min.js' ),
+			$deps,
+			filemtime( get_theme_file_path( '/assets/js/bundle.min.js' ) ),
+			true
+		);
 
 		wp_localize_script( 'script', 'vars', [
 			'templateUrl'                    => get_theme_file_uri(),

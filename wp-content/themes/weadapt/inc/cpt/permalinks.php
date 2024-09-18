@@ -100,26 +100,29 @@ add_filter('rewrite_rules_array', function( $rules ) {
  * Custom Permalinks
  */
 add_filter('post_type_link', function( $post_link, $post, $leavename, $sample ) {
-	// Handle main_theme_network in the permalink structure
-	if ( strpos( $post_link, '/%main_theme_network%/' ) !== false ) {
-		$main_theme_networks = get_field( 'relevant_main_theme_network', $post->ID );
+    // Check for main_theme_network in the permalink structure
+    if ( strpos( $post_link, '/%main_theme_network%/' ) !== false ) {
+        $main_theme_networks = get_field('relevant_main_theme_network', $post->ID);
 
-		// Replace placeholder with first valid main_theme_network slug
-		if ( ! empty( $main_theme_networks ) && is_array( $main_theme_networks ) ) {
-			foreach ( $main_theme_networks as $main_theme_network_ID ) {
-				if ( ! empty( $main_theme_network_ID ) ) {
-					$main_theme_network = get_post( $main_theme_network_ID );
-					if ( $main_theme_network ) {
-						$post_link = str_replace( '%main_theme_network%', $main_theme_network->post_name, $post_link );
-						break;
-					}
-				}
-			}
-		}
+        // Replace placeholder with first valid main_theme_network slug
+        if ( ! empty( $main_theme_networks ) && is_array( $main_theme_networks ) ) {
+            foreach ( $main_theme_networks as $main_theme_network_ID ) {
+                if ( ! empty( $main_theme_network_ID ) ) {
+                    $main_theme_network = get_post($main_theme_network_ID);
+                    if ($main_theme_network) {
+                        $post_link = str_replace('%main_theme_network%', $main_theme_network->post_name, $post_link);
+                        break;
+                    }
+                }
+            }
+        }
 
-		// If no valid main_theme_network found, remove the placeholder
-		$post_link = str_replace( '/%main_theme_network%', '', $post_link );
-	}
+        // If no valid main_theme_network found, remove the placeholder
+        if (strpos($post_link, '%main_theme_network%') !== false) {
+            $post_link = str_replace('/%main_theme_network%', '', $post_link);
+        }
+    }
 
-	return $post_link;
+    return $post_link;
 }, 10, 4);
+

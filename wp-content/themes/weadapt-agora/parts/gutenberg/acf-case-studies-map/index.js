@@ -507,8 +507,7 @@ const initMap = function (mapBlockNode, mapNode, markerNodes, markerOrgNodes, ma
 			const lat = parseFloat(markerNode.dataset.lat);
 			const lng = parseFloat(markerNode.dataset.lng);
 			const latLng = { lat, lng };
-			console.log("hhhhhhhhhhhhhhhhhhhhhhhhhhh",markerNode.dataset);
-
+ 
 			const marker = new google.maps.Marker({
 				position: latLng,
 				title: markerNode.dataset.title,

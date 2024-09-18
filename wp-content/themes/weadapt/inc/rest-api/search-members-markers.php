@@ -14,6 +14,7 @@ add_action( 'rest_api_init', function () {
 function rest_search_members_markers( $request ) {
 	$search_query  = ! empty( $request->get_param( 'search' ) ) ? esc_attr( $request->get_param( 'search' ) ) : '';
 	$theme_network = ! empty( $request->get_param( 'theme_network' ) ) ? intval( $request->get_param( 'theme_network' ) ) : 0;
+	$country = ! empty( $request->get_param( 'select_country' ) ) ? esc_attr( $request->get_param( 'select_country' ) ) : '';
 
 	$query_args = [
 		'post_type'       => get_allowed_post_types( [ 'members' ] ),
@@ -41,6 +42,16 @@ function rest_search_members_markers( $request ) {
 		$query_args['meta_query'][] = [
 			'key'   => 'relevant_main_theme_network',
 			'value' => $theme_network,
+		];
+	}
+	if ( ! empty( $country ) ) {
+		$query_args['meta_query'][] = [
+			'relation' => 'OR',
+			[
+				'key'     => 'address_country',
+				'value'   => $country,
+				'compare' => 'LIKE'
+			],
 		];
 	}
 

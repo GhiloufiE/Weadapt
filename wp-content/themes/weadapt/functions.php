@@ -883,3 +883,327 @@ function migrate_forum_to_network_relationship()
         }
     }
 }
+add_action('admin_menu', 'register_user_migration_menu_page');
+
+function register_user_migration_menu_page() {
+    add_menu_page(
+        'User to Member Migration',   // Page title
+        'User Migration',             // Menu title
+        'manage_options',             // Capability
+        'user-migration',             // Menu slug
+        'user_migration_menu_page_html', // Callback function
+        'dashicons-admin-users',      // Icon
+        21                            // Position (appears after the Forum Migration menu)
+    );
+}
+
+function user_migration_menu_page_html() {
+    if (!current_user_can('manage_options')) {
+        return;
+    }
+
+    if (isset($_POST['migrate_and_convert'])) {
+        migrate_and_convert_user_to_member();
+    }
+
+    if (isset($_POST['update_migrations'])) {
+        update_migrated_user_locations();
+    }
+
+    if (isset($_POST['delete_migrated_members'])) {
+        delete_migrated_members();
+        echo '<div class="notice notice-success is-dismissible"><p>All migrated members have been deleted successfully.</p></div>';
+    }
+
+    ?>
+    <div class="wrap">
+        <h1>User to Member Migration</h1>
+        <form method="post" action="">
+            <?php wp_nonce_field('user_migration_action', 'user_migration_nonce'); ?>
+            <input type="submit" name="migrate_and_convert" class="button button-primary" value="Migrate and Convert">
+            <input type="submit" name="update_migrations" class="button button-secondary" value="Update Migrations">
+            <input type="submit" name="delete_migrated_members" class="button button-tertiary" value="Delete Migrated Members">
+        </form>
+    </div>
+    <?php
+}
+
+
+
+function migrate_and_convert_user_to_member() {
+    global $wpdb;
+
+    // Verify nonce
+    if (!isset($_POST['user_migration_nonce']) || !wp_verify_nonce($_POST['user_migration_nonce'], 'user_migration_action')) {
+        error_log('Nonce verification failed.');
+        return;
+    }
+
+    // Query the database directly for users who match the criteria in wp_usermeta
+    $users = $wpdb->get_results("
+        SELECT u.ID, u.user_login 
+        FROM {$wpdb->users} u
+        INNER JOIN {$wpdb->usermeta} um ON u.ID = um.user_id
+        WHERE um.meta_key = 'primary_blog' AND um.meta_value = '11'
+    ");
+
+    if (empty($users)) {
+        echo '<div class="notice notice-error is-dismissible"><p>No users found to migrate.</p></div>';
+        return;
+    }
+
+    $migration_done = false;
+    $migration_count = 0;  // Counter for successful migrations
+    $conversion_done = false;
+
+    foreach ($users as $user) {
+        $user_id = $user->ID;
+        $username = $user->user_login;
+
+        error_log('Processing user ID: ' . $user_id);
+
+        // Check if a member post already exists for this username
+        $existing_member = $wpdb->get_var($wpdb->prepare("
+            SELECT ID 
+            FROM {$wpdb->posts} 
+            WHERE post_type = 'members' 
+            AND post_title = %s
+        ", $username));
+
+        if ($existing_member) {
+            error_log('User ' . $username . ' is already migrated with member post ID: ' . $existing_member);
+            continue;
+        }
+
+        // Fetch user meta directly
+        $address_country = get_user_meta($user_id, 'address_country', true);
+        $address_city = get_user_meta($user_id, 'address_city', true);
+        $address_county = get_user_meta($user_id, 'address_county', true);
+
+        // Ensure the address fields are strings, not arrays
+        $address_country = is_array($address_country) ? implode(', ', $address_country) : $address_country;
+        $address_city = is_array($address_city) ? implode(', ', $address_city) : $address_city;
+        $address_county = is_array($address_county) ? implode(', ', $address_county) : $address_county;
+
+        // Create a new member post with the user details
+        $new_member_post = array(
+            'post_title'    => $username,
+            'post_status'   => 'publish',
+            'post_author'   => $user_id,
+            'post_type'     => 'members'
+        );
+
+        // Insert the new member post
+        $new_member_id = wp_insert_post($new_member_post);
+
+        if (is_wp_error($new_member_id)) {
+            error_log('Failed to create member post for user ID: ' . $user_id . '. Error: ' . $new_member_id->get_error_message());
+        } else {
+            error_log('Created member post ID: ' . $new_member_id . ' for user ID: ' . $user_id);
+
+            // Insert user meta into the member post as post meta
+            update_post_meta($new_member_id, 'user_id', $user_id);
+            update_post_meta($new_member_id, 'username', $username);
+            update_post_meta($new_member_id, 'address_country', $address_country);
+            update_post_meta($new_member_id, 'address_city', $address_city);
+            update_post_meta($new_member_id, 'address_county', $address_county);
+
+            // Store the ACF field value correctly as an array
+            $acf_value = array('11');
+            add_post_meta($new_member_id, 'publish_to', $acf_value, true);
+            add_post_meta($new_member_id, '_publish_to', 'field_6374a3364bb73', true);
+
+            error_log('Inserted meta data and ACF field for member post ID: ' . $new_member_id);
+
+            // Set the migration flag to true
+            $migration_done = true;
+            $migration_count++;  // Increment the successful migration counter
+
+            // Address conversion section
+            $existing_location = get_post_meta($new_member_id, 'location_members', true);
+
+            if (empty($existing_location) && $address_country && $address_city && $address_county) {
+                // Prepare the query URL, making sure that the variables are strings
+                $query_url = "https://nominatim.openstreetmap.org/search.php?county=" . urlencode($address_county) . "&country=" . urlencode($address_country) . "&format=jsonv2";
+                error_log('Query URL: ' . $query_url);
+
+                $response = wp_remote_get($query_url);
+                if (!is_wp_error($response)) {
+                    $body = wp_remote_retrieve_body($response);
+                    $data = json_decode($body, true);
+
+                    if (!empty($data) && isset($data[0]['lat']) && isset($data[0]['lon'])) {
+                        $lat = floatval($data[0]['lat']);
+                        $lng = floatval($data[0]['lon']);
+
+                        $acf_value = array(
+                            'zoom' => 14,
+                            'lat' => $lat,
+                            'lng' => $lng,
+                        );
+
+                        // Store the location data in the post meta
+                        add_post_meta($new_member_id, 'location_members', $acf_value, true);
+                        add_post_meta($new_member_id, '_location_members', 'field_65fcef62959d4', true);
+
+                        error_log('Converted and saved location for member post ID: ' . $new_member_id);
+                        $conversion_done = true;
+                    }
+                }
+            }
+        }
+    }
+
+    if ($migration_done) {
+        echo '<div class="notice notice-success is-dismissible"><p>' . $migration_count . ' users migrated successfully.</p></div>';
+    } else {
+        echo '<div class="notice notice-info is-dismissible"><p>All users are already migrated. No new migrations were made.</p></div>';
+    }
+
+    if ($conversion_done) {
+        echo '<div class="notice notice-success is-dismissible"><p>Address conversion to location completed successfully.</p></div>';
+    } else {
+        echo '<div class="notice notice-info is-dismissible"><p>All addresses are already converted. No new conversions were made.</p></div>';
+    }
+}
+
+
+
+
+
+
+function delete_migrated_members() {
+    global $wpdb;
+
+    // Get all member posts
+    $member_posts = $wpdb->get_results("
+        SELECT ID 
+        FROM {$wpdb->posts} 
+        WHERE post_type = 'members'
+    ");
+
+    if (empty($member_posts)) {
+        echo '<div class="notice notice-error is-dismissible"><p>No migrated members found to delete.</p></div>';
+        return;
+    }
+
+    foreach ($member_posts as $post) {
+        $post_id = $post->ID;
+
+        delete_post_meta($post_id, 'user_id');
+        delete_post_meta($post_id, 'username');
+        delete_post_meta($post_id, 'address_country');
+        delete_post_meta($post_id, 'address_city');
+        delete_post_meta($post_id, 'address_county');
+
+        wp_delete_post($post_id, true);
+        error_log('Deleted member post ID: ' . $post_id . ' and associated post meta.');
+    }
+
+    echo '<div class="notice notice-success is-dismissible"><p>All migrated members and their associated post meta have been deleted successfully.</p></div>';
+}
+
+function update_migrated_user_locations() {
+    global $wpdb;
+
+    // Verify nonce
+    if (!isset($_POST['user_migration_nonce']) || !wp_verify_nonce($_POST['user_migration_nonce'], 'user_migration_action')) {
+        error_log('Nonce verification failed.');
+        return;
+    }
+
+    // Query the database directly for users who match the criteria in wp_usermeta
+    $users = $wpdb->get_results("
+        SELECT u.ID, u.user_login 
+        FROM {$wpdb->users} u
+        INNER JOIN {$wpdb->usermeta} um ON u.ID = um.user_id
+        WHERE um.meta_key = 'primary_blog' AND um.meta_value = '11'
+    ");
+
+    if (empty($users)) {
+        echo '<div class="notice notice-error is-dismissible"><p>No users found to update.</p></div>';
+        return;
+    }
+
+    $update_done = false;  // Track if any updates were made
+    $update_count = 0;  // Counter for updates
+
+    foreach ($users as $user) {
+        $user_id = $user->ID;
+        $username = $user->user_login;
+
+        // Check if a member post exists for this username
+        $existing_member_id = $wpdb->get_var($wpdb->prepare("
+            SELECT ID 
+            FROM {$wpdb->posts} 
+            WHERE post_type = 'members' 
+            AND post_title = %s
+        ", $username));
+
+        if ($existing_member_id) {
+            // Fetch user's current address metadata
+            $user_address_country = get_user_meta($user_id, 'address_country', true);
+            $user_address_city = get_user_meta($user_id, 'address_city', true);
+            $user_address_county = get_user_meta($user_id, 'address_county', true);
+
+            // Ensure the address fields are strings, not arrays
+            $user_address_country = is_array($user_address_country) ? implode(', ', $user_address_country) : $user_address_country;
+            $user_address_city = is_array($user_address_city) ? implode(', ', $user_address_city) : $user_address_city;
+            $user_address_county = is_array($user_address_county) ? implode(', ', $user_address_county) : $user_address_county;
+
+            // Fetch the member's stored address metadata
+            $member_address_country = get_post_meta($existing_member_id, 'address_country', true);
+            $member_address_city = get_post_meta($existing_member_id, 'address_city', true);
+            $member_address_county = get_post_meta($existing_member_id, 'address_county', true);
+
+            // Check if the user's address is different from the member's address
+            if ($user_address_country !== $member_address_country || $user_address_city !== $member_address_city || $user_address_county !== $member_address_county) {
+                error_log('User address changed for user ID: ' . $user_id);
+
+                // Update the member's address metadata
+                update_post_meta($existing_member_id, 'address_country', $user_address_country);
+                update_post_meta($existing_member_id, 'address_city', $user_address_city);
+                update_post_meta($existing_member_id, 'address_county', $user_address_county);
+
+                // Update the member's location based on the new address
+                if ($user_address_country && $user_address_city && $user_address_county) {
+                    $query_url = "https://nominatim.openstreetmap.org/search.php?county=" . urlencode($user_address_county) . "&country=" . urlencode($user_address_country) . "&format=jsonv2";
+                    $response = wp_remote_get($query_url);
+
+                    if (!is_wp_error($response)) {
+                        $body = wp_remote_retrieve_body($response);
+                        $data = json_decode($body, true);
+
+                        if (!empty($data) && isset($data[0]['lat']) && isset($data[0]['lon'])) {
+                            $lat = floatval($data[0]['lat']);
+                            $lng = floatval($data[0]['lon']);
+
+                            $acf_value = array(
+                                'zoom' => 14,
+                                'lat' => $lat,
+                                'lng' => $lng,
+                            );
+
+                            // Store the updated location data in the post meta
+                            update_post_meta($existing_member_id, 'location_members', $acf_value);
+                            update_post_meta($existing_member_id, '_location_members', 'field_65fcef62959d4', true);
+
+                            error_log('Updated location for member post ID: ' . $existing_member_id);
+                            $update_done = true;
+                            $update_count++;
+                        }
+                    }
+                }
+            } else {
+                error_log('No address change for user ID: ' . $user_id);
+            }
+        }
+    }
+
+    if ($update_done) {
+        echo '<div class="notice notice-success is-dismissible"><p>' . $update_count . ' users updated successfully.</p></div>';
+    } else {
+        echo '<div class="notice notice-info is-dismissible"><p>No updates were necessary. All users have the correct address and location.</p></div>';
+    }
+}
+
