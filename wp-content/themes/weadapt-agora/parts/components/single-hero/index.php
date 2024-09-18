@@ -298,7 +298,7 @@ switch ($type) {
 
 					$title_with_breaks = insert_line_breaks($title);
 					?>
-					<h1 class="single-hero__title" id="main-heading"><?php echo $title_with_breaks; ?></h1>
+					<h1 class="single-hero__title" id="main-heading"><?php echo $title; ?></h1>
 					<?php if ($excerpt) : ?>
 						<div class="single-hero__excerpt"><?php echo $excerpt; ?></div>
 					<?php endif; ?>
