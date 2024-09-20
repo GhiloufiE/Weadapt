@@ -222,7 +222,8 @@ function theme_ajax_create()
 		} else {
 			$roles = isset($_POST['role']) ? $_POST['role'] : array();
 			update_field('role', $roles, 'user_' . $user_ID);
-
+			$selected_organisation = sanitize_text_field($_POST['organisation']);
+			update_field('organisations', $selected_organisation, 'user_' . $user_ID);
 			update_user_meta($user_ID, 'user_roles', $roles);
 			update_user_meta($user_ID, 'address_country', $address_country);
 			update_user_meta($user_ID, 'address_city', $address_town_city);

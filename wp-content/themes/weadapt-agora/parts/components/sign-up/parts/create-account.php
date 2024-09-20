@@ -22,7 +22,7 @@
 		<p class="ajax-form__field">
 			<label for="create-user-email"><?php _e('E-mail address', 'weadapt'); ?><span class="required">*</span></label>
 			<input id="create-user-email" type="email" name="user_email" required="required" autocomplete="email">
-			<span class="description"><?php _e('A valid e-mail address. All e-mails from the system will be sent to this address. The e-mail address is not made public and will only be used if you wish to receive a new password or wish to receive certain news or notifications by e-mail.', 'weadapt'); ?></span>
+			<span class="description"><?php _e('A valid e-mail address. All e-mails from the system will be sent to this address. The e-mail address is not made public and will only be used if you wish to receive a new password or certain notifications by e-mail.', 'weadapt'); ?></span>
 		</p>
 	</div>
 	<div class="col-12 col-md-6">
@@ -70,6 +70,13 @@
 				echo '</select>';
 				echo '</div>';
 			}
+			$args = [
+				'post_status'    => ['publish'],
+				'post_type'      => 'organisation',
+				'posts_per_page' => -1,
+			];
+
+			$query = new WP_Query($args);
 			?>
 		</div>
 	</div>
@@ -118,180 +125,50 @@
 		</p>
 	</div>
 
-	<div class="col-12 col-md-6">
-		<div class="registration__checkbox">
-			<label class="registration-form__checkbox">
-				<input type="checkbox" name="AGREE_TO_TERMS" value="1" required="">
-				<span class="checkbox-label">
-					<?php $terms = get_field('terms-policies', 'options');
-					echo wpautop(wp_kses_post($terms['description']), false); ?>
-				</span>
+	<div class="col-12">
+	<div class="register-profile__item">
+			<h4 class="register-profile__title"><?php _e('Organisation', 'weadapt'); ?></h4>
+			<div class="theme-select-wrap">
+				<input type="text" id="organisation-search" placeholder="<?php _e('Search organisation...', 'weadapt'); ?>" onkeyup="filterOrganisations()">
+				<div id="organisation-list" class="styled-checkbox-list">
+					<?php while ($query->have_posts()) :
+						$query->the_post();
+						$ID = get_the_ID();
+					?>
+						<label class="organisation-item">
+							<input type="checkbox" class="organisation-checkbox" name="organisation" value="<?php echo $ID; ?>" onclick="limitOrganisationSelection(this)">
+							<span><?php the_title(); ?></span>
+						</label>
+					<?php endwhile; ?>
+				</div>
+			</div>
+			<small class="organisation-hint">
+    <?php _e("If you couldn't find your organisation, you can create one by checking the checkbox below.", 'weadapt'); ?>
+</small>
+			<label for="add_org" class="registration__checkbox">
+				<input type="checkbox" id="add_org" name="add_org" value="1" onclick="limitOrganisationSelection()">
+				<span><?php _e('I want to add my own organization', 'weadapt'); ?></span>
 			</label>
+			
 		</div>
 	</div>
-	<!-- <div class="col-12 col-md-6">
-		<div class="registration__checkbox">
-			<label for="mailchimp_subscribe">
-				<input type="checkbox" id="mailchimp_subscribe" name="mailchimp_subscribe" value="1">
-				Subscribe to our newsletter
-			</label>
-		</div>
-	</div> -->
 </div>
-<div class="popup__separator"></div>
-<div style="text-align: -webkit-center;">
-	<h3 style="text-align:center;"><?php _e('Do you have your own organization?', 'weadapt'); ?></h3>
 
-	<div class="col-12 col-md-6">
-		<label for="add_org" class="registration__checkbox">
-			<input type="checkbox" id="add_org" name="add_org" value="1">
-			<span>I want to add my own organization</span>
+<div class="popup__separator"></div>
+
+<div class="register-profile__item">
+	<div class="registration__checkbox">
+		<label class="registration__checkbox">
+			<input type="checkbox" name="AGREE_TO_TERMS" value="1" required="">
+			<span class="checkbox-label">
+				<?php $terms = get_field('terms-policies', 'options');
+				echo wpautop(wp_kses_post($terms['description']), false); ?>
+			</span>
 		</label>
 	</div>
-
 </div>
-<style>
-	.ajax-form__field {
-		margin-bottom: 20px;
-	}
 
-	.ajax-form__field label {
-		display: block;
-		margin-bottom: 5px;
-		font-weight: bold;
-		color: #555;
-	}
 
-	.styled-select,
-	.styled-multiselect {
-		width: 100%;
-		padding: 10px;
-		border: 1px solid #ccc;
-		border-radius: 4px;
-		background-color: #fff;
-		font-size: 14px;
-		color: #333;
-		background-image: linear-gradient(to bottom, #f7f7f7, #e7e7e7);
-		background-repeat: no-repeat;
-		background-position: right 10px center;
-		background-size: 20px 20px;
-		appearance: none;
-		-webkit-appearance: none;
-		-moz-appearance: none;
-	}
-
-	.styled-select option,
-	.styled-multiselect option {
-		padding: 5px;
-		font-size: 14px;
-		color: #333;
-		background: #fff;
-		border-bottom: 1px solid #ccc;
-	}
-
-	.styled-select option:hover,
-	.styled-multiselect option:hover {
-		background: #e7e7e7;
-	}
-
-	.styled-select option:checked,
-	.styled-multiselect option:checked {
-		background: #d7d7d7;
-	}
-
-	.checkbox-label {
-		margin-left: 0.9rem;
-	}
-
-	.registration__checkbox span {
-		box-sizing: unset;
-	}
-
-	@media(max-width: 767px) {
-		.registration__checkbox {
-			margin: 1.125rem;
-
-		}
-
-		#g-recaptcha {
-			margin-left: 0.5rem;
-		}
-	}
-
-	.registration__checkbox {
-		display: block;
-		align-items: center;
-	}
-
-	.registration__checkbox span {
-		margin-left: 0.5rem;
-	}
-
-	.registration__checkbox input {
-		margin-bottom: auto;
-		width: 4% !important;
-		display: inline-flex;
-	}
-
-	.registration-form__checkbox {
-		display: inline-flex !important;
-	}
-
-	.ajax-form__field label {
-		display: block;
-		margin-bottom: 1.5rem !important;
-		font-weight: bold;
-		color: #555;
-	}
-
-	.custom-multiselect {
-		border: 1px solid #ccc;
-		border-radius: 4px;
-		padding: 10px;
-		background-color: #fff;
-		position: relative;
-		min-height: 40px;
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-	}
-
-	.styled-multiselect {
-		width: 100%;
-		border: none;
-		font-size: 14px;
-		color: #333;
-		background: transparent;
-		padding: 5px;
-		box-sizing: border-box;
-		margin-top: 5px;
-		flex-grow: 1;
-	}
-
-	.selected-options {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 5px;
-		margin-bottom: 5px;
-	}
-
-	.selected-option {
-		background-color: #e4e4e4;
-		border: 1px solid #aaa;
-		border-radius: 4px;
-		padding: 2px 5px;
-		display: flex;
-		align-items: center;
-		font-size: 14px;
-	}
-
-	.selected-option .remove-selected-option {
-		margin-left: 5px;
-		cursor: pointer;
-		color: #888;
-		font-weight: bold;
-	}
-</style>
 <!-- <?php
 		$google_recaptcha_site_key = get_field('google_recaptcha_site_key', 'options');
 
@@ -350,4 +227,90 @@
 		updateSelectedOptions();
 		document.getElementById('user-roles').addEventListener('change', updateSelectedOptions);
 	});
+</script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    updateSelectedOptions();
+    document.getElementById('user-roles').addEventListener('change', updateSelectedOptions);
+
+    document.getElementById('add_org').addEventListener('change', function() {
+        if (this.checked) {
+            document.querySelectorAll('.organisation-checkbox').forEach(function(checkbox) {
+                checkbox.checked = false;
+                checkbox.closest('.organisation-item').classList.remove('selected');
+            });
+        }
+    });
+
+    document.querySelectorAll('.organisation-checkbox').forEach(function(checkbox) {
+        checkbox.addEventListener('click', function() {
+            document.getElementById('add_org').checked = false;
+
+            document.querySelectorAll('.organisation-checkbox').forEach(function(otherCheckbox) {
+                if (otherCheckbox !== checkbox) {
+                    otherCheckbox.checked = false;
+                    otherCheckbox.closest('.organisation-item').classList.remove('selected');
+                }
+            });
+
+            if (checkbox.checked) {
+                checkbox.closest('.organisation-item').classList.add('selected');
+            } else {
+                checkbox.closest('.organisation-item').classList.remove('selected');
+            }
+        });
+    });
+});
+
+function updateSelectedOptions() {
+    const select = document.getElementById('user-roles');
+    const selectedOptionsContainer = document.getElementById('selected-options');
+    selectedOptionsContainer.innerHTML = '';
+
+    Array.from(select.selectedOptions).forEach(option => {
+        const selectedOption = document.createElement('div');
+        selectedOption.classList.add('selected-option');
+        selectedOption.textContent = option.text;
+
+        const removeButton = document.createElement('span');
+        removeButton.classList.add('remove-selected-option');
+        removeButton.textContent = 'x';
+        removeButton.onclick = (event) => {
+            event.stopPropagation();
+            option.selected = false;
+            updateSelectedOptions();
+        };
+
+        selectedOption.appendChild(removeButton);
+        selectedOptionsContainer.appendChild(selectedOption);
+    });
+}
+
+function validateForm(event) {
+    var organisationChecked = document.querySelector('.organisation-checkbox:checked');
+    var addOrgChecked = document.getElementById('add_org').checked;
+    if (organisationChecked && addOrgChecked) {
+        alert("Please select only one option: either choose an organisation or add your own.");
+        event.preventDefault();
+    } else if (!organisationChecked && !addOrgChecked) {
+        alert("Please select an organisation or add your own.");
+        event.preventDefault();
+    }
+}
+
+function filterOrganisations() {
+    var input = document.getElementById('organisation-search');
+    var filter = input.value.toLowerCase();
+    var items = document.querySelectorAll('#organisation-list .organisation-item');
+    items.forEach(function(item) {
+        var text = item.textContent || item.innerText;
+        if (text.toLowerCase().indexOf(filter) > -1) {
+            item.style.display = '';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+}
 </script>

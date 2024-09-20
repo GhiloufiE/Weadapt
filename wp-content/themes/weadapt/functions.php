@@ -324,15 +324,40 @@ function forum_new_post_notification($post_id)
 add_action('acf/save_post', 'forum_new_post_notification', 10, 1);
 
 
-function restrict_editors_to_own_posts($query)
-{
+function restrict_contributor_posts_access($query) {
     if (is_admin() && $query->is_main_query() && current_user_can('contributor') && !current_user_can('edit_others_posts')) {
         global $user_ID;
         $query->set('author', $user_ID);
-        add_action('admin_notices', 'editor_notice');
+
+        $post_type = isset($_GET['post_type']) ? $_GET['post_type'] : '';
+        if (in_array($post_type, ['members', 'stakeholders'])) {
+            wp_redirect(admin_url());
+            exit;
+        }
     }
 }
-add_action('pre_get_posts', 'restrict_editors_to_own_posts');
+add_action('pre_get_posts', 'restrict_contributor_posts_access');
+
+function hide_menu_items_and_plugin_alerts() {
+    if (current_user_can('contributor') && !current_user_can('edit_others_posts')) {
+        remove_menu_page('edit.php?post_type=members');
+        remove_menu_page('edit.php?post_type=stakeholders');
+        
+        remove_action('admin_notices', 'update_nag', 3);
+        remove_action('network_admin_notices', 'update_nag', 3);
+    }
+}
+add_action('admin_menu', 'hide_menu_items_and_plugin_alerts', 999);
+function hide_plugin_update_rows_for_contributors() {
+    if (current_user_can('contributor') && !current_user_can('edit_others_posts')) {
+        echo '<style>
+                .notice {
+                    display: none;
+                }
+              </style>';
+    }
+}
+add_action('admin_head', 'hide_plugin_update_rows_for_contributors');
 
 function editor_notice()
 {
