@@ -8,11 +8,21 @@ function load_post_content() {
 	$post_ID   = ! empty( $_POST['post_id'] ) ? intval( $_POST['post_id'] ) : 0;
 	$part_name = file_exists( get_theme_file_path("/parts/single/$post_type/") ) ? $post_type : 'blog';
 
-
-	ob_start();
+ 	ob_start();
 		global $post;
 
 		$post = get_post( $post_ID );
+
+		// If post type is 'members', get the user by username and fetch display name
+		if ( 'members' === $post_type ) {
+			$member_username = $post->post_name; // Assuming post slug is the username
+			$member_user = get_user_by( 'login', $member_username ); // Get the user by their username
+
+			if ( $member_user ) {
+				// Replace the post title (username) with the display name
+				$post->post_title = $member_user->display_name;
+			}
+		}
 
 		setup_postdata( $post );
 		?>
