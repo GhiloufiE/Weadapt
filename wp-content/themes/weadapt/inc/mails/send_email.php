@@ -66,12 +66,9 @@ function insert_buttons_into_message($message, $button_container) {
 }
 
 function generate_email_template($image_urls, $message) {
-  // Ensure the images are displayed at a max-width of 40% and do not stretch
   $image_size_style = '
      max-width: 30%;  
  ';
-    
-  // Create a container for the images that expands horizontally
   $image_html = '<div class="image-wrapper" style="text-align: center; display: flex; flex-wrap:wrap;  justify-content: space-around; width: 100%; max-width: 100%;">';
   
   foreach ($image_urls as $image_url) {

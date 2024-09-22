@@ -227,6 +227,15 @@ function get_admin_info()
     return $admin_info;
 }
 
+if (! function_exists('use_an_or_a')) {
+    function use_an_or_a($word)
+    {
+        $first_letter = strtolower(substr($word, 0, 1));
+        $vowels = ['a', 'e', 'i', 'o', 'u'];
+        return in_array($first_letter, $vowels) ? 'an' : 'a';
+    }
+}
+
 function forum_new_post_notification($post_id)
 {
     global $wpdb;
@@ -324,7 +333,8 @@ function forum_new_post_notification($post_id)
 add_action('acf/save_post', 'forum_new_post_notification', 10, 1);
 
 
-function restrict_contributor_posts_access($query) {
+function restrict_contributor_posts_access($query)
+{
     if (is_admin() && $query->is_main_query() && current_user_can('contributor') && !current_user_can('edit_others_posts')) {
         global $user_ID;
         $query->set('author', $user_ID);
@@ -338,17 +348,19 @@ function restrict_contributor_posts_access($query) {
 }
 add_action('pre_get_posts', 'restrict_contributor_posts_access');
 
-function hide_menu_items_and_plugin_alerts() {
+function hide_menu_items_and_plugin_alerts()
+{
     if (current_user_can('contributor') && !current_user_can('edit_others_posts')) {
         remove_menu_page('edit.php?post_type=members');
         remove_menu_page('edit.php?post_type=stakeholders');
-        
+
         remove_action('admin_notices', 'update_nag', 3);
         remove_action('network_admin_notices', 'update_nag', 3);
     }
 }
 add_action('admin_menu', 'hide_menu_items_and_plugin_alerts', 999);
-function hide_plugin_update_rows_for_contributors() {
+function hide_plugin_update_rows_for_contributors()
+{
     if (current_user_can('contributor') && !current_user_can('edit_others_posts')) {
         echo '<style>
                 .notice {
@@ -460,31 +472,20 @@ function notify_editors_after_publish($post_id, $new_theme)
         }
         $users = array_unique($users);
         if (!empty($users)) {
-            // Determine the initial part of the subject based on post type
-            if ($post->post_type == 'article' || $post->post_type == 'event' || $post->post_type == 'organisation') {
-                $subject = sprintf(
-                    __('An %s has been published on ', 'weadapt'),
-                    ucfirst($post->post_type)
-                );
-            } else {
-                $subject = sprintf(
-                    __('A %s has been published on ', 'weadapt'),
-                    ucfirst($post->post_type)
-                );
-            }
+            $subject = sprintf(
+                __('A Forum has been published on ', 'weadapt')
+            );
 
             // Fetching publish_to meta and adding blog names to the subject
             $publish_to = get_post_meta($post_id, 'publish_to', true);
             if (is_array($publish_to)) {
-                $blog_names = []; // Temporary array to store blog names
+                $blog_names = [];
                 foreach ($publish_to as $blog_id) {
                     $blog_name = get_blog_details($blog_id)->blogname;
-                    $blog_names[] = $blog_name; // Add each blog name to the array
+                    $blog_names[] = $blog_name;
                 }
-                // Join blog names with a ", " separator
                 $subject .= implode(', ', $blog_names);
             } else {
-                // If no array, fallback to blog name
                 $subject .= get_bloginfo('name');
             }
 
@@ -496,8 +497,9 @@ function notify_editors_after_publish($post_id, $new_theme)
             $post_excerpt = wp_strip_all_tags($post_excerpt);
             $post_excerpt = mb_strimwidth($post_excerpt, 0, 100, '...');
 
-            $message .= '<p>' . sprintf(__('Summary: %s', 'weadapt'), esc_html($post_excerpt)) . '</p><br>';
-
+            $message .= '<p>' . sprintf(__('Summarys: %s', 'weadapt'), esc_html($post_excerpt)) . '</p>';
+            $message .= '<p> <a href="' . get_permalink($post_id) . '">View Discussions</a></p>';
+            $message .= "<br>Best Regards,<br>WeAdapt";
             if ($post_author_ID = get_post_meta($post_id, 'author', true)) {
                 $post_author = get_userdata($post_author_ID);
                 $author_organisations = get_field('organisations', $post_author);
@@ -508,9 +510,6 @@ function notify_editors_after_publish($post_id, $new_theme)
                     $message .= '<p>' . sprintf(__('By %s', 'weadapt'), $post_author->display_name) . '</p>';
                 }
             }
-
-            $message .= '<p><a href="' . get_permalink($post_id) . '">' . __('See it', 'weadapt') . '</a></p>';
-            $message .= '<p><a href="' . get_edit_post_link($post_id) . '">' . __('Publish / Edit / Delete it', 'weadapt') . '</a></p>';
             theme_mail_save_to_db($users, $subject, $message);
             send_email_immediately($users, $subject, $message, $post_id);
         }
@@ -608,10 +607,10 @@ function notify_editors_after_publish($post_id, $new_theme)
         if ($published_for_the_first_time) {
             $valid_contributors = get_field('people_contributors', $post_id) ?: array();
             $people_creator = get_field('people_creator', $post_id) ?: array();
-            $valid_contributors = array_merge($valid_contributors, $people_creator);
-
-            if (!empty($valid_contributors)) {
-                $subject = sprintf(
+            $post_author_ID = get_post_field('post_author', $post_id);
+            error_log('this is the post author'. $post_author_ID);
+            $valid_contributors = array_merge($valid_contributors, $people_creator, array($post_author_ID));            if (!empty($valid_contributors)) {
+            $subject = sprintf(
                     __('Your %s has been published on %s', 'weadapt'),
                     ucfirst($post->post_type),
                     get_bloginfo('name')
@@ -645,7 +644,7 @@ function notify_editors_after_publish($post_id, $new_theme)
                     $subject,
                     $message
                 );
-                send_email_immediately($valid_contributors, $subject, $message, $post_id);
+                send_email_immediately($valid_contributors, $subject, $message, null);
                 update_post_meta($post_id, '_notification_sent', true);
             }
 
@@ -656,44 +655,26 @@ function notify_editors_after_publish($post_id, $new_theme)
             }
             $users = array_unique($users);
             if (!empty($users)) {
-                if ($post->post_type == 'article' || $post->post_type == 'event' || $post->post_type == 'organisation') {
-                    $subject = sprintf(
-                        __('An %s has been published on ', 'weadapt'),
-                        ucfirst($post->post_type)
-                    );
-                    $publish_to = get_post_meta($post_id, 'publish_to', true);
-                    if (is_array($publish_to)) {
-                        $blog_names = []; 
-                        foreach ($publish_to as $blog_id) {
-                            $blog_name = get_blog_details($blog_id)->blogname;
-                            $blog_names[] = $blog_name; 
-                        }
-                        $subject .= implode(', ', $blog_names);
-                    } else {
-                        $subject .= get_bloginfo('name');
+                $article_or_an = use_an_or_a($post->post_type);
+
+                $subject = sprintf(
+                    __('%s %s has been published on ', 'weadapt'),
+                    ucfirst($article_or_an),
+                    ucfirst($post->post_type)
+                );
+
+                // Fetching the 'publish_to' meta field
+                $publish_to = get_post_meta($post_id, 'publish_to', true);
+                if (is_array($publish_to)) {
+                    $blog_names = [];
+                    foreach ($publish_to as $blog_id) {
+                        $blog_name = get_blog_details($blog_id)->blogname;
+                        $blog_names[] = $blog_name;
                     }
+                    $subject .= implode(', ', $blog_names);
                 } else {
-                    $subject = sprintf(
-                        __('A %s has been published on ', 'weadapt'),
-                        ucfirst($post->post_type)
-                    );
-
-                    $publish_to = get_post_meta($post_id, 'publish_to', true);
-                    if (is_array($publish_to)) {
-                        $blog_names = [];
-                        foreach ($publish_to as $blog_id) {
-                            $blog_name = get_blog_details($blog_id)->blogname;
-                            $blog_names[] = $blog_name; 
-                        }
-                        $subject .= implode(', ', $blog_names);
-                    } else {
-                        $subject .= get_bloginfo('name');
-                    }
+                    $subject .= get_bloginfo('name');
                 }
-
-
-
-
                 $message  = esc_html($subject) .  '<br> <br> <strong>' . __('Title: ', 'weadapt') . '</strong>' .  esc_html($post->post_title) . '<br><br>';
                 $post_excerpt = get_the_excerpt($post);
                 $post_excerpt = wp_strip_all_tags($post_excerpt);
@@ -718,12 +699,8 @@ function notify_editors_after_publish($post_id, $new_theme)
                     $message .= "<br>Best Regards,<br>WeAdapt";
                     theme_mail_save_to_db($users, $subject, $message);
                     send_email_immediately($users, $subject, $message, $post_id);
-                } else {
-                    error_log("Not sending email to users as this is not the first publish time.");
-                }
-            } else {
-                error_log("No users to notify in the article/event/organisation section.");
-            }
+                } 
+            } 
         }
         // related to your theme/network 
         if ($published_for_the_first_time) {
@@ -806,7 +783,6 @@ function notify_editors_after_publish($post_id, $new_theme)
     }
     error_log("Finished processing post ID: $post_id");
 }
-
 add_action('notify_editors_after_publish', 'notify_editors_after_publish', 10, 2);
 
 
@@ -921,7 +897,8 @@ function migrate_forum_to_network_relationship()
 }
 add_action('admin_menu', 'register_user_migration_menu_page');
 
-function register_user_migration_menu_page() {
+function register_user_migration_menu_page()
+{
     add_menu_page(
         'User to Member Migration',   // Page title
         'User Migration',             // Menu title
@@ -933,7 +910,8 @@ function register_user_migration_menu_page() {
     );
 }
 
-function user_migration_menu_page_html() {
+function user_migration_menu_page_html()
+{
     if (!current_user_can('manage_options')) {
         return;
     }
@@ -951,7 +929,7 @@ function user_migration_menu_page_html() {
         echo '<div class="notice notice-success is-dismissible"><p>All migrated members have been deleted successfully.</p></div>';
     }
 
-    ?>
+?>
     <div class="wrap">
         <h1>User to Member Migration</h1>
         <form method="post" action="">
@@ -961,12 +939,13 @@ function user_migration_menu_page_html() {
             <input type="submit" name="delete_migrated_members" class="button button-tertiary" value="Delete Migrated Members">
         </form>
     </div>
-    <?php
+<?php
 }
 
 
 
-function migrate_and_convert_user_to_member() {
+function migrate_and_convert_user_to_member()
+{
     global $wpdb;
 
     // Verify nonce
@@ -1108,7 +1087,8 @@ function migrate_and_convert_user_to_member() {
 
 
 
-function delete_migrated_members() {
+function delete_migrated_members()
+{
     global $wpdb;
 
     // Get all member posts
@@ -1139,7 +1119,8 @@ function delete_migrated_members() {
     echo '<div class="notice notice-success is-dismissible"><p>All migrated members and their associated post meta have been deleted successfully.</p></div>';
 }
 
-function update_migrated_user_locations() {
+function update_migrated_user_locations()
+{
     global $wpdb;
 
     // Verify nonce
@@ -1242,4 +1223,3 @@ function update_migrated_user_locations() {
         echo '<div class="notice notice-info is-dismissible"><p>No updates were necessary. All users have the correct address and location.</p></div>';
     }
 }
-
