@@ -89,11 +89,11 @@
 	$sql = $wpdb->prepare("
     SELECT wp_posts.ID
     FROM wp_posts
-    INNER JOIN wp_theme_forum_relationship 
-    ON wp_posts.ID = wp_theme_forum_relationship.forum_id
+    INNER JOIN {$wpdb->prefix}theme_forum_relationship 
+    ON wp_posts.ID = {$wpdb->prefix}theme_forum_relationship.forum_id
     WHERE 
      wp_posts.post_status = 'publish'
-    AND wp_theme_forum_relationship.theme_id = %d
+    AND {$wpdb->prefix}theme_forum_relationship.theme_id = %d
     ORDER BY wp_posts.post_date DESC
     LIMIT 0, 10", $theme_id);
 
@@ -107,13 +107,16 @@
 			'post_type'      => get_allowed_post_types(['forum']),
 			'orderby'        => 'date',
 			'order'          => 'DESC',
-			'meta_query'     => [[
-				'key'      => 'forum',
-				'value'    => $post_ids
-			]],
+			'meta_query'     => array(
+				array(
+					'key'     => 'forum',
+					'value'   => $post_ids,  
+					'compare' => 'IN',       
+				),
+			),
 			'ignore_sticky_posts' => true,
-			'theme_query'         => true, // multisite fix
-			'categories'          => []
+			'theme_query'         => true,  
+			'categories'          => array(),
 		);
 
 		get_part('components/cpt-query/index', [

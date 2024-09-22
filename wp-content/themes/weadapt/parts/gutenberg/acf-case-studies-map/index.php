@@ -44,13 +44,15 @@ $filter_value = ! empty( $_GET['filter'] ) ? intval( $_GET['filter'] ) : 'all';
 			echo $block_object->desc('description');
 		?>
 	</div>
-		<form class="map__controls">
-			<div class="map__search">
-				<input type="search" name="search" placeholder="<?php _e( 'Search case studies', 'weadapt' ); ?>" value="<?php echo esc_attr( $search_value ); ?>">
-				<button type="submit" aria-label="<?php esc_attr_e( 'Search', 'weadapt' ); ?>"><?php echo get_img( 'icon-search' ); ?></button>
-			</div>
+    <form class="map__controls">
+        <div class="map__search">
+            <input type="search" name="search" placeholder="<?php _e( 'Search', 'weadapt' ); ?>"
+                value="<?php echo esc_attr( $search_value ); ?>">
+            <button type="submit"
+                aria-label="<?php esc_attr_e( 'Search', 'weadapt' ); ?>"><?php echo get_img( 'icon-search' ); ?></button>
+        </div>
 
-			<?php
+        <?php
 				$themes_networks = new WP_Query( [
 					'post_status'         => 'publish',
 					'post_type'           => get_allowed_post_types( [ 'theme', 'network' ] ),
@@ -64,16 +66,16 @@ $filter_value = ! empty( $_GET['filter'] ) ? intval( $_GET['filter'] ) : 'all';
 
 				if ( ! empty( $themes_networks->posts ) ) :
 			?>
-			<div class="map__select">
+        <div class="map__select">
 				<select name="theme_network">
-					<option value="all" selected><?php _e( 'Any Theme or Network...', 'weadapt' ); ?></option>
+					<option disabled value="all" selected><?php _e( 'Any Theme or Network...', 'weadapt' ); ?></option>
 					<?php foreach( $themes_networks->posts as $post_ID ) : ?>
 						<option value="<?php echo intval( $post_ID ); ?>" <?php selected( $filter_value, $post_ID ); ?>><?php echo get_the_title( $post_ID ); ?></option>
 					<?php endforeach; ?>
 				</select>
 				<div class="theme-select"></div>
 			</div>
-			<?php endif; ?>
+        <?php endif; ?>
 
 			<?php /*
 			<button class="view-cip-data button" data-show-text="<?php _e( 'View climate stations', 'weadapt' ); ?>" data-hide-text="<?php _e( 'Hide climate stations', 'weadapt' ); ?>">

@@ -385,7 +385,7 @@ function create_forum_post_on_theme_creation($new_status, $old_status, $post) {
     }
 
     global $wpdb;
-    $table_name = 'wp_theme_forum_relationship';
+    $table_name = $wpdb->prefix .'theme_forum_relationship';
 
     $existing_forum = $wpdb->get_var($wpdb->prepare(
         "SELECT forum_id FROM $table_name WHERE theme_id = %d", 
@@ -1223,3 +1223,119 @@ function update_migrated_user_locations()
         echo '<div class="notice notice-info is-dismissible"><p>No updates were necessary. All users have the correct address and location.</p></div>';
     }
 }
+function create_theme_forum_relationship_table() {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'theme_forum_relationship';
+
+    // Define the charset and collation for the table
+    $charset_collate = $wpdb->get_charset_collate();
+
+    // SQL statement for creating the table
+    $sql = "CREATE TABLE IF NOT EXISTS $table_name (
+        id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+        theme_id bigint(20) unsigned NOT NULL,
+        forum_id bigint(20) unsigned NOT NULL,
+        PRIMARY KEY (id),
+        KEY theme_id (theme_id),
+        KEY forum_id (forum_id)
+    ) $charset_collate;";
+
+    // Use dbDelta to create the table
+    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+    dbDelta($sql);
+}
+
+function insert_theme_forum_relationship() {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'theme_forum_relationship';
+
+    // Create the table if it doesn't exist
+    create_theme_forum_relationship_table();
+
+    // Retrieve all published themes
+    $themes = get_posts(array(
+        'post_type' => 'theme',
+        'posts_per_page' => -1,
+        'post_status' => 'publish'
+    ));
+    error_log('Themes: ' . count($themes)); // Logging the count of themes
+
+    foreach ($themes as $theme) {
+        // Retrieve all forums related to the current theme by its ID
+        $forums = get_posts(array(
+            'post_type' => 'forums',
+            'posts_per_page' => -1,
+            'meta_query' => array(
+                array(
+                    'key' => 'relevant_main_theme_network',
+                    'value' => $theme->ID,
+                    'compare' => '='
+                )
+            )
+        ));
+
+        // Log for debugging
+        error_log('Processing Theme ID: ' . $theme->ID . ', Found ' . count($forums) . ' forums');
+
+        // Insert each forum found into the database table
+        foreach ($forums as $forum) {
+            $wpdb->insert(
+                $table_name,
+                array(
+                    'theme_id' => $theme->ID,
+                    'forum_id' => $forum->ID
+                ),
+                array(
+                    '%d',
+                    '%d'
+                )
+            );
+            // Logging each insert for debugging
+            error_log('Inserted relationship for Theme ID: ' . $theme->ID . ' and Forum ID: ' . $forum->ID);
+        }
+    }
+}
+// Add a page under the "Tools" menu
+function add_theme_forum_relationship_page() {
+    add_management_page(
+        'Theme Forum Relationship', // Page title
+        'Theme Forum Relationship', // Menu title
+        'manage_options',           // Capability required
+        'theme-forum-relationship', // Menu slug
+        'render_theme_forum_relationship_page' // Callback function
+    );
+}
+add_action('admin_menu', 'add_theme_forum_relationship_page');
+
+function render_theme_forum_relationship_page() {
+    ?>
+    <div class="wrap">
+        <h1>Insert Theme-Forum Relationship</h1>
+        <p>Click the button below to insert the theme-forum relationships into the database.</p>
+        <button id="insert-theme-forum-button" class="button button-primary">Insert Relationships</button>
+        <div id="insert-theme-forum-result"></div>
+
+        <script type="text/javascript">
+            jQuery(document).ready(function($) {
+                $('#insert-theme-forum-button').on('click', function() {
+                    $('#insert-theme-forum-result').html('<p>Processing...</p>');
+
+                    $.post(ajaxurl, {
+                        action: 'insert_theme_forum_relationship'
+                    }, function(response) {
+                        $('#insert-theme-forum-result').html('<p>' + response.data + '</p>');
+                    });
+                });
+            });
+        </script>
+    </div>
+    <?php
+}
+
+// Register the AJAX action for logged-in users
+function handle_ajax_insert_theme_forum_relationship() {
+    insert_theme_forum_relationship();
+    wp_send_json_success('Theme-forum relationships have been inserted successfully.');
+}
+add_action('wp_ajax_insert_theme_forum_relationship', 'handle_ajax_insert_theme_forum_relationship');
+

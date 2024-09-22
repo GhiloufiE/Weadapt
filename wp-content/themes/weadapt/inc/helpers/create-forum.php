@@ -1,8 +1,8 @@
 <?php
-function handle_create_post()
-{
+function handle_create_post() {
     global $wpdb;
-
+    $blog_id = get_current_blog_id();
+    error_log('Handling create post request for blog_id: ' . $blog_id);
     // Verify nonce
     if (!isset($_POST['_wpnonce']) || !wp_verify_nonce($_POST['_wpnonce'], 'create_post_nonce')) {
         error_log('Nonce verification failed');
@@ -99,6 +99,11 @@ function handle_create_post()
     } elseif ($forum_true_id !== null) {
         update_field('field_653b5c7e6d5f5', $forum_true_id, $post_id);
     }
+ 
+ 
+    update_field('field_6374a3364bb73', $blog_id, $post_id);
+
+ 
 
     // Send notification
     if (in_array($post_type, ['forum', 'theme'])) {
