@@ -367,36 +367,47 @@ function editor_notice()
               </div>';
     }
 }
-function create_forum_post_on_theme_creation($new_status, $old_status, $post)
-{
+function create_forum_post_on_theme_creation($new_status, $old_status, $post) {
+    if ($post->post_type !== 'theme' || $old_status !== 'auto-draft' || $new_status !== 'publish') {
+        return;
+    }
+
     global $wpdb;
-    $table_name = $wpdb->prefix . 'theme_forum_relationship';
+    $table_name = 'wp_theme_forum_relationship';
 
-    if ($post->post_type == 'theme' && $old_status == 'auto-draft' && $new_status == 'publish') {
+    $existing_forum = $wpdb->get_var($wpdb->prepare(
+        "SELECT forum_id FROM $table_name WHERE theme_id = %d", 
+        $post->ID
+    ));
 
-        $forum_post = array(
-            'post_title'    => $post->post_title,
-            'post_content'  => 'This is a forum linked to the theme: ' . $post->post_title,
-            'post_status'   => 'publish',
-            'post_type'     => 'forums'
+    if ($existing_forum) {
+        return;
+    }
+
+    $forum_post = array(
+        'post_title'    => $post->post_title,
+        'post_content'  => 'This is a forum linked to the theme: ' . $post->post_title,
+        'post_status'   => 'publish',
+        'post_type'     => 'forums'
+    );
+
+    $forum_post_id = wp_insert_post($forum_post);
+
+    if ($forum_post_id) {
+        $wpdb->insert(
+            $table_name,
+            array(
+                'theme_id' => $post->ID,
+                'forum_id' => $forum_post_id
+            ),
+            array(
+                '%d',
+                '%d'
+            )
         );
-        $forum_post_id = wp_insert_post($forum_post);
-        if ($forum_post_id != 0) {
-            $wpdb->insert(
-                $table_name,
-                array(
-                    'theme_id' => $post->ID,
-                    'forum_id' => $forum_post_id
-                ),
-                array(
-                    '%d',
-                    '%d'
-                )
-            );
-        }
     }
 }
-
+add_action('transition_post_status', 'create_forum_post_on_theme_creation', 10, 3);
 
 
 //forum notification

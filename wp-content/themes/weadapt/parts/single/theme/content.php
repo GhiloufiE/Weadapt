@@ -89,11 +89,11 @@
 	$sql = $wpdb->prepare("
     SELECT wp_posts.ID
     FROM wp_posts
-    INNER JOIN {$wpdb->prefix}theme_forum_relationship 
-    ON wp_posts.ID = {$wpdb->prefix}theme_forum_relationship.forum_id
+    INNER JOIN wp_theme_forum_relationship 
+    ON wp_posts.ID = wp_theme_forum_relationship.forum_id
     WHERE 
      wp_posts.post_status = 'publish'
-    AND {$wpdb->prefix}theme_forum_relationship.theme_id = %d
+    AND wp_theme_forum_relationship.theme_id = %d
     ORDER BY wp_posts.post_date DESC
     LIMIT 0, 10", $theme_id);
 
