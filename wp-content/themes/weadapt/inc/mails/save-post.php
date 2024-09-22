@@ -207,7 +207,7 @@ function on_pending_organisation($ID, $post)
         $message .= sprintf('<a href="%s">%s</a>', get_permalink($ID), __('Go to the organisation', 'weadapt'));
 
         theme_mail_save_to_db($users, $subject, $message);
-        send_email_immediately($users, $subject, $message, $post_ID);
+        send_email_immediately($users, $subject, $message, null);
         set_transient($transient_key, true, HOUR_IN_SECONDS);
     }
 }
