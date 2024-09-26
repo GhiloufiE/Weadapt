@@ -125,24 +125,6 @@ add_action('admin_head', 'toast_resizable_sidebar');
         wp_mail($recipient_email, $subject, $message, $headers);
     }
 } */
-
-function notify_admin_on_pending_comment($comment_id, $comment_approved)
-{
-    if ($comment_approved == 0) {
-        $comment = get_comment($comment_id);
-        $post = get_post($comment->comment_post_ID);
-        $admin_email = get_option('admin_email');
-        $subject = 'New Comment Awaiting Approval';
-        $message = sprintf(
-            'A new comment on the post "%s" is awaiting your approval. %s',
-            $post->post_title,
-            admin_url('comment.php?action=editcomment&c=' . $comment_id)
-        );
-        wp_mail($admin_email, $subject, $message);
-    }
-}
-
-
 function replace_howdy($wp_admin_bar)
 {
     $my_account = $wp_admin_bar->get_node('my-account');

@@ -2,28 +2,27 @@
 function handle_create_post() {
     global $wpdb;
     $blog_id = get_current_blog_id();
-    error_log('Handling create post request for blog_id: ' . $blog_id);
+
     // Verify nonce
     if (!isset($_POST['_wpnonce']) || !wp_verify_nonce($_POST['_wpnonce'], 'create_post_nonce')) {
-        error_log('Nonce verification failed');
+        error_log("Nonce verification failed for blog ID: {$blog_id}");
         wp_send_json_error('Nonce verification failed');
         return;
     }
 
-    // Check required fields
+    // Check for required fields
     if (!isset($_POST['post_title']) || !isset($_POST['post_description']) || !isset($_POST['post_type'])) {
-        error_log('Missing required POST fields: post_title, post_description, or post_type.');
+        error_log("Missing required POST fields for blog ID: {$blog_id}");
         wp_send_json_error('Missing required POST fields');
         return;
     }
 
-    // Sanitize inputs
     $post_title = sanitize_text_field($_POST['post_title']);
     $post_description = sanitize_textarea_field($_POST['post_description']);
     $post_type = sanitize_text_field($_POST['post_type']);
     
-    // Log post data
-    error_log('Post Data: Title - ' . $post_title . ', Type - ' . $post_type);
+    // Log the post data being prepared
+    error_log("Creating post with title: {$post_title}, type: {$post_type}, for blog ID: {$blog_id}");
 
     $post_data = array(
         'post_title'   => $post_title,
@@ -37,54 +36,58 @@ function handle_create_post() {
     $network_true_id = null;
     $forum_true_id = null;
 
-    // Handle forum or theme relationships
+    // Handle forum type post
     if ($post_type == 'forum' && isset($_POST['forum'])) {
         $forum_id = intval($_POST['forum']);
-        error_log('Handling forum relationship for forum_id: ' . $forum_id);
+        error_log("Forum ID provided: {$forum_id}");
 
-        $forum_true_id = $wpdb->get_var($wpdb->prepare("SELECT forum_id FROM wp_theme_forum_relationship WHERE theme_id = %d", $forum_id));
+        $forum_true_id = $wpdb->get_var($wpdb->prepare("SELECT forum_id FROM {$wpdb->prefix}theme_forum_relationship WHERE theme_id = %d", $forum_id));
         if ($forum_true_id !== null) {
             $post_data['meta_input']['forum'] = $forum_true_id;
+            error_log("Forum true ID set to: {$forum_true_id}");
         } else {
-            error_log('Failed to retrieve forum_true_id for forum_id: ' . $forum_id);
+            error_log("Forum true ID not found for forum ID: {$forum_id}");
         }
 
         $network_true_id = $wpdb->get_var($wpdb->prepare("SELECT forum_id FROM wp_network_forum_relationship WHERE network_id = %d", $forum_id));
         if ($network_true_id !== null) {
             $post_data['meta_input']['network_forum'] = $network_true_id;
+            error_log("Network true ID set to: {$network_true_id}");
         } else {
-            error_log('Failed to retrieve network_true_id for forum_id: ' . $forum_id);
+            error_log("Network true ID not found for forum ID: {$forum_id}");
         }
     }
 
+    // Handle theme type post
     if ($post_type == 'theme' && isset($_POST['forum'])) {
         $forum_id = intval($_POST['forum']);
-        error_log('Handling theme relationship for forum_id: ' . $forum_id);
+        error_log("Theme Forum ID provided: {$forum_id}");
 
-        $forum_true_id = $wpdb->get_var($wpdb->prepare("SELECT forum_id FROM wp_theme_forum_relationship WHERE theme_id = %d", $forum_id));
+        $forum_true_id = $wpdb->get_var($wpdb->prepare("SELECT forum_id FROM {$wpdb->prefix}theme_forum_relationship WHERE theme_id = %d", $forum_id));
         if ($forum_true_id !== null) {
             $post_data['meta_input']['relevant_main_theme_network'] = $forum_true_id;
+            error_log("Relevant main theme network ID set to: {$forum_true_id}");
         } else {
-            error_log('Failed to retrieve forum_true_id for theme_id: ' . $forum_id);
+            error_log("Relevant main theme network ID not found for forum ID: {$forum_id}");
         }
     }
 
     // Insert post
     $post_id = wp_insert_post($post_data);
-
+    
+    // Log post creation status
     if (is_wp_error($post_id)) {
-        error_log('Error creating post: ' . $post_id->get_error_message());
+        error_log("Error creating post: " . $post_id->get_error_message());
         wp_send_json_error('Error creating post: ' . $post_id->get_error_message());
         return;
     } else {
-        error_log('Post created successfully with ID: ' . $post_id);
+        error_log("Post created successfully with ID: {$post_id}");
     }
 
-    // Update fields
+    // Update ACF fields
     $post_author_id = get_current_user_id();
     $group_field_value = get_field('field_637f1ee7327b4', $post_id);
     if (!is_array($group_field_value)) {
-        error_log('Field field_637f1ee7327b4 not an array, initializing new array.');
         $group_field_value = [];
     }
 
@@ -93,22 +96,23 @@ function handle_create_post() {
     $group_field_value['contributors'] = $post_author_id;
 
     update_field('field_637f1ee7327b4', $group_field_value, $post_id);
+    error_log("ACF field updated with creator, publisher, and contributors for post ID: {$post_id}");
 
     if ($network_true_id !== null) {
         update_field('field_653b5c7e6d5f5', $network_true_id, $post_id);
+        error_log("Network field updated with ID: {$network_true_id} for post ID: {$post_id}");
     } elseif ($forum_true_id !== null) {
         update_field('field_653b5c7e6d5f5', $forum_true_id, $post_id);
+        error_log("Forum field updated with ID: {$forum_true_id} for post ID: {$post_id}");
     }
- 
- 
-    update_field('field_6374a3364bb73', $blog_id, $post_id);
 
- 
+    update_field('field_6374a3364bb73', $blog_id, $post_id);
+    error_log("Blog ID updated in ACF for post ID: {$post_id}");
 
     // Send notification
     if (in_array($post_type, ['forum', 'theme'])) {
-        error_log('Sending notification for post_id: ' . $post_id . ' and post_type: ' . $post_type);
         notify_admins_of_pending_posts($post_id, $post_type);
+        error_log("Notification sent for post ID: {$post_id}, type: {$post_type}");
     }
 
     wp_send_json_success('Post created successfully');

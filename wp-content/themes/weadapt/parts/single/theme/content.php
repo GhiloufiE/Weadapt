@@ -5,11 +5,21 @@
  *
  * @package WeAdapt
  */
+$tab_panels = [
+    'tab-latest'       => 'tab-latest-panel',
+    'tab-about'        => 'tab-about-panel',
+    'tab-editors'      => 'tab-editors-panel',
+    'tab-members'      => 'tab-members-panel',
+    'tab-organisations'=> 'tab-organisations-panel',
+    'tab-forum'        => 'tab-forum-panel',
+];
 
+$activeTab = isset($_GET['tab']) ? 'tab-' . sanitize_text_field($_GET['tab']) : null;
+$active_panel = $activeTab && isset($tab_panels[$activeTab]) ? $tab_panels[$activeTab] : 'tab-forum-panel';
 ?>
 
 
-<section id="tab-latest-panel" role="tabpanel" aria-hidden="false">
+<section id="tab-latest-panel" role="tabpanel" aria-hidden="<?php echo $active_panel === 'tab-latest-panel' ? 'false' : 'true'; ?>" <?php if ($active_panel !== 'tab-latest-panel') echo 'hidden'; ?>>
 	<?php
 	$query_args = array(
 		'post_status'    => 'publish',
@@ -41,8 +51,8 @@
 	?>
 </section>
 
-<section id="tab-about-panel" role="tabpanel" aria-hidden="true" hidden>
-	<div class="archive-main__entry archive-main__entry--smaller">
+<section id="tab-about-panel" role="tabpanel" aria-hidden="<?php echo $active_panel === 'tab-about-panel' ? 'false' : 'true'; ?>" <?php if ($active_panel !== 'tab-about-panel') echo 'hidden'; ?>>
+		<div class="archive-main__entry archive-main__entry--smaller">
 		<?php
 		if (empty(get_the_content())) {
 			_e('There is no content.', 'weadapt');
@@ -53,12 +63,12 @@
 	</div>
 </section>
 
-<section id="tab-editors-panel" role="tabpanel" aria-hidden="true" hidden>
-	<?php get_part('components/contact-cols/index'); ?>
+<section id="tab-editors-panel" role="tabpanel" aria-hidden="<?php echo $active_panel === 'tab-editors-panel' ? 'false' : 'true'; ?>" <?php if ($active_panel !== 'tab-editors-panel') echo 'hidden'; ?>>
+		<?php get_part('components/contact-cols/index'); ?>
 </section>
 
-<section id="tab-members-panel" role="tabpanel" aria-hidden="true" hidden>
-	<?php
+<section id="tab-members-panel" role="tabpanel" aria-hidden="<?php echo $active_panel === 'tab-members-panel' ? 'false' : 'true'; ?>" <?php if ($active_panel !== 'tab-members-panel') echo 'hidden'; ?>>
+		<?php
 	if (!empty($followed_users = get_followed_users(get_the_ID(), get_post_type()))) :
 		$query_args = [
 			'include' => $followed_users,
@@ -79,7 +89,7 @@
 		</p>
 	<?php endif; ?>
 </section>
-<section id="tab-forum-panel" role="tabpanel" aria-hidden="true" hidden>
+<section id="tab-forum-panel" role="tabpanel" >
 	<?php
 	global $wpdb;
 	$wpdb->save_queries = true;

@@ -12,22 +12,7 @@
 	<?php echo get_part( 'components/header/parts/main' ); ?>
 </header>
 
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-  // Select the heading element by its ID
-  const heading = document.getElementById('main-heading');
-  if(!heading) return;
 
-  // Get the text content of the heading
-  let headingText = heading.textContent;
-
-  // Replace all occurrences of &nbsp; and \u00A0 with a regular space
-  headingText = headingText.replace(/(&nbsp;|\u00A0)/g, ' ');
-
-  // Set the modified text content back to the heading
-  heading.textContent = headingText;
-});
-</script>
 
 <?php
 	$popup_text = get_field( 'popup_text', 'options' );

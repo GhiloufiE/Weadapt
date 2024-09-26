@@ -5,13 +5,10 @@
  * @package WeAdapt
  */
 
-// Get the tab parameter from the URL
-$activeTab = isset($_GET['tab']) ? 'tab-' . sanitize_text_field($_GET['tab']) : null;
 
-// Default check for the 'about' tab on a specific page
+$activeTab = isset($_GET['tab']) ? 'tab-' . sanitize_text_field($_GET['tab']) : null;
 $is_about_default = (get_the_ID() == 28392);
 
-// Array to map tab IDs to their corresponding panels
 $tab_panels = [
     'tab-latest'       => 'tab-latest-panel',
     'tab-about'        => 'tab-about-panel',
@@ -21,7 +18,6 @@ $tab_panels = [
     'network-forum'    => 'tab-forum-panel',
 ];
 
-// Determine the active panel based on the URL parameter or fallback to the default logic
 $active_panel = $activeTab && isset($tab_panels[$activeTab]) ? $tab_panels[$activeTab] : ($is_about_default ? 'tab-about-panel' : 'tab-latest-panel');
 ?>
 

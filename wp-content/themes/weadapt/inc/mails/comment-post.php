@@ -81,3 +81,65 @@ function theme_comment_post( $comment_ID, $comment_approved, $commentdata ) {
 }
 
 add_action( 'comment_post', 'theme_comment_post', 50, 3 );
+
+add_action('comment_post', 'notify_admin_on_pending_comment', 10, 2);
+
+function notify_admin_on_pending_comment($comment_id, $comment_approved)
+{
+	
+    if ($comment_approved == 0) {
+		$users   = get_blog_administrators( false, 1 );
+        $comment = get_comment($comment_id);
+        $post = get_post($comment->comment_post_ID);
+
+        
+
+        $subject = 'New Comment Awaiting Approval on "' . $post->post_title . '" - ' . get_bloginfo('name');
+        $post_excerpt = wp_strip_all_tags(wp_trim_words($comment->comment_content, 100, '...'));
+
+        $approve_url = admin_url('comment.php?action=approve&c=' . $comment_id);
+        $edit_url = admin_url('comment.php?action=editcomment&c=' . $comment_id);
+
+        $message = '<p>A new comment is awaiting approval on the post: <strong>' . esc_html($post->post_title) . '</strong></p>';
+        $message .= '<p>Comment Summary: ' . esc_html($post_excerpt) . '</p>';
+        $message .= '<p>Review and take action:</p>';
+        $message .= '<ul>
+                        <a href="' . esc_url($approve_url) . '">Approve</a>
+                        <a href="' . esc_url($edit_url) . '">Edit</a>
+                    </ul>';
+        $message .= '<br>Best Regards,<br>' . esc_html(get_bloginfo('name')) . '<br>';
+        foreach ($users as $user) {
+                send_email_immediately($user, $subject, $message, null);
+            }
+        
+    }
+}
+add_action('comment_unapproved_to_approved', 'notify_user_comment_approved', 10, 1);
+
+function notify_user_comment_approved($comment) {
+    $comment_id = $comment->comment_ID;
+    $comment_author_email = $comment->comment_author_email;
+    $post_title = get_the_title($comment->comment_post_ID);
+    $comment_link = get_comment_link($comment_id);
+    $user = get_user_by('email', $comment_author_email);
+    if (!$user) {
+        error_log("User with email " . $comment_author_email . " not found.");
+        return;
+    }
+
+    $user_id = $user->ID;
+    $subject = 'Comment Approved on ' . get_bloginfo('name');
+    $message = sprintf(
+    'Dear %s,<br><br>Your comment on the post "<strong>%s</strong>" has been approved and is now live. You can view it by clicking the link below:<br><br><a href="%s" style="color: #0073aa; text-decoration: none;">View Your Comment</a><br><br>',
+    $user->display_name, 
+    $post_title,
+    $comment_link
+);
+$message .= "Thank you for contributing to our community!<br><br>Best Regards,<br>" . get_bloginfo('name');
+    $message .= "<br><br>Best Regards,<br>" . get_bloginfo('name');
+    send_email_immediately($user_id, $subject, $message, null);
+}
+function force_comment_moderation($approved, $commentdata) {
+    return 0; 
+}
+add_filter('pre_comment_approved', 'force_comment_moderation', 10, 2);
