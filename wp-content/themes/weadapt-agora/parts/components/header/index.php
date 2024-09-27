@@ -12,7 +12,7 @@
 	<?php echo get_part( 'components/header/parts/main' ); ?>
 </header>
 
-<script>
+<!-- <script>
 document.addEventListener("DOMContentLoaded", function() {
   // Select the heading element by its ID
   const heading = document.getElementById('main-heading');
@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", function() {
   // Set the modified text content back to the heading
   heading.textContent = headingText;
 });
-</script>
+</script> -->
 
 <?php
 	$popup_text = get_field( 'popup_text', 'options' );

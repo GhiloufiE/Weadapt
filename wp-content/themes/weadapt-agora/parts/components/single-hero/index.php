@@ -17,6 +17,10 @@ $post_author_html = '';
 $document_list = get_field('document_list');
 $document_item = !empty($document_list) ? $document_list[0] : null;
 $file_ID = !empty($document_item) ? $document_item['file'] : null;
+function clean_non_standard_spaces($string) {
+    $cleaned_string = preg_replace('/[\x{00A0}\x{200B}\x{200C}\x{200D}\x{FEFF}]/u', ' ', $string);
+    return $cleaned_string;
+}
 function parse_count($count_string)
 {
 	preg_match('/(\d+)/', $count_string, $matches);
@@ -143,11 +147,6 @@ switch ($type) {
 			}
 		}
 		break;
-		case 'members':
-			$fields = [
-				'type_link' => ucfirst($type),
-			];
-			break;
 
 	default:
 		$fields = [
@@ -161,7 +160,6 @@ switch ($type) {
 
 		$relevant = get_field('relevant');
 		$main_theme_networks = get_field('relevant_main_theme_network', $post_ID);
-		error_log(print_r($main_theme_networks, true));
 		if (!empty($main_theme_networks) && is_array($main_theme_networks)) {
 			$fields['type_link'] = [];
 			foreach ($main_theme_networks as $type_ID) {
@@ -245,7 +243,6 @@ switch ($type) {
 <section class="single-hero">
 	<?php load_inline_styles(__DIR__, 'single-hero'); ?>
 	<?php load_blocks_script('single-hero', 'weadapt/single-hero'); ?>
-
 	<div class="single-hero__container container">
 		<div class="single-hero__row row <?php echo empty($thumb_ID) ? 'single-hero__row_top' : ''; ?>">
 			<div class="single-hero__left">
@@ -277,28 +274,11 @@ switch ($type) {
 							endforeach; ?>
 						</div>
 					<?php endif; ?>
-					<?php
-					function insert_line_breaks($title, $word_limit = 3)
-					{
-						$words = explode(' ', $title);
-						$new_title = '';
-						$word_count = 0;
-
-						foreach ($words as $word) {
-							$new_title .= $word . ' ';
-							$word_count++;
-							if ($word_count >= $word_limit) {
-								$new_title .= '<br>';
-								$word_count = 0;
-							}
-						}
-
-						return trim($new_title);
-					}
-
-					$title_with_breaks = insert_line_breaks($title);
-					?>
-					<h1 class="single-hero__title" id="main-heading"><?php echo $title; ?></h1>
+					<h1 class="single-hero__titles" id="main-headissssng"> <?php
+    $title = get_the_title();
+    $clean_title = clean_non_standard_spaces($title);
+    echo esc_html($clean_title);
+    ?></h1>
 					<?php if ($excerpt) : ?>
 						<div class="single-hero__excerpt"><?php echo $excerpt; ?></div>
 					<?php endif; ?>
@@ -315,6 +295,8 @@ switch ($type) {
 					?>
 
 					<?php if (!empty($post_meta_items)) : ?>
+						<h2 class="single-hero__titles" id="main-headissssng"><?php echo esc_html($title); ?></h1>
+
 						<ul class="post-meta single-hero__meta">
 							<?php
 							$post_ID = get_the_ID();
@@ -325,11 +307,39 @@ switch ($type) {
 							<?php foreach ($post_meta_items as $item) :
 								$id = isset($item[2]) ? 'id="' . $item[2] . '"' : '';
 							?>
-								
+								<li class="post-meta__item">
+
+									<span class="icon" aria-label="<?php echo esc_attr($item[0]); ?>"><?php echo get_img($item[0]); ?></span>
+
+									<span class="text" <?php echo $id; ?>><?php echo $item[1]; ?></span>
+								</li>
 							<?php endforeach; ?>
 
 							<?php
 							if ($type === 'theme') : ?>
+								<div class="wp-block-button">
+									<button class="wp-block-button__link has-background" data-post-id="<?php echo esc_attr($post_ID); ?>" data-post-type="forum" data-popup="post-creation" onclick="setPostDetails(this)">
+										<?php echo sprintf("<span>%s</span>", esc_html__("Add a forum post", "weadapt")); ?>
+									</button>
+								</div>
+								<script>
+									function setPostDetails(button) {
+										const postId = button.getAttribute('data-post-id');
+										const postType = button.getAttribute('data-post-type');
+										const forumField = document.getElementById('forum-field');
+										const postTypeField = document.getElementById('post-type-field');
+
+										if (forumField) {
+											forumField.value = postId;
+										}
+										if (postTypeField) {
+											postTypeField.value = postType;
+										}
+									}
+								</script>
+							<?php endif; ?>
+							<?php
+							if ($type === 'network') : ?>
 								<div class="wp-block-button">
 									<button class="wp-block-button__link has-background" data-post-id="<?php echo esc_attr($post_ID); ?>" data-post-type="forum" data-popup="post-creation" onclick="setPostDetails(this)">
 										<?php echo sprintf("<span>%s</span>", esc_html__("Start a conversation", "weadapt")); ?>
@@ -344,6 +354,7 @@ switch ($type) {
 
 										if (forumField) {
 											forumField.value = postId;
+											console.log(postId);
 										}
 										if (postTypeField) {
 											postTypeField.value = postType;

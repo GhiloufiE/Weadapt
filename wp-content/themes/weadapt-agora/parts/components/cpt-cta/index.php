@@ -8,8 +8,13 @@
 $cpt_ID  = ! empty( $args['cpt_ID'] )  ? $args['cpt_ID']  : 0;
 $buttons = ! empty( $args['buttons'] ) ? $args['buttons'] : [];
 
+// Check if the post exists
 if ( ! empty( $cpt_ID ) && ! empty( get_post($cpt_ID) ) ) :
 	$link_url  = get_the_permalink( $cpt_ID );
+	$is_published = ( get_post_status( $cpt_ID ) === 'publish' ); 
+	$publish_to   = get_field('publish_to', $cpt_ID); 
+	$current_blog_ID = get_current_blog_id(); 
+	$should_display_link = $is_published && (empty($publish_to) || in_array($current_blog_ID, $publish_to)); 
 	$add_class = ( 'organisation' === get_post_type( $cpt_ID ) && 'draft' === get_post_status( $cpt_ID ) ) ? ' is-draft' : '';
 ?>
 
@@ -18,15 +23,24 @@ if ( ! empty( $cpt_ID ) && ! empty( get_post($cpt_ID) ) ) :
 
 	<?php if ( ! empty( $image = get_the_post_thumbnail( $cpt_ID, 'medium' ) ) ) : ?>
 		<div class="cpt-cta__img">
-			<a href="<?php echo $link_url; ?>" class="cpt-cta__img-link"><?php echo $image; ?></a>
+			<?php if ( $should_display_link ) : ?>
+				<a href="<?php echo esc_url( $link_url ); ?>" class="cpt-cta__img-link"><?php echo $image; ?></a>
+			<?php else : ?>
+				<!-- Display the image without a link for unpublished posts -->
+				<?php echo $image; ?>
+			<?php endif; ?>
 		</div>
 	<?php endif; ?>
 
 	<div class="cpt-cta__content">
 		<?php if ( ! empty( $title = get_the_title( $cpt_ID ) ) ) : ?>
 			<h3 class="cpt-cta__title">
-				<a class="cpt-cta__title__link" href="<?php echo $link_url; ?>"><?php echo $title; ?>
-				</a>
+				<?php if ( $should_display_link ) : ?>
+					<a class="cpt-cta__title__link" href="<?php echo esc_url( $link_url ); ?>"><?php echo esc_html( $title ); ?></a>
+				<?php else : ?>
+					<!-- Display the title without a link for unpublished posts -->
+					<?php echo esc_html( $title ); ?>
+				<?php endif; ?>
 			</h3>
 		<?php endif; ?>
 
@@ -55,7 +69,6 @@ if ( ! empty( $cpt_ID ) && ! empty( get_post($cpt_ID) ) ) :
 								'style'   => 'outline-small',
 								'join_ID' => $cpt_ID
 							] );
-
 							break;
 
 						case 'share':
@@ -64,7 +77,6 @@ if ( ! empty( $cpt_ID ) && ! empty( get_post($cpt_ID) ) ) :
 								'url'   => get_permalink( $cpt_ID ),
 								'type'  => get_post_type( $cpt_ID )
 							] );
-
 							break;
 
 						case 'contact':
@@ -75,7 +87,6 @@ if ( ! empty( $cpt_ID ) && ! empty( get_post($cpt_ID) ) ) :
 									'target' => '_blank',
 								];
 							}
-
 							break;
 
 						case 'find-out-more':
@@ -84,7 +95,6 @@ if ( ! empty( $cpt_ID ) && ! empty( get_post($cpt_ID) ) ) :
 								'title' => __( 'Find out More', 'weadapt' ),
 								'target' => '',
 							];
-
 							break;
 
 						case 'website':
@@ -96,14 +106,16 @@ if ( ! empty( $cpt_ID ) && ! empty( get_post($cpt_ID) ) ) :
 								];
 								$class = 'outline-small';
 							}
+							break;
 
 						case 'permalink':
-							$link = [
-								'url'   => get_the_permalink( $cpt_ID ),
-								'title'  => __( 'Find out more', 'weadapt' ),
-								'target' => '_blank',
-							];
-
+							if ( $should_display_link ) {
+								$link = [
+									'url'   => get_the_permalink( $cpt_ID ),
+									'title'  => __( 'Find out more', 'weadapt' ),
+									'target' => '_blank',
+								];
+							}
 							break;
 					}
 

@@ -225,10 +225,20 @@ function theme_ajax_create()
 			$selected_organisation = sanitize_text_field($_POST['organisation']);
 			update_field('organisations', $selected_organisation, 'user_' . $user_ID);
 			update_user_meta($user_ID, 'user_roles', $roles);
-			update_user_meta($user_ID, 'address_country', $address_country);
-			update_user_meta($user_ID, 'address_city', $address_town_city);
-			update_user_meta($user_ID, 'address_county', $address_county);
+			update_user_meta($user_ID, 'organisation', sanitize_text_field($_POST['organisation']));
+			update_user_meta($user_ID, 'address_country', sanitize_text_field($_POST['country']));
+			update_user_meta($user_ID, 'address_city', sanitize_text_field($_POST['city']));
+			update_user_meta($user_ID, 'address_county', sanitize_text_field($_POST['county']));
+			error_log("Organisation saved for user: " . get_user_meta($user_ID, 'organisation', true));
+			error_log("Country saved for user: " . get_user_meta($user_ID, 'address_country', true));
+			error_log("City saved for user: " . get_user_meta($user_ID, 'address_city', true));
 			migrate_user_to_member_relationship_single($user_ID);
+			do_action('custom_user_meta_saved', $user_ID, array(
+				'first_name' => $user_first_name,
+				'last_name' => $user_last_name,
+				'user_login' => $user_name,
+				'user_email' => $user_email,
+			));
 			if (isset($_POST['mailchimp_subscribe']) && $_POST['mailchimp_subscribe'] === '1') {
 				$api_key = '8b4651ed405334d02ccaa5870f9b2770-us22';
 				$audience_id = '1d67a109f9';
