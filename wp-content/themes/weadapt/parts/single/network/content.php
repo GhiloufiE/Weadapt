@@ -141,57 +141,64 @@ $active_panel = $activeTab && isset($tab_panels[$activeTab]) ? $tab_panels[$acti
     if ($wpdb->last_error) {
         error_log('SQL Query: ' . $sql);
     }
+    error_log('Post IDs: ' . print_r($post_ids, true));
+    if (empty($post_ids)) {
+		echo 'No forum topics available';
+	} else {
+		$query_args = array(
+			'post_status'    => 'publish',
+			'post_type'      => get_allowed_post_types(['forum']),
+			'orderby'        => 'date',
+			'order'          => 'DESC',
+			'meta_query'     => array(
+				array(
+					'key'     => 'forum',
+					'value'   => $post_ids,  
+					'compare' => 'IN',       
+				),
+			),
+			'ignore_sticky_posts' => true,
+			'theme_query'         => true,  
+			'categories'          => array(),
+		);
 
-    $query_args = array(
-        'post_status'    => 'publish',
-        'post_type'      => get_allowed_post_types(['forum']),
-        'orderby'        => 'date',
-        'order'          => 'DESC',
-        'meta_query'     => [[
-            'key'   => 'forum',
-            'value' => $post_ids
-        ]],
-        'ignore_sticky_posts' => true,
-        'theme_query'         => true, // multisite fix
-        'categories'          => []
-    );
+		get_part('components/cpt-query/index', [
+			'query_args'      => $query_args,
+			'show_post_types' => false,
+			'show_search'	=> $show_search,
+			'show_categories' => false,
+			'query_type'      => 'forum_query',
+			'title'       => __('Forum Topics', 'weadapt'),
+			'description' => __('Discover the forum topics in this theme.', 'weadapt'),
+		]);
 
-    get_part('components/cpt-query/index', [
-        'query_args'      => $query_args,
-        'show_post_types' => false,
-        'show_search'     => $show_search,
-        'show_categories' => false,
-        'query_type'      => 'forum_query',
-        'title'           => __('Forum Topics', 'weadapt'),
-        'description'     => __('Discover the forum topics in this theme.', 'weadapt'),
-    ]);
+		$query_args = array(
+			'post__in' => $post_ids,
+			'post_status' => 'publish',
+			'orderby' => 'post_date',
+			'order' => 'DESC',
+			'ignore_sticky_posts' => true,
+		);
+		$query = new WP_Query($query_args);
+		if ($query->have_posts()) {
+			while ($query->have_posts()) {
+				$query->the_post();
+				get_part('components/cpt-search-query/index', [
+					'query_args'      => $query_args,
+					'show_post_types' => true,
+					'show_categories' => true
+				]);
+			}
+			wp_reset_postdata();
+		}
+		if (apply_filters('show_related_single_theme_content', true)) {
+			get_part('components/related-content/index');
+		}
 
-    $query_args = array(
-        'post__in' => $post_ids,
-        'post_status' => 'publish',
-        'orderby' => 'post_date',
-        'order' => 'DESC',
-        'ignore_sticky_posts' => true,
-    );
-    $query = new WP_Query($query_args);
-    if ($query->have_posts()) {
-        while ($query->have_posts()) {
-            $query->the_post();
-            get_part('components/cpt-query/index', [
-                'query_args'      => $query_args,
-                'show_post_types' => true,
-                'show_categories' => true
-            ]);
-        }
-        wp_reset_postdata();
-    }
-    if (apply_filters('show_related_single_theme_content', true)) {
-        get_part('components/related-content/index');
-    }
-
-    if (!empty(get_allowed_post_types(['forums']))) {
-        get_part('components/forum-cta/index');
-    }
-    get_part('components/forum-cta/index');
+		if (!empty(get_allowed_post_types(['forums']))) {
+			get_part('components/forum-cta/index');
+		}
+		get_part('components/forum-cta/index');
+	}
     ?>
 </section>

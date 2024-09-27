@@ -1339,3 +1339,119 @@ function handle_ajax_insert_theme_forum_relationship() {
 }
 add_action('wp_ajax_insert_theme_forum_relationship', 'handle_ajax_insert_theme_forum_relationship');
 
+function create_forum_network_relationship_table() {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'forum_network_relationship';
+
+    // Define the charset and collation for the table
+    $charset_collate = $wpdb->get_charset_collate();
+
+    // SQL statement for creating the table
+    $sql = "CREATE TABLE IF NOT EXISTS $table_name (
+        id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+        forum_id bigint(20) unsigned NOT NULL,
+        network_id bigint(20) unsigned NOT NULL,
+        PRIMARY KEY (id),
+        KEY forum_id (forum_id),
+        KEY network_id (network_id)
+    ) $charset_collate;";
+
+    // Use dbDelta to create the table
+    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+    dbDelta($sql);
+}
+
+function insert_forum_network_relationship() {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'forum_network_relationship';
+
+    // Create the table if it doesn't exist
+    create_forum_network_relationship_table();
+
+    // Retrieve all published forums
+    $forums = get_posts(array(
+        'post_type' => 'forums',
+        'posts_per_page' => -1,
+        'post_status' => 'publish'
+    ));
+    error_log('Forums: ' . count($forums)); // Logging the count of forums
+
+    foreach ($forums as $forum) {
+        // Retrieve all networks related to the current forum by its ID
+        $networks = get_posts(array(
+            'post_type' => 'network',
+            'posts_per_page' => -1,
+            'meta_query' => array(
+                array(
+                    'key' => 'relevant_forum',
+                    'value' => $forum->ID,
+                    'compare' => '='
+                )
+            )
+        ));
+
+        // Log for debugging
+        error_log('Processing Forum ID: ' . $forum->ID . ', Found ' . count($networks) . ' networks');
+
+        // Insert each network found into the database table
+        foreach ($networks as $network) {
+            $wpdb->insert(
+                $table_name,
+                array(
+                    'forum_id' => $forum->ID,
+                    'network_id' => $network->ID
+                ),
+                array(
+                    '%d',
+                    '%d'
+                )
+            );
+            // Logging each insert for debugging
+            error_log('Inserted relationship for Forum ID: ' . $forum->ID . ' and Network ID: ' . $network->ID);
+        }
+    }
+}
+
+// Add a page under the "Tools" menu
+function add_forum_network_relationship_page() {
+    add_management_page(
+        'Forum Network Relationship', // Page title
+        'Forum Network Relationship', // Menu title
+        'manage_options',             // Capability required
+        'forum-network-relationship',  // Menu slug
+        'render_forum_network_relationship_page' // Callback function
+    );
+}
+add_action('admin_menu', 'add_forum_network_relationship_page');
+
+function render_forum_network_relationship_page() {
+    ?>
+    <div class="wrap">
+        <h1>Insert Forum-Network Relationship</h1>
+        <p>Click the button below to insert the forum-network relationships into the database.</p>
+        <button id="insert-forum-network-button" class="button button-primary">Insert Relationships</button>
+        <div id="insert-forum-network-result"></div>
+
+        <script type="text/javascript">
+            jQuery(document).ready(function($) {
+                $('#insert-forum-network-button').on('click', function() {
+                    $('#insert-forum-network-result').html('<p>Processing...</p>');
+
+                    $.post(ajaxurl, {
+                        action: 'insert_forum_network_relationship'
+                    }, function(response) {
+                        $('#insert-forum-network-result').html('<p>' + response.data + '</p>');
+                    });
+                });
+            });
+        </script>
+    </div>
+    <?php
+}
+
+// Register the AJAX action for logged-in users
+function handle_ajax_insert_forum_network_relationship() {
+    insert_forum_network_relationship();
+    wp_send_json_success('Forum-network relationships have been inserted successfully.');
+}
+add_action('wp_ajax_insert_forum_network_relationship', 'handle_ajax_insert_forum_network_relationship');
