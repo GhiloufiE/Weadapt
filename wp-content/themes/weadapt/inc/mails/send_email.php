@@ -1,45 +1,45 @@
 <?php
-function send_email_immediately($user_ids, $subject, $message, $post_id) {
-    $user_ids = (array) $user_ids;
-    
-    $publish_to = get_post_meta($post_id, 'publish_to', true);
+function send_email_immediately($user_ids, $subject, $message, $post_id = null) {
+  $user_ids = (array) $user_ids;
+  if ($post_id) {
+      $publish_to = (array) get_post_meta($post_id, 'publish_to', true);
+  } else {
+      $publish_to = [get_current_blog_id()];
+  }
+  $blog_image_map = [
+      'weADAPT' => get_theme_file_uri('/assets/images/weadapt.webp'),
+      'Adaptation At Altitude' => get_theme_file_uri('/assets/images/adaptation-alt.webp'),
+      'Can-Adapt' => get_theme_file_uri('/assets/images/can-adapt.webp'),
+      'Adaptation Without Borders' => get_theme_file_uri('/assets/images/adaptation-without-borders.webp'),
+      'Water Adaptation Community' => get_theme_file_uri('/assets/images/weadapt.webp'),
+      'MAIA' => get_theme_file_uri('/assets/images/maia.webp'),
+      'Agora' => get_theme_file_uri('/assets/images/agora.webp'),
+  ];
 
-    if (is_array($publish_to)) {
-        $blog_image_map = [
-            'weADAPT' => get_theme_file_uri('/assets/images/weadapt.webp'),
-            'Adaptation At Altitude' => get_theme_file_uri('/assets/images/adaptation-alt.webp'),
-            'Can-Adapt' => get_theme_file_uri('/assets/images/can-adapt.webp'),
-            'Adaptation Without Borders' => get_theme_file_uri('/assets/images/adaptation-without-borders.webp'),
-            'Water Adaptation Community' => get_theme_file_uri('/assets/images/weadapt.webp'),
-            'MAIA' => get_theme_file_uri('/assets/images/maia.webp'),
-            'Agora' => get_theme_file_uri('/assets/images/agora.webp'),
-        ];
+  $image_urls = [];
+  $blog_names = [];
+  foreach ($publish_to as $blog_id) {
+      $blog_details = get_blog_details($blog_id);
 
-        $image_urls = [];
-        $blog_names = [];
-
-        foreach ($publish_to as $blog_id) {
-            $blog_name = get_blog_details($blog_id)->blogname;
-            $blog_names[] = $blog_name;
-
-            if (isset($blog_image_map[$blog_name])) {
-                $image_urls[] = $blog_image_map[$blog_name];
-            } else {
-                $image_urls[] = get_theme_file_uri('/assets/images/weadapt.png');
-            }
-        }
-    } else {
-        $image_urls[] = get_theme_file_uri('/assets/images/weadapt.png');
-    }
-
-    $button_style = generate_button_style();
-    $buttons = extract_buttons_from_message($message, $button_style);
-    $button_container = generate_button_container($buttons);
-    $message = insert_buttons_into_message($message, $button_container);
-    $html_template = generate_email_template($image_urls, $message);
-
-    $headers = array('Content-Type: text/html; charset=UTF-8');
-    send_emails_to_users($user_ids, $subject, $html_template, $headers);
+      if ($blog_details) {
+          $blog_name = $blog_details->blogname;
+          $blog_names[] = $blog_name;
+          if (isset($blog_image_map[$blog_name])) {
+              $image_urls[] = $blog_image_map[$blog_name];
+          } else {
+              $image_urls[] = get_theme_file_uri('/assets/images/weadapt.png');
+          }
+      } else {
+          error_log('Invalid blog_id: ' . $blog_id);
+      }
+  }
+  $button_style = generate_button_style();
+  $buttons = extract_buttons_from_message($message, $button_style);
+  $button_container = generate_button_container($buttons);
+  $message = insert_buttons_into_message($message, $button_container);
+  $html_template = generate_email_template($image_urls, $message);
+  $headers = array('Content-Type: text/html; charset=UTF-8');
+  send_emails_to_users($user_ids, $subject, $html_template, $headers);
 }
 
 function generate_button_style() {

@@ -146,7 +146,7 @@ function theme_save_post($post_ID, $post, $update)
                 $author_info = get_userdata($post->post_author);
                 $message .= '<br><br>';
                 $message .= sprintf(__('<strong>Title:</strong> %s', 'weadapt'), esc_html($post->post_title));
-                $message .= '<br>';
+                $message .= '<br><br>';
                 $message .= sprintf(__('This content was originally created by <strong>%s</strong>.', 'weadapt'), esc_html($author_info->display_name));
                 $message .= '<br><br>';
                 $message .= sprintf('<a href="%s">%s</a>', get_permalink($post->ID), __('Visit the content', 'weadapt'));
