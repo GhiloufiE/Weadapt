@@ -31,10 +31,10 @@ $attr = $block_object->attr('has-image');
 				<div class="image-wrapper" style="position: relative; display: inline-block;">
 			    <img src="<?php echo get_theme_file_uri('/assets/images/diagram.png'); ?>" style="width: 100%;" />
 			    <!-- Clickable Areas -->
-			    <div id="scope-review" class="clickable-area" style="background-color: red; position: absolute; top: 15%; left: 38%; width: 100px; height: 100px;"></div>
-			    <div id="integrate-knowledge" class="clickable-area" style="background-color: green;position: absolute; top: 40%; left: 12%; width: 100px; height: 100px;"></div>
-			    <div id="co-design" class="clickable-area" style="background-color: yellow;position: absolute; top: 66%; left: 38%; width: 100px; height: 100px;"></div>
-			    <div id="co-explore" class="clickable-area" style="background-color: blue;position: absolute; top: 40%; left: 65%; width: 100px; height: 100px;"></div>
+			    <div id="scope-review" class="clickable-area" style="position: absolute; top: 15%; left: 38%; width: 100px; height: 100px;"></div>
+			    <div id="integrate-knowledge" class="clickable-area" style="position: absolute; top: 40%; left: 12%; width: 100px; height: 100px;"></div>
+			    <div id="co-design" class="clickable-area" style="position: absolute; top: 66%; left: 38%; width: 100px; height: 100px;"></div>
+			    <div id="co-explore" class="clickable-area" style="position: absolute; top: 40%; left: 65%; width: 100px; height: 100px;"></div>
 			</div>
 
 				<!-- <svg class="hero-tandem__svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 441.3333 441.3333">
