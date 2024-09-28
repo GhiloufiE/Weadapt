@@ -83,13 +83,13 @@
 
 	<div class="col-12 col-md-6">
 		<p class="ajax-form__field">
-			<label for="user-country"><?php _e('Country', 'weadapt'); ?></label>
+			<label for="user-country"><?php _e('Country', 'weadapt'); ?><span class="required">*</span></label>
 			<?php
 			$field_key = "field_6437a20cbbc21";
 			$field = get_field_object($field_key);
 
 			if ($field) {
-				echo '<select id="user-country" name="' . esc_attr($field['name']) . '" class="styled-select">';
+				echo '<select id="user-country" name="' . esc_attr($field['name']) . '" class="styled-select" required="required">';
 				echo '<option value="">' . __('Select Country', 'weadapt') . '</option>';
 				foreach ($field['choices'] as $value => $label) {
 					echo '<option value="' . esc_attr($value) . '">' . esc_html($label) . '</option>';
@@ -101,17 +101,17 @@
 	</div>
 
 	<div class="col-12 col-md-6">
-		<p class="ajax-form__field">
-			<?php $field_key = "field_6437a28bbbc22";
-			$field = get_field_object($field_key);
-			?>
-			<label for="user-town-city"><?php _e('Town/City', 'weadapt'); ?></label>
-			<?php if ($field) {
-				echo '<input id="user-town-city" type="text" name="' . esc_attr($field['name']) . '" >';
-			}
-			?>
-		</p>
-	</div>
+    <p class="ajax-form__field">
+        <?php $field_key = "field_6437a28bbbc22";
+        $field = get_field_object($field_key);
+        ?>
+        <label for="user-town-city"><?php _e('Town/City', 'weadapt'); ?><span class="required">*</span></label>
+        <?php if ($field) {
+            echo '<input id="user-town-city" type="text" name="' . esc_attr($field['name']) . '" required="required">';
+        }
+        ?>
+    </p>
+</div>
 	<div class="col-12 col-md-6">
 		<p class="ajax-form__field">
 			<?php $field_key = "field_6437a2a4bbc23";
@@ -126,32 +126,31 @@
 	</div>
 
 	<div class="col-12">
-	<div class="register-profile__item">
-			<h4 class="register-profile__title"><?php _e('Organisation', 'weadapt'); ?></h4>
-			<div class="theme-select-wrap">
-				<input type="text" id="organisation-search" placeholder="<?php _e('Search organisation...', 'weadapt'); ?>" onkeyup="filterOrganisations()">
-				<div id="organisation-list" class="styled-checkbox-list">
-					<?php while ($query->have_posts()) :
-						$query->the_post();
-						$ID = get_the_ID();
-					?>
-						<label class="organisation-item">
-							<input type="checkbox" class="organisation-checkbox" name="organisation" value="<?php echo $ID; ?>" onclick="limitOrganisationSelection(this)">
-							<span><?php the_title(); ?></span>
-						</label>
-					<?php endwhile; ?>
-				</div>
-			</div>
-			<small class="organisation-hint">
-    <?php _e("If you couldn't find your organisation, you can create one by checking the checkbox below.", 'weadapt'); ?>
-</small>
-			<label for="add_org" class="registration__checkbox">
-				<input type="checkbox" id="add_org" name="add_org" value="1" onclick="limitOrganisationSelection()">
-				<span><?php _e('I want to add my own organization', 'weadapt'); ?></span>
-			</label>
-			
-		</div>
-	</div>
+    <div class="register-profile__item">
+        <h4 class="register-profile__title"><?php _e('Organisation', 'weadapt'); ?></h4>
+        <div class="theme-select-wrap">
+            <input type="text" id="organisation-search" placeholder="<?php _e('Search organisation...', 'weadapt'); ?>" onkeyup="filterOrganisations()">
+            <div id="organisation-list" class="styled-checkbox-list">
+                <?php while ($query->have_posts()) :
+                    $query->the_post();
+                    $ID = get_the_ID();
+                ?>
+                    <label class="organisation-item">
+                        <input type="checkbox" class="organisation-checkbox" name="organisation" value="<?php echo $ID; ?>" onclick="limitOrganisationSelection(this)">
+                        <span><?php the_title(); ?></span>
+                    </label>
+                <?php endwhile; ?>
+            </div>
+        </div>
+        <small class="organisation-hint">
+            <?php _e("If you couldn't find your organisation, you can create one by checking the checkbox below.", 'weadapt'); ?>
+        </small>
+        <label for="add_org" class="registration__checkbox">
+            <input type="checkbox" id="add_org" name="add_org" value="1" onclick="limitOrganisationSelection()">
+            <span><?php _e('I want to add my own organization', 'weadapt'); ?></span>
+        </label>
+    </div>
+</div>
 </div>
 
 <div class="popup__separator"></div>
@@ -291,14 +290,24 @@ function updateSelectedOptions() {
 function validateForm(event) {
     var organisationChecked = document.querySelector('.organisation-checkbox:checked');
     var addOrgChecked = document.getElementById('add_org').checked;
-    if (organisationChecked && addOrgChecked) {
-        alert("Please select only one option: either choose an organisation or add your own.");
+    if (!organisationChecked && !addOrgChecked) {
+        alert("Please select an organisation or check the 'add my own organisation' checkbox.");
         event.preventDefault();
-    } else if (!organisationChecked && !addOrgChecked) {
-        alert("Please select an organisation or add your own.");
-        event.preventDefault();
+        return false;
     }
+    
+    if (organisationChecked && addOrgChecked) {
+        alert("Please select only one option: either choose an organisation or check the 'add my own organisation' checkbox.");
+        event.preventDefault();
+        return false;
+    }
+    
+    return true;
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelector('form').addEventListener('submit', validateForm);
+});
 
 function filterOrganisations() {
     var input = document.getElementById('organisation-search');

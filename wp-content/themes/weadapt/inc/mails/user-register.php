@@ -5,60 +5,296 @@
  *
  * For debuging use: error_log( print_r( $variable, true ) );
  */
-add_action('custom_user_meta_saved', 'theme_user_register_after_meta', 10, 2);
+
+ add_action('custom_user_meta_saved', 'theme_user_register_after_meta', 10, 2);
+function get_country_list() {
+ return array(
+    'AF' => 'Afghanistan',
+    'AX' => 'Aland Islands',
+    'AL' => 'Albania',
+    'DZ' => 'Algeria',
+    'AS' => 'American Samoa',
+    'AD' => 'Andorra',
+    'AO' => 'Angola',
+    'AI' => 'Anguilla',
+    'AQ' => 'Antarctica',
+    'AG' => 'Antigua and Barbuda',
+    'AR' => 'Argentina',
+    'AM' => 'Armenia',
+    'AW' => 'Aruba',
+    'AU' => 'Australia',
+    'AT' => 'Austria',
+    'AZ' => 'Azerbaijan',
+    'BS' => 'Bahamas',
+    'BH' => 'Bahrain',
+    'BD' => 'Bangladesh',
+    'BB' => 'Barbados',
+    'BY' => 'Belarus',
+    'BE' => 'Belgium',
+    'BZ' => 'Belize',
+    'BJ' => 'Benin',
+    'BM' => 'Bermuda',
+    'BT' => 'Bhutan',
+    'BO' => 'Bolivia',
+    'BQ' => 'Bonaire, Saint Eustatius and Saba',
+    'BA' => 'Bosnia and Herzegovina',
+    'BW' => 'Botswana',
+    'BV' => 'Bouvet Island',
+    'BR' => 'Brazil',
+    'IO' => 'British Indian Ocean Territory',
+    'VG' => 'British Virgin Islands',
+    'BN' => 'Brunei',
+    'BG' => 'Bulgaria',
+    'BF' => 'Burkina Faso',
+    'BI' => 'Burundi',
+    'KH' => 'Cambodia',
+    'CM' => 'Cameroon',
+    'CA' => 'Canada',
+    'CV' => 'Cape Verde',
+    'KY' => 'Cayman Islands',
+    'CF' => 'Central African Republic',
+    'TD' => 'Chad',
+    'CL' => 'Chile',
+    'CN' => 'China',
+    'CX' => 'Christmas Island',
+    'CC' => 'Cocos Islands',
+    'CO' => 'Colombia',
+    'KM' => 'Comoros',
+    'CK' => 'Cook Islands',
+    'CR' => 'Costa Rica',
+    'HR' => 'Croatia',
+    'CU' => 'Cuba',
+    'CW' => 'Curacao',
+    'CY' => 'Cyprus',
+    'CZ' => 'Czech Republic',
+    'CD' => 'Democratic Republic of the Congo',
+    'DK' => 'Denmark',
+    'DJ' => 'Djibouti',
+    'DM' => 'Dominica',
+    'DO' => 'Dominican Republic',
+    'TL' => 'East Timor',
+    'EC' => 'Ecuador',
+    'EG' => 'Egypt',
+    'SV' => 'El Salvador',
+    'GQ' => 'Equatorial Guinea',
+    'ER' => 'Eritrea',
+    'EE' => 'Estonia',
+    'ET' => 'Ethiopia',
+    'FK' => 'Falkland Islands',
+    'FO' => 'Faroe Islands',
+    'FJ' => 'Fiji',
+    'FI' => 'Finland',
+    'FR' => 'France',
+    'GF' => 'French Guiana',
+    'PF' => 'French Polynesia',
+    'TF' => 'French Southern Territories',
+    'GA' => 'Gabon',
+    'GM' => 'Gambia',
+    'GE' => 'Georgia',
+    'DE' => 'Germany',
+    'GH' => 'Ghana',
+    'GI' => 'Gibraltar',
+    'GR' => 'Greece',
+    'GL' => 'Greenland',
+    'GD' => 'Grenada',
+    'GP' => 'Guadeloupe',
+    'GU' => 'Guam',
+    'GT' => 'Guatemala',
+    'GG' => 'Guernsey',
+    'GN' => 'Guinea',
+    'GW' => 'Guinea-Bissau',
+    'GY' => 'Guyana',
+    'HT' => 'Haiti',
+    'HM' => 'Heard Island and McDonald Islands',
+    'HN' => 'Honduras',
+    'HK' => 'Hong Kong',
+    'HU' => 'Hungary',
+    'IS' => 'Iceland',
+    'IN' => 'India',
+    'ID' => 'Indonesia',
+    'IR' => 'Iran',
+    'IQ' => 'Iraq',
+    'IE' => 'Ireland',
+    'IM' => 'Isle of Man',
+    'IL' => 'Israel',
+    'IT' => 'Italy',
+    'CI' => 'Ivory Coast',
+    'JM' => 'Jamaica',
+    'JP' => 'Japan',
+    'JE' => 'Jersey',
+    'JO' => 'Jordan',
+    'KZ' => 'Kazakhstan',
+    'KE' => 'Kenya',
+    'KI' => 'Kiribati',
+    'XK' => 'Kosovo',
+    'KW' => 'Kuwait',
+    'KG' => 'Kyrgyzstan',
+    'LA' => 'Laos',
+    'LV' => 'Latvia',
+    'LB' => 'Lebanon',
+    'LS' => 'Lesotho',
+    'LR' => 'Liberia',
+    'LY' => 'Libya',
+    'LI' => 'Liechtenstein',
+    'LT' => 'Lithuania',
+    'LU' => 'Luxembourg',
+    'MO' => 'Macao',
+    'MK' => 'Macedonia',
+    'MG' => 'Madagascar',
+    'MW' => 'Malawi',
+    'MY' => 'Malaysia',
+    'MV' => 'Maldives',
+    'ML' => 'Mali',
+    'MT' => 'Malta',
+    'MH' => 'Marshall Islands',
+    'MQ' => 'Martinique',
+    'MR' => 'Mauritania',
+    'MU' => 'Mauritius',
+    'YT' => 'Mayotte',
+    'MX' => 'Mexico',
+    'FM' => 'Micronesia',
+    'MD' => 'Moldova',
+    'MC' => 'Monaco',
+    'MN' => 'Mongolia',
+    'ME' => 'Montenegro',
+    'MS' => 'Montserrat',
+    'MA' => 'Morocco',
+    'MZ' => 'Mozambique',
+    'MM' => 'Myanmar',
+    'NA' => 'Namibia',
+    'NR' => 'Nauru',
+    'NP' => 'Nepal',
+    'NL' => 'Netherlands',
+    'NC' => 'New Caledonia',
+    'NZ' => 'New Zealand',
+    'NI' => 'Nicaragua',
+    'NE' => 'Niger',
+    'NG' => 'Nigeria',
+    'NU' => 'Niue',
+    'NF' => 'Norfolk Island',
+    'KP' => 'North Korea',
+    'MP' => 'Northern Mariana Islands',
+    'NO' => 'Norway',
+    'OM' => 'Oman',
+    'PK' => 'Pakistan',
+    'PW' => 'Palau',
+    'PS' => 'Palestinian Territory',
+    'PA' => 'Panama',
+    'PG' => 'Papua New Guinea',
+    'PY' => 'Paraguay',
+    'PE' => 'Peru',
+    'PH' => 'Philippines',
+    'PN' => 'Pitcairn',
+    'PL' => 'Poland',
+    'PT' => 'Portugal',
+    'PR' => 'Puerto Rico',
+    'QA' => 'Qatar',
+    'CG' => 'Republic of the Congo',
+    'RE' => 'Reunion',
+    'RO' => 'Romania',
+    'RU' => 'Russia',
+    'RW' => 'Rwanda',
+    'BL' => 'Saint Barthelemy',
+    'SH' => 'Saint Helena',
+    'KN' => 'Saint Kitts and Nevis',
+    'LC' => 'Saint Lucia',
+    'MF' => 'Saint Martin',
+    'PM' => 'Saint Pierre and Miquelon',
+    'VC' => 'Saint Vincent and the Grenadines',
+    'WS' => 'Samoa',
+    'SM' => 'San Marino',
+    'ST' => 'Sao Tome and Principe',
+    'SA' => 'Saudi Arabia',
+    'SN' => 'Senegal',
+    'RS' => 'Serbia',
+    'SC' => 'Seychelles',
+    'SL' => 'Sierra Leone',
+    'SG' => 'Singapore',
+    'SX' => 'Sint Maarten',
+    'SK' => 'Slovakia',
+    'SI' => 'Slovenia',
+    'SB' => 'Solomon Islands',
+    'SO' => 'Somalia',
+    'ZA' => 'South Africa',
+    'GS' => 'South Georgia and the South Sandwich Islands',
+    'KR' => 'South Korea',
+    'SS' => 'South Sudan',
+    'ES' => 'Spain',
+    'LK' => 'Sri Lanka',
+    'SD' => 'Sudan',
+    'SR' => 'Suriname',
+    'SJ' => 'Svalbard and Jan Mayen',
+    'SZ' => 'Swaziland',
+    'SE' => 'Sweden',
+    'CH' => 'Switzerland',
+    'SY' => 'Syria',
+    'TW' => 'Taiwan',
+    'TJ' => 'Tajikistan',
+    'TZ' => 'Tanzania',
+    'TH' => 'Thailand',
+    'TG' => 'Togo',
+    'TK' => 'Tokelau',
+    'TO' => 'Tonga',
+    'TT' => 'Trinidad and Tobago',
+    'TN' => 'Tunisia',
+    'TR' => 'Turkey',
+    'TM' => 'Turkmenistan',
+    'TC' => 'Turks and Caicos Islands',
+    'TV' => 'Tuvalu',
+    'VI' => 'U.S. Virgin Islands',
+    'UG' => 'Uganda',
+    'UA' => 'Ukraine',
+    'AE' => 'United Arab Emirates',
+    'GB' => 'United Kingdom',
+    'US' => 'United States',
+    'UM' => 'United States Minor Outlying Islands',
+    'UY' => 'Uruguay',
+    'UZ' => 'Uzbekistan',
+    'VU' => 'Vanuatu',
+    'VA' => 'Vatican',
+    'VE' => 'Venezuela',
+    'VN' => 'Vietnam',
+    'WF' => 'Wallis and Futuna',
+    'EH' => 'Western Sahara',
+    'YE' => 'Yemen',
+    'ZM' => 'Zambia',
+    'ZW' => 'Zimbabwe',);
+}
+function get_country_name_from_code($country_code) {
+    $countries = get_country_list();
+    return isset($countries[$country_code]) ? $countries[$country_code] : $country_code;
+}
 
 function theme_user_register_after_meta($user_id, $userdata) {
     $users = array_merge(get_blog_administrators(false, 1), get_blog_editors());
-    include_once ABSPATH . 'wp-content/plugins/front-end-pm-pro/freemius/templates/account/billing.php';
-
-    function get_country_name_from_code($country_code) {
-    global $countries;
-    
-    return isset($countries[$country_code]) ? $countries[$country_code] : $country_code;
-    }
-    // Fetch additional user meta fields
     $user_organisation_id = get_user_meta($user_id, 'organisation', true);
     $user_country_code = get_user_meta($user_id, 'address_country', true);
+    $user_country_name = get_country_name_from_code($user_country_code); 
     $user_city = get_user_meta($user_id, 'address_city', true);
-    $user_country_name = get_country_name_from_code($user_country_code);
-    $user_organisation = !empty($user_organisation_id) ? get_the_title($user_organisation_id) : '';
-    error_log('User Organisation: ' . print_r($user_organisation, true));
-    error_log('User Country: ' . print_r($user_country_name, true));
-    error_log('User City: ' . print_r($user_city, true));
+    $user_organisation = get_the_title($user_organisation_id);
 
-    if (!empty($users)) {
-        $subject = sprintf(__('A new user account has been created on [%s]', 'weadapt'), get_bloginfo('name'));
+    $subject = sprintf(__('A new user account has been created on [%s]', 'weadapt'), get_bloginfo('name'));
 
-        $message = sprintf(__('A new user account has been created: %s %s (%s) on [%s]', 'weadapt'),
-            esc_html($userdata['first_name']),
-            esc_html($userdata['last_name']),
-            esc_html($userdata['user_login']),
-            get_bloginfo('name')
-        ) . '<br><br>';
+    $message = sprintf(__('A new user account has been created: <b> %s %s </b> (%s) on <b> %s </b>', 'weadapt'),
+        esc_html($userdata['first_name']),
+        esc_html($userdata['last_name']),
+        esc_html($userdata['user_login']),
+        get_bloginfo('name')
+    ) . '<br><br>';
 
-        if (!empty($user_organisation)) {
-            $message .= sprintf(__('Organisation: %s', 'weadapt'), esc_html($user_organisation)) . '<br>';
-        }
+    $message .= sprintf(__('<b>Organisation: </b>%s', 'weadapt'), esc_html($user_organisation)) . '<br>';
+    $message .= __('<b>Location:</b>', 'weadapt') . ' ' . esc_html($user_city) . ', ' . esc_html($user_country_name) . '<br><br>';
 
-        if (!empty($user_city)) {
-            $message .= __('City:', 'weadapt') . ' ' . esc_html($user_city) . '<br>';
-        }
-        
-        if (!empty($user_country_name)) {
-            $message .= __('Country:', 'weadapt') . ' ' . esc_html($user_country_name) . '<br><br>';
-        }
+    $message .= sprintf('<a href="%s">%s</a><br>',
+        get_author_posts_url($user_id),
+        __('View user profile', 'weadapt')
+    );
 
-        $message .= sprintf('<a href="%s">%s</a><br>',
-            get_author_posts_url($user_id),
-            __('View user profile', 'weadapt')
-        );
+    $message .= sprintf(' <a href="%s">%s</a>',
+        add_query_arg('user_id', $user_id, self_admin_url('user-edit.php')),
+        __('Edit/delete user', 'weadapt')
+    );
 
-        $message .= sprintf(' <a href="%s">%s</a>',
-            add_query_arg('user_id', $user_id, self_admin_url('user-edit.php')),
-            __('Edit/delete user', 'weadapt')
-        );
-
-        theme_mail_save_to_db($users, $subject, $message);
-        send_email_immediately($users, $subject, $message, null);
-    }
+    theme_mail_save_to_db($users, $subject, $message);
+    send_email_immediately($users, $subject, $message, null);
 }

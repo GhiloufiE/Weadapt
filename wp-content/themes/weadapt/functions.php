@@ -472,14 +472,14 @@ function notify_editors_after_publish($post_id, $new_theme)
             }
 
             $message = '<p>' . $subject . '</p>';
-            $message .= '<strong><p>' . esc_html($post->post_title) . '</p></strong>';
+            $message .= '<strong>Title : </strong> <p>' . esc_html($post->post_title) . '</p>';
             $message .= '<p>' . esc_html($post->post_excerpt) . '</p>';
 
             $post_excerpt = get_the_excerpt($post);
             $post_excerpt = wp_strip_all_tags($post_excerpt);
             $post_excerpt = mb_strimwidth($post_excerpt, 0, 100, '...');
 
-            $message .= '<p>' . sprintf(__('Summarys: %s', 'weadapt'), esc_html($post_excerpt)) . '</p>';
+            $message .= '<p><strong>' . sprintf(__('Summarys: </strong> %s', 'weadapt'), esc_html($post_excerpt)) . '</p>';
             $message .= '<p> <a href="' . get_permalink($post_id) . '">View Discussions</a></p>';
             $message .= "<br>Best Regards,<br>WeAdapt";
             if ($post_author_ID = get_post_meta($post_id, 'author', true)) {
