@@ -22,6 +22,10 @@ if (!function_exists('render_content')) {
 if (!function_exists('enforce_character_limit')) {
     function enforce_character_limit($html, $char_limit)
     {
+        if (empty($html)) {
+            return ''; // If the HTML is empty, return an empty string.
+        }
+
         $total_characters = 0;
         $output = '';
         $dom = new DOMDocument;
@@ -48,10 +52,16 @@ if (!function_exists('enforce_character_limit')) {
         return $output;
     }
 }
+
 if (!function_exists('get_sanitized_field')) {
     function get_sanitized_field($field_name, $allowed_tags = '<strong><em><b><i><br>', $char_limit = null)
     {
         $field_value = get_field($field_name);
+
+        if ($field_value === null) {
+            return ''; // Return an empty string if the field value is null.
+        }
+
         $sanitized_value = strip_tags($field_value, $allowed_tags);
         
         if ($char_limit && strlen($sanitized_value) > $char_limit) {
@@ -61,10 +71,15 @@ if (!function_exists('get_sanitized_field')) {
         return $sanitized_value;
     }
 }
+
 if (!function_exists('get_sanitized_field_with_limit')) {
     function get_sanitized_field_with_limit($field_name, $char_limit = null, $allowed_tags = '<strong><em><b><i><br>')
     {
         $field_value = get_field($field_name);
+
+        if ($field_value === null || empty($field_value)) {
+            return ''; // If the field value is null or empty, return an empty string.
+        }
 
         if ($char_limit) {
             return enforce_character_limit($field_value, $char_limit);
@@ -73,6 +88,7 @@ if (!function_exists('get_sanitized_field_with_limit')) {
         }
     }
 }
+
 if (!function_exists('get_section_fields')) {
     function get_section_fields()
     {
@@ -330,8 +346,60 @@ $section_fields = get_section_fields();
 		</div>
 	</div>
 </section>
+ 
 <script src="https://d3js.org/d3.v7.min.js"></script>
 <script>
+function initClickableAreas() {
+    // Add click handlers for each area in the diagram
+    d3.select('#scope-review').on('click', function() {
+        scrollToSection('.tandem-full-content', function() {
+            zoomToTarget('red'); // Adjust based on your existing zoom setup
+        });
+    });
+
+    d3.select('#integrate-knowledge').on('click', function() {
+        scrollToSection('.tandem-full-content', function() {
+            zoomToTarget('blue'); // Adjust accordingly
+        });
+    });
+
+    d3.select('#co-design').on('click', function() {
+        scrollToSection('.tandem-full-content', function() {
+            zoomToTarget('green'); // Adjust accordingly
+        });
+    });
+
+    d3.select('#co-explore').on('click', function() {
+        scrollToSection('.tandem-full-content', function() {
+            zoomToTarget('orange'); // Adjust accordingly
+        });
+    });
+}
+/**
+ * Scrolls to a specified section and then executes a callback.
+ * @param {string} targetSelector - The CSS selector of the target section.
+ * @param {Function} callback - The function to execute after scrolling is complete.
+ */
+function scrollToSection(targetSelector, callback) {
+    const targetElement = document.querySelector(targetSelector);
+    
+    if (targetElement) {
+        // Smooth scroll to the section
+        window.scrollTo({
+            top: targetElement.offsetTop,
+            behavior: 'smooth'
+        });
+
+        // Wait for the scrolling to finish (using a timeout based on duration)
+        setTimeout(() => {
+            if (typeof callback === 'function') {
+                callback();
+            }
+        }, 800); // Adjust duration as necessary (in ms)
+    } else {
+        console.error('Target section not found:', targetSelector);
+    }
+}
 	window.onload = function() {
 		if (document.querySelector('.inner-circle')) {
 			var footer = document.querySelector('.main-footer');
@@ -465,6 +533,7 @@ $section_fields = get_section_fields();
 	window.onload = function() {
   
     initZoomHandlers();
+	initClickableAreas(); // Add this line
 };
 
 function zoomToTarget(targetClass) {
