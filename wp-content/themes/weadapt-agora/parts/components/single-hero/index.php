@@ -362,6 +362,30 @@ switch ($type) {
 									}
 								</script>
 							<?php endif; ?>
+							<?php
+							if ($type === 'network') : ?>
+								<div class="wp-block-button">
+									<button class="wp-block-button__link has-background" data-post-id="<?php echo esc_attr($post_ID); ?>" data-post-type="forum" data-popup="post-creation" onclick="setPostDetails(this)">
+										<?php echo sprintf("<span>%s</span>", esc_html__("Start a conversation", "weadapt")); ?>
+									</button>
+								</div>
+								<script>
+									function setPostDetails(button) {
+										const postId = button.getAttribute('data-post-id');
+										const postType = button.getAttribute('data-post-type');
+										const forumField = document.getElementById('forum-field');
+										const postTypeField = document.getElementById('post-type-field');
+
+										if (forumField) {
+											forumField.value = postId;
+											console.log(postId);
+										}
+										if (postTypeField) {
+											postTypeField.value = postType;
+										}
+									}
+								</script>
+							<?php endif; ?>
 							<?php if ($type === 'event') :
 								$date_html = get_event_formatted_date($post_ID);
 								if (!empty($date_html)) : ?>
