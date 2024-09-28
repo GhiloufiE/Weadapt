@@ -17,48 +17,49 @@ function rest_search_members_markers( $request ) {
 	$country = ! empty( $request->get_param( 'select_country' ) ) ? esc_attr( $request->get_param( 'select_country' ) ) : '';
 
 	$query_args = [
-		'post_type'       => get_allowed_post_types( [ 'members' ] ),
-		'posts_per_page'  => -1,
-		'fields'          => 'ids',
-		'no_found_rows'   => true,
-		's'               => $search_query,
-		'meta_query'      => [
+		'search'         => "*{$search_query}*", // Search users by the query value.
+		'search_columns' => [ 'user_login', 'user_nicename', 'user_email' ], // Specify which columns to search.
+		'meta_query'     => [
 			'relation' => 'AND',
 			[
-				'key'     => 'location_members',
+				'key'     => 'location_users',
 				'value'   => ':"lat";',
 				'compare' => 'LIKE'
 			],
 			[
-				'key'     => 'location_members',
+				'key'     => 'location_users',
 				'value'   => ':"lng";',
 				'compare' => 'LIKE'
 			]
 		],
-		'theme_query'     => true, // multisite fix
+		'number'         => -1, // Equivalent to posts_per_page => -1 for users
 	];
 
+	// Filter by theme network if provided
 	if ( ! empty( $theme_network ) ) {
 		$query_args['meta_query'][] = [
 			'key'   => 'relevant_main_theme_network',
 			'value' => $theme_network,
 		];
 	}
+
+	// Filter by country if provided
 	if ( ! empty( $country ) ) {
 		$query_args['meta_query'][] = [
-			'relation' => 'OR',
-			[
-				'key'     => 'address_country',
-				'value'   => $country,
-				'compare' => 'LIKE'
-			],
+			'key'     => 'address_country',
+			'value'   => $country,
+			'compare' => 'LIKE'
 		];
 	}
 
-	$case_studies = new WP_Query( $query_args );
+	// Run the user query
+	$user_query = new WP_User_Query( $query_args );
+
+	// Extract user IDs from the results
+	$user_ids = wp_list_pluck( $user_query->get_results(), 'ID' );
 
 	echo json_encode( [
-		'ids' => $case_studies->posts
+		'ids' => $user_ids
 	] );
 
 	die();

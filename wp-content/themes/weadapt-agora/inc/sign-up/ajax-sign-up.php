@@ -317,59 +317,35 @@ add_action('wp_ajax_theme_ajax_create', 'theme_ajax_create');
 add_action('wp_ajax_nopriv_theme_ajax_create', 'theme_ajax_create');
 
 function migrate_user_to_member_relationship_single($user_id) {
-    global $wpdb;
-
     // Fetch user details
     $user_info = get_userdata($user_id);
     $username = $user_info->user_login;
-    
+
     // Fetch user meta fields
     $address_country = get_user_meta($user_id, 'address_country', true);
     $address_city = get_user_meta($user_id, 'address_city', true);
     $address_county = get_user_meta($user_id, 'address_county', true);
 
-    // Log the country for debugging
+    // Ensure the address fields are strings, not arrays
     if (is_array($address_country)) {
-        $address_country_str = $address_country[1]; // Assuming array format, use the second value
+        $address_country_str = isset($address_country[1]) ? $address_country[1] : implode(', ', $address_country); // Use second value or fallback
     } else {
         $address_country_str = $address_country;
     }
 
     error_log('Country: ' . $address_country_str);
 
-    // Create a new "member" post with the user details
-    $new_member_post = array(
-        'post_title'    => $username,
-        'post_status'   => 'publish',
-        'post_author'   => $user_id,
-        'post_type'     => 'members'
-    );
+    // Store the user meta fields as new user meta
+    update_user_meta($user_id, 'migrated_username', $username);
+    update_user_meta($user_id, 'migrated_address_country', $address_country_str);
+    update_user_meta($user_id, 'migrated_address_city', $address_city);
+    update_user_meta($user_id, 'migrated_address_county', $address_county);
 
-    // Insert the new member post
-    $new_member_id = wp_insert_post($new_member_post);
+    error_log('Updated user meta fields for user ID: ' . $user_id);
 
-    if (is_wp_error($new_member_id)) {
-        error_log('Failed to create member post for user ID: ' . $user_id . '. Error: ' . $new_member_id->get_error_message());
-        return;
-    }
-
-    // Update the member post with user meta
-    update_post_meta($new_member_id, 'user_id', $user_id);
-    update_post_meta($new_member_id, 'username', $username);
-    update_post_meta($new_member_id, 'address_country', $address_country_str);
-    update_post_meta($new_member_id, 'address_city', $address_city);
-    update_post_meta($new_member_id, 'address_county', $address_county);
-
-    // Handle any additional custom fields (e.g., ACF fields)
-    $acf_value = array('11'); // Example value for ACF field
-    add_post_meta($new_member_id, 'publish_to', $acf_value, true);
-    add_post_meta($new_member_id, '_publish_to', 'field_6374a3364bb73', true); // This assumes you have an ACF field
-
-    error_log('Inserted meta data and ACF fields for member post ID: ' . $new_member_id);
-
-    // Additional logics for location data (if necessary)
+    // Additional logic for location data (if necessary)
     if ($address_country_str && $address_city && $address_county) {
-        // Build the query URL to convert address into location (lat, long)
+        // Build the query URL to convert address into location (latitude, longitude)
         $query_url = "https://nominatim.openstreetmap.org/search.php?county=" . urlencode($address_county) . "&country=" . urlencode($address_country_str) . "&format=jsonv2";
         error_log('Query URL: ' . $query_url);
 
@@ -384,22 +360,25 @@ function migrate_user_to_member_relationship_single($user_id) {
                 $lat = floatval($data[0]['lat']);
                 $lng = floatval($data[0]['lon']);
 
-                // Save location data as ACF (or other custom field format)
-                $acf_location_value = array(
+                // Save location data as a new user meta field
+                $location_value = array(
                     'zoom' => 14,
                     'lat' => $lat,
                     'lng' => $lng,
                 );
 
-                // Assuming you are storing this data in an ACF field
-                update_post_meta($new_member_id, 'location_members', $acf_location_value);
-                update_post_meta($new_member_id, '_location_members', 'field_65fcef62959d4'); // ACF field key for location
+                // Store the location data in the user meta
+                update_user_meta($user_id, 'location_users', $location_value);
+                update_user_meta($user_id, '_location_users', 'field_65fcef62959d4'); // Assuming this is the ACF field key for location
+
+                error_log('Converted and saved location for user ID: ' . $user_id);
             }
         }
     }
 
     error_log('User migration completed for user ID: ' . $user_id);
 }
+
 
 
 /**

@@ -8,10 +8,19 @@
  * @since      weadapt 1.0
  */
 $type = isset($args['type']) ? $args['type'] : '';
+error_log("Post type received: " . $type);
+
 $post_ID = isset(get_queried_object()->term_id) ? get_queried_object()->term_id : get_the_ID();
 $title = get_the_title();
-$excerpt = has_excerpt() ? get_the_excerpt() : '';
-$thumb_ID = 0;
+
+// Use user display name instead of post title if type is 'members'
+if ($type === 'members') {
+    $user_info = get_user_by('ID', $post_ID);
+    $title = $user_info ? $user_info->display_name : $title; // Update title to user display name
+}
+error_log("the title: ". $title);
+$excerpt = ($type === 'members' && $user_info) ? get_user_meta($user_info->ID, 'description', true) : (has_excerpt() ? get_the_excerpt() : '');
+$thumb_ID = ($type === 'members') ? get_user_meta($user_info->ID, 'profile_picture', true) : 0;
 $thumb_caption = '';
 $post_author_html = '';
 $document_list = get_field('document_list');
@@ -38,11 +47,22 @@ if (empty($thumb_ID) && has_post_thumbnail()) {
 echo get_part('components/popup/index', ['template' => 'post-creation']);
 $fields = [];
 
+$post_meta_items = [];
 $post_meta_items = [
 	['icon-user', get_members_count($post_ID)],
 	['icon-edit-pencil', get_post_meta_count($post_ID)],
 	['icon-glob', get_post_meta_count($post_ID, ['case-study'], 'Case study', 'Case studies')],
 ];
+if ($type === 'members') {
+	$post_meta_items = [];
+    $member_since = date('F Y', strtotime($user_info->user_registered));
+    $post_meta_items[] = ['icon-calendar', 'Member since: ' . $member_since];
+
+ 
+    $user_posts_count = count_user_posts($user_info->ID);
+    $post_meta_items[] = ['icon-edit-pencil', 'Posts: ' . $user_posts_count];
+}
+
 
 switch ($type) {
 	case 'theme':
@@ -147,7 +167,18 @@ switch ($type) {
 			}
 		}
 		break;
-
+	case 'members':  // Handling for the 'members' post type
+		$fields = [
+			'type_link' => 'Profile',
+			'btn_join' => [
+				'title' => __('Follow User', 'weadapt'),
+				'unjoin_title' => __('Unfollow User', 'weadapt'),
+				'class' => 'button-follow single-hero__action-btn',
+				'icon' => ['icon-add-user', 'icon-remove-user']
+			]
+		];
+		break;
+	
 	default:
 		$fields = [
 			'btn_join' => [
@@ -275,9 +306,6 @@ switch ($type) {
 						</div>
 					<?php endif; ?>
 					<h1 class="single-hero__titles" id="main-headissssng"> <?php
-    $title = get_the_title();
-    $clean_title = clean_non_standard_spaces($title);
-    echo esc_html($clean_title);
     ?></h1>
 					<?php if ($excerpt) : ?>
 						<div class="single-hero__excerpt"><?php echo $excerpt; ?></div>

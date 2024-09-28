@@ -540,7 +540,7 @@ const initMap = function (mapBlockNode, mapNode, markerNodes, markerOrgNodes, ma
 				// Fetch Data
 				const formData = new FormData();
 				formData.append('post_id', markerNode.dataset.id);
-				formData.append('post_type', 'members');
+				formData.append('post_type', 'user');
 				formData.append('action', 'load_post_content');
 
 				contentNode.classList.add('loading');

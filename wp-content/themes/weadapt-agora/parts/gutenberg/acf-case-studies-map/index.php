@@ -305,64 +305,63 @@ $filter_value = ! empty( $_GET['filter'] ) ? intval( $_GET['filter'] ) : 'all';
 
 
                 // members
-				$location_members = get_transient( 'map_location_members' );
+// members
+$location_members = get_transient( 'map_location_users' );
 
-				if ( false === $location_members ) {
-					$location_members = [];
+if ( false === $location_members ) {
+	$location_members = [];
 
-					$members = new WP_Query([
-						'post_type'       => get_allowed_post_types( [ 'members' ] ),
-						'posts_per_page'  => -1,
-						'fields'          => 'ids',
-						'no_found_rows'   => true,
-						'meta_query'      => [
-							'relation' => 'AND',
-							[
-								'key'     => 'location_members',
-								'value'   => ':"lat";',
-								'compare' => 'LIKE'
-							],
-							[
-								'key'     => 'location_members',
-								'value'   => ':"lng";',
-								'compare' => 'LIKE'
-							]
-						],
-						'theme_query'     => true, // multisite fix
-					]);
-					
+	// Use WP_User_Query instead of WP_Query
+	$members = new WP_User_Query([
+		'number'         => -1, // Equivalent to 'posts_per_page' => -1
+		'fields'         => 'ID', // Return only the user IDs
+		'meta_query'     => [
+			'relation' => 'AND',
+			[
+				'key'     => 'location_users',
+				'value'   => ':"lat";',
+				'compare' => 'LIKE'
+			],
+			[
+				'key'     => 'location_users',
+				'value'   => ':"lng";',
+				'compare' => 'LIKE'
+			]
+		]
+	]);
 
-					if ( ! empty( $members->posts ) ) {
-						foreach( $members->posts as $post_ID ) {
-							$location = get_field( 'location_members', $post_ID );
+	// Check if the query returned any users
+	if ( ! empty( $members->get_results() ) ) {
+		foreach( $members->get_results() as $user_id ) {
+			// Fetch the 'location_users' user meta
+			$location = get_user_meta( $user_id, 'location_users', true );
 
+			if ( ! empty( $location['lat'] ) && ! empty( $location['lng'] ) ) {
+				$location_members[$user_id] = [
+					'lat'   => $location['lat'],
+					'lng'   => $location['lng'],
+					'title' => get_user_by( 'ID', $user_id )->display_name, // Use display name as the title
+					'slug'  => get_user_by( 'ID', $user_id )->user_nicename // Use the user_nicename as a slug
+				];
+			}
+		}
+	}
 
-							if ( ! empty( $location['lat'] ) && ! empty( $location['lng'] ) ) {
-								$location_members[$post_ID] = [
-									'lat'   => $location['lat'],
-									'lng'   => $location['lng'],
-									'title' => get_the_title( $post_ID ),
-									'slug'  => get_post_field( 'post_name', $post_ID )
-								];
-							}
-						}
-					}
-					
+	// Cache the results for 60 seconds
+	set_transient( 'map_location_users', $location_members, 60 );
+}
 
-					set_transient( 'map_location_members', $location_members, 60 );
-				}
-
-				if ( ! empty( $location_members ) ) {
-					foreach ( $location_members as $post_ID => $location ) {
-						echo sprintf( '<div class="marker-members" data-id="%s" data-title="%s" data-lat="%s" data-lng="%s" data-slug="%s"></div>',
-							esc_attr( $post_ID ),
-							esc_attr( $location['title'] ),
-							esc_attr( $location['lat'] ),
-							esc_attr( $location['lng'] ),
-							esc_attr( $location['slug'] ),
-						);
-					}
-				}
+if ( ! empty( $location_members ) ) {
+	foreach ( $location_members as $user_id => $location ) {
+		echo sprintf( '<div class="marker-members" data-id="%s" data-title="%s" data-lat="%s" data-lng="%s" data-slug="%s"></div>',
+			esc_attr( $user_id ),
+			esc_attr( $location['title'] ),
+			esc_attr( $location['lat'] ),
+			esc_attr( $location['lng'] ),
+			esc_attr( $location['slug'] )
+		);
+	}
+}
 
 				// solution
 				$location_solution = get_transient( 'map_location_solution' );

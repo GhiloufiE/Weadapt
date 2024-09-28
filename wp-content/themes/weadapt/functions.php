@@ -882,7 +882,7 @@ add_action('admin_menu', 'register_user_migration_menu_page');
 function register_user_migration_menu_page()
 {
     add_menu_page(
-        'User to Member Migration',   // Page title
+        'User to Member Migration',   // Page titlex
         'User Migration',             // Menu title
         'manage_options',             // Capability
         'user-migration',             // Menu slug
@@ -945,12 +945,12 @@ function migrate_and_convert_user_to_member()
     ");
 
     if (empty($users)) {
-        echo '<div class="notice notice-error is-dismissible"><p>No users found to migrate.</p></div>';
+        echo '<div class="notice notice-error is-dismissible"><p>No users found to update.</p></div>';
         return;
     }
 
     $migration_done = false;
-    $migration_count = 0;  // Counter for successful migrations
+    $migration_count = 0;  // Counter for successful updates
     $conversion_done = false;
 
     foreach ($users as $user) {
@@ -958,19 +958,6 @@ function migrate_and_convert_user_to_member()
         $username = $user->user_login;
 
         error_log('Processing user ID: ' . $user_id);
-
-        // Check if a member post already exists for this username
-        $existing_member = $wpdb->get_var($wpdb->prepare("
-            SELECT ID 
-            FROM {$wpdb->posts} 
-            WHERE post_type = 'members' 
-            AND post_title = %s
-        ", $username));
-
-        if ($existing_member) {
-            error_log('User ' . $username . ' is already migrated with member post ID: ' . $existing_member);
-            continue;
-        }
 
         // Fetch user meta directly
         $address_country = get_user_meta($user_id, 'address_country', true);
@@ -982,79 +969,48 @@ function migrate_and_convert_user_to_member()
         $address_city = is_array($address_city) ? implode(', ', $address_city) : $address_city;
         $address_county = is_array($address_county) ? implode(', ', $address_county) : $address_county;
 
-        // Create a new member post with the user details
-        $new_member_post = array(
-            'post_title'    => $username,
-            'post_status'   => 'publish',
-            'post_author'   => $user_id,
-            'post_type'     => 'members'
-        );
+        // Check if the user already has a location meta
+        $existing_location = get_user_meta($user_id, 'location_users', true);
 
-        // Insert the new member post
-        $new_member_id = wp_insert_post($new_member_post);
+        if (empty($existing_location) && $address_country && $address_city && $address_county) {
+            // Prepare the query URL for address to lat/lon conversion
+            $query_url = "https://nominatim.openstreetmap.org/search.php?county=" . urlencode($address_county) . "&country=" . urlencode($address_country) . "&format=jsonv2";
+            error_log('Query URL: ' . $query_url);
 
-        if (is_wp_error($new_member_id)) {
-            error_log('Failed to create member post for user ID: ' . $user_id . '. Error: ' . $new_member_id->get_error_message());
-        } else {
-            error_log('Created member post ID: ' . $new_member_id . ' for user ID: ' . $user_id);
+            $response = wp_remote_get($query_url);
+            if (!is_wp_error($response)) {
+                $body = wp_remote_retrieve_body($response);
+                $data = json_decode($body, true);
 
-            // Insert user meta into the member post as post meta
-            update_post_meta($new_member_id, 'user_id', $user_id);
-            update_post_meta($new_member_id, 'username', $username);
-            update_post_meta($new_member_id, 'address_country', $address_country);
-            update_post_meta($new_member_id, 'address_city', $address_city);
-            update_post_meta($new_member_id, 'address_county', $address_county);
+                if (!empty($data) && isset($data[0]['lat']) && isset($data[0]['lon'])) {
+                    $lat = floatval($data[0]['lat']);
+                    $lng = floatval($data[0]['lon']);
 
-            // Store the ACF field value correctly as an array
-            $acf_value = array('11');
-            add_post_meta($new_member_id, 'publish_to', $acf_value, true);
-            add_post_meta($new_member_id, '_publish_to', 'field_6374a3364bb73', true);
+                    $location_data = array(
+                        'zoom' => 14,
+                        'lat' => $lat,
+                        'lng' => $lng,
+                    );
 
-            error_log('Inserted meta data and ACF field for member post ID: ' . $new_member_id);
+                    // Store the location data in the user meta
+                    update_user_meta($user_id, 'location_users', $location_data);
+                    update_user_meta($user_id, '_location_users', 'field_65fcef62959d4');
 
-            // Set the migration flag to true
-            $migration_done = true;
-            $migration_count++;  // Increment the successful migration counter
-
-            // Address conversion section
-            $existing_location = get_post_meta($new_member_id, 'location_members', true);
-
-            if (empty($existing_location) && $address_country && $address_city && $address_county) {
-                // Prepare the query URL, making sure that the variables are strings
-                $query_url = "https://nominatim.openstreetmap.org/search.php?county=" . urlencode($address_county) . "&country=" . urlencode($address_country) . "&format=jsonv2";
-                error_log('Query URL: ' . $query_url);
-
-                $response = wp_remote_get($query_url);
-                if (!is_wp_error($response)) {
-                    $body = wp_remote_retrieve_body($response);
-                    $data = json_decode($body, true);
-
-                    if (!empty($data) && isset($data[0]['lat']) && isset($data[0]['lon'])) {
-                        $lat = floatval($data[0]['lat']);
-                        $lng = floatval($data[0]['lon']);
-
-                        $acf_value = array(
-                            'zoom' => 14,
-                            'lat' => $lat,
-                            'lng' => $lng,
-                        );
-
-                        // Store the location data in the post meta
-                        add_post_meta($new_member_id, 'location_members', $acf_value, true);
-                        add_post_meta($new_member_id, '_location_members', 'field_65fcef62959d4', true);
-
-                        error_log('Converted and saved location for member post ID: ' . $new_member_id);
-                        $conversion_done = true;
-                    }
+                    error_log('Converted and saved location for user ID: ' . $user_id);
+                    $conversion_done = true;
                 }
             }
         }
+
+        // Set the migration flag to true for this user
+        $migration_done = true;
+        $migration_count++;  // Increment the successful migration counter
     }
 
     if ($migration_done) {
-        echo '<div class="notice notice-success is-dismissible"><p>' . $migration_count . ' users migrated successfully.</p></div>';
+        echo '<div class="notice notice-success is-dismissible"><p>' . $migration_count . ' users updated successfully.</p></div>';
     } else {
-        echo '<div class="notice notice-info is-dismissible"><p>All users are already migrated. No new migrations were made.</p></div>';
+        echo '<div class="notice notice-info is-dismissible"><p>All users are already updated. No new migrations were made.</p></div>';
     }
 
     if ($conversion_done) {
@@ -1063,6 +1019,7 @@ function migrate_and_convert_user_to_member()
         echo '<div class="notice notice-info is-dismissible"><p>All addresses are already converted. No new conversions were made.</p></div>';
     }
 }
+
 
 
 

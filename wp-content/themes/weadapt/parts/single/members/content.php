@@ -7,6 +7,9 @@
 
 $post_ID = get_the_ID();
 $user_ID = get_post_meta($post_ID, 'user_id', true);
+if (!$user_ID) {
+	$user_ID = $post_ID;
+}
 $user_data  = get_userdata( $user_ID );
 
 ?>
