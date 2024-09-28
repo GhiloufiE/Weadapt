@@ -350,52 +350,46 @@ $section_fields = get_section_fields();
 <script src="https://d3js.org/d3.v7.min.js"></script>
 <script>
 function initClickableAreas() {
-    // Add click handlers for each area in the diagram
     d3.select('#scope-review').on('click', function() {
         scrollToSection('.tandem-first-content-wrapper', function() {
-            zoomToTarget('red'); // Adjust based on your existing zoom setup
+            zoomToTarget('red'); 
         });
     });
 
     d3.select('#integrate-knowledge').on('click', function() {
         scrollToSection('.tandem-first-content-wrapper', function() {
-            zoomToTarget('blue'); // Adjust accordingly
+            zoomToTarget('blue'); 
         });
     });
 
     d3.select('#co-design').on('click', function() {
         scrollToSection('.tandem-first-content-wrapper', function() {
-            zoomToTarget('green'); // Adjust accordingly
+            zoomToTarget('green'); 
         });
     });
 
     d3.select('#co-explore').on('click', function() {
         scrollToSection('.tandem-first-content-wrapper', function() {
-            zoomToTarget('orange'); // Adjust accordingly
+            zoomToTarget('orange'); 
         });
     });
 }
-/**
- * Scrolls to a specified section and then executes a callback.
- * @param {string} targetSelector - The CSS selector of the target section.
- * @param {Function} callback - The function to execute after scrolling is complete.
- */
+
 function scrollToSection(targetSelector, callback) {
     const targetElement = document.querySelector(targetSelector);
     
     if (targetElement) {
-        // Use scrollIntoView to scroll directly to the element
         targetElement.scrollIntoView({
             behavior: 'smooth',
-            block: 'start', // Adjust alignment to scroll to the top of the target element
+            block: 'start', 
         });
 
-        // Execute callback after scrolling is complete
+
         setTimeout(() => {
             if (typeof callback === 'function') {
                 callback();
             }
-        }, 250); // Adjust this timeout as needed for a smooth scroll
+        }, 250); 
     } else {
         console.error('Target section not found:', targetSelector);
     }
