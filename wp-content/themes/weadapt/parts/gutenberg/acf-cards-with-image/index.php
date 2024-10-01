@@ -9,6 +9,9 @@
 $block_object = new Block( $block );
 $attr = $block_object->attr();
 $name = $block_object->name();
+
+$custom_classes = isset( $block['className'] ) ? $block['className'] : '';
+$is_new_class = strpos( $custom_classes, 'microsites' ) !== false;
 ?>
 
 <section <?php echo $attr; ?>>
@@ -26,8 +29,9 @@ $name = $block_object->name();
 						$url          = $button['url'];
 						$button_title = $button['title'];
 						$target       = $button['target'] ? $button['target'] : '_self';
+						$col_class = $is_new_class ? 'col-lg-3' : 'col-lg-4';
 				?>
-					<div class="col-12 col-md-6 col-lg-4 <?php echo esc_attr( $name ); ?>__col">
+					<div class="col-12 col-md-6 <?php echo esc_attr( $col_class ); ?> <?php echo esc_attr( $name ); ?>__col">
 						<div class="card-with-image">
 							<?php if ( ! empty( $image = get_sub_field( 'image' ) ) ) : ?>
 								<div class="card-with-image__image">

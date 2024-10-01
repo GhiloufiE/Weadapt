@@ -389,12 +389,11 @@ function scrollToSection(targetSelector, callback) {
             if (typeof callback === 'function') {
                 callback();
             }
-        }, 250); 
+        }, 300); 
     } else {
         console.error('Target section not found:', targetSelector);
     }
 }
-
 	window.onload = function() {
 		if (document.querySelector('.inner-circle')) {
 			var footer = document.querySelector('.main-footer');
@@ -481,7 +480,6 @@ function scrollToSection(targetSelector, callback) {
 				.style('transform', `translate(${transform.translateX}px, ${transform.translateY}px) scale(${transform.scale})`)
 				.on('end', function() {
 					d3.select(this).style('transform', `translate(${transform.translateX}px, ${transform.translateY}px) scale(${transform.scale})`);
-					// Enable links only if the zoom scale is equal to the target scale
 					toggleLinks(transform.scale === zoomTargets[targetClass].scale);
 				});
 		}
@@ -495,15 +493,10 @@ function scrollToSection(targetSelector, callback) {
 
 			var targetRect = targetElement.getBoundingClientRect();
 			var containerRect = d3.select('.tandem-first-content').node().getBoundingClientRect();
-
-			// Calculate the relative position of the target center within the container
 			var targetCenterX = targetRect.left + targetRect.width / 2 - containerRect.left;
 			var targetCenterY = targetRect.top + targetRect.height / 2 - containerRect.top;
-
 			var targetPercentX = (targetCenterX / containerRect.width) * 100;
 			var targetPercentY = (targetCenterY / containerRect.height) * 100;
-
-			// Create and apply the gradient overlay, with a class specific to the targetClass
 			d3.select('.tandem-first-content')
 				.append('div')
 				.attr('class', `gradient-overlay ${targetClass}`)
@@ -522,33 +515,25 @@ function scrollToSection(targetSelector, callback) {
 	}
 
 
-	let zoomOrder = ['red', 'orange', 'green', 'blue', 'rectangle']; // Define the order of targets
-	let currentTargetIndex = -1; // Initialize the current target index
+	let zoomOrder = ['red', 'orange', 'green', 'blue', 'rectangle']; 
+	let currentTargetIndex = -1; 
 
 	window.onload = function() {
   
     initZoomHandlers();
-	initClickableAreas(); // Add this line
+	initClickableAreas();
 };
 
 function zoomToTarget(targetClass) {
-    // Check if the gradient overlay already exists for the current target
     if (d3.select('.tandem-first-content').select(`.gradient-overlay.${targetClass}`).node()) {
-        return; // If it exists, don't reapply the gradient
+        return; 
     }
-  // Hide all target sections first
  	 d3.selectAll('.red-content, .orange-content, .green-content, .blue-content, .rectangle-content').style('display', 'none');
  	 d3.selectAll('.red-cards, .orange-cards, .green-cards, .blue-cards, .rectangle-cards').style('display', 'none');
-
-    // Update the current target index
     currentTargetIndex = zoomOrder.indexOf(targetClass);
-    if (currentTargetIndex === -1) return; // Invalid target class
-
-    // Show the navigation arrows
+    if (currentTargetIndex === -1) return;
     d3.select('.arrow-left').style('display', 'block');
     d3.select('.arrow-right').style('display', 'block');
-
-    // Clear any previous overlays
     d3.select('.tandem-first-content')
         .select('.gradient-overlay')
         .transition()
@@ -583,11 +568,7 @@ function zoomToTarget(targetClass) {
     setTimeout(function() {
         observer.disconnect();
     }, 200);
-
-    // Show the zoom out button when zoomed in
     d3.select('.tandem-container-nav-zoom button').style('display', 'flex');
-
-    // Update the color indicator based on the targetClass
     var colors = {
         red: '#B94343',
         orange: '#F6B552',
@@ -609,14 +590,10 @@ function zoomToTarget(targetClass) {
         if (buttonTarget === targetClass) {
             img.attr('src', svgMappings[buttonTarget]);
         } else {
-            // Reset to the original SVG if it's not the selected button
             var originalSrc = themeUri + buttonTarget + '-nav.svg';
             img.attr('src', originalSrc);
         }
     });
-
-  
-    // Show the section corresponding to the clicked target (e.g., .red-content, .orange-content, etc.)
     d3.select('.' + targetClass + '-content').style('display', 'block');
     d3.select('.' + targetClass + '-cards').style('display', 'block');
 }
@@ -657,16 +634,10 @@ function zoomToTarget(targetClass) {
 				});
 
 				d3.select('.tandem-container-nav-zoom button').style('display', 'none');
-
-				// Disable all links when zoom is reset
 				toggleLinks(false);
 			});
 	}
-
-	// Initialize the handlers when the script loads
 	initZoomHandlers();
-
-	// Disable all links initially
 	toggleLinks(false);
 
 
@@ -700,33 +671,24 @@ function zoomToTarget(targetClass) {
 			timeout = setTimeout(later, wait);
 		};
 	}
-
 	function navigate(direction) {
 		if (currentTargetIndex === -1) return; // If no target is set, do nothing
-
 		var newIndex = (currentTargetIndex + direction + zoomOrder.length) % zoomOrder.length;
 		var newTarget = zoomOrder[newIndex];
-
 		zoomToTarget(newTarget);
 	}
-
 	function initZoomHandlers() {
 		d3.selectAll('.tandem-nav button[data-target]').on('click', function() {
 			var targetClass = d3.select(this).attr('data-target');
 			zoomToTarget(targetClass);
 		});
-
 		Object.keys(zoomTargets).forEach(function(targetClass) {
 			d3.select(zoomTargets[targetClass].element).on('click', function() {
 				zoomToTarget(targetClass);
 			});
 		});
-
 		d3.select('.tandem-container-nav-zoom button').on('click', resetZoom);
-
 		d3.select('.tandem-container-nav-zoom button').style('display', 'none');
-
-		// Add click handlers for the navigation arrows
 		d3.select('.arrow-right').on('click', function() {
 			if (currentTargetIndex < zoomOrder.length - 1) {
 				currentTargetIndex++;
@@ -741,8 +703,5 @@ function zoomToTarget(targetClass) {
 			}
 		});
 	}
-
-
-	// Initialize the handlers when the script loads
 	initZoomHandlers();
 </script>

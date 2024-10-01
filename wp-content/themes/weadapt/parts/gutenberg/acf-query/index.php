@@ -82,9 +82,16 @@ if ( count( $post_type ) == 1 && in_array( 'event', $post_type ) ) {
 	$types      = get_field( 'types' ) ? get_field( 'types' ) : 'none';
 
 	if ( $event_type !== 'all' ) {
-		$query_args['orderby']   = 'meta_value';
 		$query_args['meta_key']  = 'start_date';
+		$query_args['orderby']   = 'meta_value'; 
 		$query_args['meta_type'] = 'DATETIME';
+		$query_args['order']     = 'DESC';
+	}
+	if ( $event_type === 'all' ) {
+		$query_args['meta_key']  = 'start_date';
+		$query_args['orderby']   = 'meta_value'; 
+		$query_args['meta_type'] = 'DATETIME';
+		$query_args['order']     = 'DESC'; // Change to ASC to display events in chronological order
 	}
 
 	if ( $event_type === 'upcoming' ) {
