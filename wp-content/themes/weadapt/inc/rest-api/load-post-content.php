@@ -7,20 +7,12 @@ function load_post_content() {
 	$post_type = ! empty( $_POST['post_type'] ) ? esc_attr( $_POST['post_type'], true ) : 'any';
 	$post_ID   = ! empty( $_POST['post_id'] ) ? intval( $_POST['post_id'] ) : 0;
 
-	// If the received post_type is 'user', change it to 'members'
 	if ( $post_type === 'user' ) {
 		$post_type = 'members';
 	}
-
-	// Check if the directory exists, otherwise fallback to 'blog'
 	$part_name = file_exists( get_theme_file_path("/parts/single/$post_type/") ) ? $post_type : 'blog';
-
- 
-
-	// Fetch the post object
 	$post = get_post( $post_ID );
 
-	// Global post variable
 	global $post;
 	$post = get_post( $post_ID );
 

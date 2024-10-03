@@ -17,17 +17,7 @@ $user_data  = get_userdata( $user_ID );
 
 if ($user_ID) {
     $user_info = get_userdata($user_ID);
-
-    if ($user_info) {
-        // The user exists, continue with your logic
-        error_log(print_r($user_info, true));
-    } else {
-        // Handle the case where the user ID does not correspond to a valid user
-        error_log("Invalid user ID: $user_ID");
-    }
-} else {
-    // Handle the case where the user_id meta is not set or is empty
-    error_log("No user_id meta found for post ID: $post_ID");
+   
 }
 
 ?>

@@ -930,13 +930,10 @@ function migrate_and_convert_user_to_member()
 {
     global $wpdb;
 
-    // Verify nonce
     if (!isset($_POST['user_migration_nonce']) || !wp_verify_nonce($_POST['user_migration_nonce'], 'user_migration_action')) {
-        error_log('Nonce verification failed.');
         return;
     }
 
-    // Query the database directly for users who match the criteria in wp_usermeta
     $users = $wpdb->get_results("
         SELECT u.ID, u.user_login 
         FROM {$wpdb->users} u
@@ -956,27 +953,16 @@ function migrate_and_convert_user_to_member()
     foreach ($users as $user) {
         $user_id = $user->ID;
         $username = $user->user_login;
-
-        error_log('Processing user ID: ' . $user_id);
-
-        // Fetch user meta directly
         $address_country = get_user_meta($user_id, 'address_country', true);
         $address_city = get_user_meta($user_id, 'address_city', true);
         $address_county = get_user_meta($user_id, 'address_county', true);
-
-        // Ensure the address fields are strings, not arrays
         $address_country = is_array($address_country) ? implode(', ', $address_country) : $address_country;
         $address_city = is_array($address_city) ? implode(', ', $address_city) : $address_city;
         $address_county = is_array($address_county) ? implode(', ', $address_county) : $address_county;
-
-        // Check if the user already has a location meta
         $existing_location = get_user_meta($user_id, 'location_users', true);
 
         if (empty($existing_location) && $address_country && $address_city && $address_county) {
-            // Prepare the query URL for address to lat/lon conversion
             $query_url = "https://nominatim.openstreetmap.org/search.php?county=" . urlencode($address_county) . "&country=" . urlencode($address_country) . "&format=jsonv2";
-            error_log('Query URL: ' . $query_url);
-
             $response = wp_remote_get($query_url);
             if (!is_wp_error($response)) {
                 $body = wp_remote_retrieve_body($response);
@@ -991,20 +977,15 @@ function migrate_and_convert_user_to_member()
                         'lat' => $lat,
                         'lng' => $lng,
                     );
-
-                    // Store the location data in the user meta
                     update_user_meta($user_id, 'location_users', $location_data);
                     update_user_meta($user_id, '_location_users', 'field_65fcef62959d4');
 
-                    error_log('Converted and saved location for user ID: ' . $user_id);
                     $conversion_done = true;
                 }
             }
         }
-
-        // Set the migration flag to true for this user
         $migration_done = true;
-        $migration_count++;  // Increment the successful migration counter
+        $migration_count++;
     }
 
     if ($migration_done) {
