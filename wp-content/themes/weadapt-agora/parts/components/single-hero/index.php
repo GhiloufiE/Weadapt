@@ -15,9 +15,9 @@ $post_ID = isset(get_queried_object()->term_id) ? get_queried_object()->term_id 
 $title = get_the_title();
 if ($type === 'members') {
     $user_info = get_user_by('ID', $post_ID);
-    $title = $user_info ? $user_info->display_name : $title; // Update title to user display name
-	$thumb_ID = get_avatar($user_info->ID, 608); // 150 is the size of the avatar in pixels
-        $thumb_caption = $user_info->display_name;  // Optionally use the display name as a caption
+    $title = $user_info ? $user_info->display_name : $title;  
+	$thumb_ID = get_avatar($user_info->ID, 608);  
+        $thumb_caption = $user_info->display_name;  
 }
 error_log("the title: ". $title);
 $excerpt = has_excerpt() ? get_the_excerpt() : '';
