@@ -76,36 +76,13 @@ if ($user_ID) {
 
 	<?php
 		$organizations = get_field( 'organisations', "user_$user_ID" );
-
-		if ( ! empty( $organizations ) ) {
-			?>
-			<h2 class="user-about__info__title"><?php echo __( 'Organisation', 'weadapt' ); ?></h2>
-			<div class="user-about__info">
-				<?php foreach ( $organizations as $post_ID ) :
-					$post_link   = get_permalink( $post_ID );
-					$post_status = get_post_status( $post_ID );
-					?>
-					<div class="user-about__info__item--organisation">
-						<?php if ( 'draft' === $post_status ) : ?>
-							<?php if ( has_post_thumbnail( $post_ID ) ) : ?>
-								<div class="organisation__logo"><?php echo get_the_post_thumbnail( $post_ID, 'medium' ); ?></div>
-							<?php endif; ?>
-							<div class="organisation__title"><?php echo get_the_title( $post_ID ); ?></div>
-						<?php else : ?>
-							<?php if ( has_post_thumbnail( $post_ID ) ) : ?>
-								<div class="organisation__logo">
-									<a href="<?php echo $post_link; ?>"><?php echo get_the_post_thumbnail( $post_ID, 'medium' ); ?></a>
-								</div>
-							<?php endif; ?>
-							<div class="organisation__title">
-								<a href="<?php echo $post_link; ?>"><?php echo get_the_title( $post_ID ); ?></a>
-							</div>
-						<?php endif; ?>
-					</div>
-				<?php endforeach; ?>
-			</div>
-			<?php
-		}
+		$organisations            = get_field('organisations', 'user_' . $user_ID);
+		$cpt_widget_args          = [
+			'title' => __( 'Organisations', 'weadapt' ),
+			'cpt_IDs' => $organisations,
+			'buttons' => [ 'permalink' ]
+		];
+		get_part('components/cpt-widget/index', $cpt_widget_args);
 	?>
 
 	<?php
