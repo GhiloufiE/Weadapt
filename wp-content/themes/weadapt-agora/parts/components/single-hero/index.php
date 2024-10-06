@@ -9,7 +9,8 @@
  */
 $type = isset($args['type']) ? $args['type'] : '';
 error_log("Post type received: " . $type);
-
+$thumb_ID = 0;
+$thumb_caption = '';
 $post_ID = isset(get_queried_object()->term_id) ? get_queried_object()->term_id : get_the_ID();
 $title = get_the_title();
 
@@ -17,11 +18,12 @@ $title = get_the_title();
 if ($type === 'members') {
     $user_info = get_user_by('ID', $post_ID);
     $title = $user_info ? $user_info->display_name : $title; // Update title to user display name
+	$thumb_ID = get_avatar($user_info->ID, 608); // 150 is the size of the avatar in pixels
+        $thumb_caption = $user_info->display_name;  // Optionally use the display name as a caption
 }
 error_log("the title: ". $title);
-$excerpt = ($type === 'members' && $user_info) ? get_user_meta($user_info->ID, 'description', true) : (has_excerpt() ? get_the_excerpt() : '');
-$thumb_ID = ($type === 'members') ? get_user_meta($user_info->ID, 'profile_picture', true) : 0;
-$thumb_caption = '';
+$excerpt = has_excerpt() ? get_the_excerpt() : '';
+
 $post_author_html = '';
 $document_list = get_field('document_list');
 $document_item = !empty($document_list) ? $document_list[0] : null;
@@ -429,15 +431,17 @@ switch ($type) {
 			</div>
 
 			<div class="single-hero__right">
-				<?php if (!empty($thumb_ID)) : ?>
-					<figure class="single-hero__image img-caption">
-						<?php echo get_img($thumb_ID); ?>
-
-						<?php if (!empty($thumb_caption)) : ?>
-							<figcaption class="img-caption__caption"><?php echo wp_kses_post($thumb_caption); ?></figcaption>
-						<?php endif; ?>
-					</figure>
-				<?php endif; ?>
+					<?php if (!empty($thumb_ID)) : ?>
+ 			    <figure class="single-hero__image img-caption">
+					<?php if($type === 'members') {
+ 			        echo $thumb_ID; 
+					}?> 
+					<?php echo get_img($thumb_ID); ?>
+ 			        <?php if (!empty($thumb_caption)) : ?>
+ 			            <figcaption class="img-caption__caption"><?php echo wp_kses_post($thumb_caption); ?></figcaption>
+ 			        <?php endif; ?>
+ 			    </figure>
+ 			<?php endif; ?>
 
 				<?php
 				if (!empty($fields['btn_link'])) {
