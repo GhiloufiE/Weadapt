@@ -16,7 +16,16 @@ function rest_search_members_markers( $request ) {
 	$search_query  = ! empty( $request->get_param( 'search' ) ) ? esc_attr( $request->get_param( 'search' ) ) : '';
 	$theme_network = ! empty( $request->get_param( 'theme_network' ) ) ? intval( $request->get_param( 'theme_network' ) ) : 0;
 	$country = ! empty( $request->get_param( 'select_country' ) ) ? esc_attr( $request->get_param( 'select_country' ) ) : '';
+	$country_map = [
+		'Germany' => 'DE',
+		'France'  => 'FR',
+		'Sweden'  => 'SE',
+		'Spain'   => 'ES'
+	];
 
+	if ( array_key_exists( $country, $country_map ) ) {
+		$country = $country_map[ $country ];
+	}
 	$query_args = [
 		'search'         => "*{$search_query}*", 
 		'search_columns' => [ 'user_login', 'user_nicename', 'user_email' ], 
@@ -44,7 +53,7 @@ function rest_search_members_markers( $request ) {
 
 	if ( ! empty( $country ) ) {
 		$query_args['meta_query'][] = [
-			'key'     => 'address_country',
+			'key'     => 'migrated_address_country',
 			'value'   => $country,
 			'compare' => 'LIKE'
 		];

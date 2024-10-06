@@ -23,17 +23,41 @@ function handle_create_post() {
         'post_type'    => ($post_type === 'theme') ? 'article' : $post_type,
         'meta_input'   => array(),
     );
+  
+    // if (isset($_POST['selected_forum']) && !empty($_POST['selected_forum'])) {
+    //     $selected_forum = intval($_POST['selected_forum']); 
+    //     $post_data['meta_input']['forum'] = $selected_forum;
+
+    //     error_log("Selected forum set: {$selected_forum} for blog ID: {$blog_id}");
+    // } else {
+    //     error_log("No forum selected for blog ID: {$blog_id}");
+    // }
 
     $network_true_id = null;
     $forum_true_id = null;
+    $selected_forum_true_id = null;
+    $meta_key = 'forum';
     if ($post_type == 'forum' && isset($_POST['forum'])) {
+        $selected_forum = intval($_POST['selected_forum']);
+        error_log("Selected forum: {$selected_forum}" );
+        $selected_forum_true_id = $wpdb->get_var($wpdb->prepare("SELECT forum_id FROM {$wpdb->prefix}theme_forum_relationship WHERE theme_id = %d", $selected_forum));
+        if ($selected_forum_true_id === null) {
+            $selected_forum_true_id = $wpdb->get_var($wpdb->prepare("SELECT forum_id FROM {$wpdb->prefix}network_forum_relationship WHERE network_id = %d", $selected_forum));
+            if ($selected_forum_true_id !== null) {
+                $meta_key = 'network_forum';
+            }
+        }
+        if ($selected_forum_true_id !== null) {
+            $post_data['meta_input'][$meta_key] = $selected_forum_true_id;
+        }
+        error_log("Selected forum set: {$selected_forum_true_id}" );
         $forum_id = intval($_POST['forum']);
         $forum_true_id = $wpdb->get_var($wpdb->prepare("SELECT forum_id FROM {$wpdb->prefix}theme_forum_relationship WHERE theme_id = %d", $forum_id));
         if ($forum_true_id !== null) {
             $post_data['meta_input']['forum'] = $forum_true_id;
         }
 
-        $network_true_id = $wpdb->get_var($wpdb->prepare("SELECT forum_id FROM wp_network_forum_relationship WHERE network_id = %d", $forum_id));
+        $network_true_id = $wpdb->get_var($wpdb->prepare("SELECT forum_id FROM {$wpdb->prefix}network_forum_relationship WHERE network_id = %d", $forum_id));
         if ($network_true_id !== null) {
             $post_data['meta_input']['network_forum'] = $network_true_id;
         } 
@@ -65,7 +89,9 @@ function handle_create_post() {
     } elseif ($forum_true_id !== null) {
         update_field('field_653b5c7e6d5f5', $forum_true_id, $post_id);
     }
-
+    if ($selected_forum_true_id !== null) {
+        update_field('field_653b5c7e6d5f5', $selected_forum_true_id, $post_id);
+    }
     update_field('field_6374a3364bb73', $blog_id, $post_id);
 
     if (in_array($post_type, ['forum', 'theme'])) {

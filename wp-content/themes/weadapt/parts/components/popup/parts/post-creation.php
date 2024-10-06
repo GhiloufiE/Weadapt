@@ -49,6 +49,30 @@
 </div>
 
 <script>
+
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('post-creation-form');
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        
+        const formData = new FormData(form);
+        fetch('<?php echo esc_url(admin_url('admin-post.php')); ?>', {
+            method: 'POST',
+            body: formData,
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('success-message').style.display = 'block';
+                form.reset(); 
+            } else {
+                alert('There was an error submitting your post: ' + data.data);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+});
+
  document.addEventListener('DOMContentLoaded', function() {
     const forumSearchWrap = document.querySelector('.theme-network-fields');
     const isConnectPage = window.location.href.includes('connect'); 

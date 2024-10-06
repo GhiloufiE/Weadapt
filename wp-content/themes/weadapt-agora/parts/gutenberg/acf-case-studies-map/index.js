@@ -968,37 +968,40 @@ const initMap = function (mapBlockNode, mapNode, markerNodes, markerOrgNodes, ma
 	if (formNode) {
 		formNode.addEventListener('submit', event => {
 			event.preventDefault();
-
 			updateMap();
 		});
-
+	
 		formNode.addEventListener('reset', () => {
+			console.log('Reset event triggered');
+	
 			if (selectNodes) {
 				selectNodes.forEach(selectNode => {
 					const optionAll = selectNode.querySelector('.select-pure__option[data-value="all"]');
-
 					if (optionAll) {
-						// Fix reset selectPure
+						console.log('Clicking optionAll');
 						optionAll.click();
 						optionAll.click();
+	
+						// Dispatch change event
+						const event = new Event('change', { bubbles: true });
+						selectNode.dispatchEvent(event);
 					}
 				});
 			}
-
+	
 			// Clear Search Input
 			const searchNode = mapBlockNode.querySelector('input[type="search"]');
-
 			if (searchNode) {
-				searchNode.removeAttribute('value');
+				searchNode.value = ''; 
+				console.log('Search input cleared');
 			}
-
-
-
-			setTimeout(() => {
-				updateMap();
-			}, 50);
+	
+			// Update map immediately
+			updateMap();
+			console.log('Map updated after reset');
 		});
 	}
+	
 
 	// $_GET variables
 	const currentUrl = new URL(window.location.href);
