@@ -8,17 +8,12 @@
  * @since      weadapt 1.0
  */
 $type = isset($args['type']) ? $args['type'] : '';
-error_log("Post type received: " . $type);
-
 $post_ID = isset(get_queried_object()->term_id) ? get_queried_object()->term_id : get_the_ID();
 $title = get_the_title();
-
-// Use user display name instead of post title if type is 'members'
 if ($type === 'members') {
-    $user_info = get_user_by('ID', $post_ID);
-    $title = $user_info ? $user_info->display_name : $title; // Update title to user display name
+	$user_info = get_user_by('ID', $post_ID);
+	$title = $user_info ? $user_info->display_name : $title;
 }
-error_log("the title: ". $title);
 $excerpt = ($type === 'members' && $user_info) ? get_user_meta($user_info->ID, 'description', true) : (has_excerpt() ? get_the_excerpt() : '');
 $thumb_ID = ($type === 'members') ? get_user_meta($user_info->ID, 'profile_picture', true) : 0;
 $thumb_caption = '';
@@ -26,9 +21,10 @@ $post_author_html = '';
 $document_list = get_field('document_list');
 $document_item = !empty($document_list) ? $document_list[0] : null;
 $file_ID = !empty($document_item) ? $document_item['file'] : null;
-function clean_non_standard_spaces($string) {
-    $cleaned_string = preg_replace('/[\x{00A0}\x{200B}\x{200C}\x{200D}\x{FEFF}]/u', ' ', $string);
-    return $cleaned_string;
+function clean_non_standard_spaces($string)
+{
+	$cleaned_string = preg_replace('/[\x{00A0}\x{200B}\x{200C}\x{200D}\x{FEFF}]/u', ' ', $string);
+	return $cleaned_string;
 }
 function parse_count($count_string)
 {
@@ -55,12 +51,12 @@ $post_meta_items = [
 ];
 if ($type === 'members') {
 	$post_meta_items = [];
-    $member_since = date('F Y', strtotime($user_info->user_registered));
-    $post_meta_items[] = ['icon-calendar', 'Member since: ' . $member_since];
+	$member_since = date('F Y', strtotime($user_info->user_registered));
+	$post_meta_items[] = ['icon-calendar', 'Member since: ' . $member_since];
 
- 
-    $user_posts_count = count_user_posts($user_info->ID);
-    $post_meta_items[] = ['icon-edit-pencil', 'Posts: ' . $user_posts_count];
+
+	$user_posts_count = count_user_posts($user_info->ID);
+	$post_meta_items[] = ['icon-edit-pencil', 'Posts: ' . $user_posts_count];
 }
 
 
@@ -167,7 +163,7 @@ switch ($type) {
 			}
 		}
 		break;
-	case 'members':  // Handling for the 'members' post type
+	case 'members':
 		$fields = [
 			'type_link' => 'Profile',
 			'btn_join' => [
@@ -178,7 +174,7 @@ switch ($type) {
 			]
 		];
 		break;
-	
+
 	default:
 		$fields = [
 			'btn_join' => [
@@ -191,6 +187,7 @@ switch ($type) {
 
 		$relevant = get_field('relevant');
 		$main_theme_networks = get_field('relevant_main_theme_network', $post_ID);
+
 		if (!empty($main_theme_networks) && is_array($main_theme_networks)) {
 			$fields['type_link'] = [];
 			foreach ($main_theme_networks as $type_ID) {
@@ -269,11 +266,14 @@ switch ($type) {
 		.post-meta {
 			gap: 1.5rem !important;
 		}
+
+
 	}
 </style>
 <section class="single-hero">
 	<?php load_inline_styles(__DIR__, 'single-hero'); ?>
 	<?php load_blocks_script('single-hero', 'weadapt/single-hero'); ?>
+
 	<div class="single-hero__container container">
 		<div class="single-hero__row row <?php echo empty($thumb_ID) ? 'single-hero__row_top' : ''; ?>">
 			<div class="single-hero__left">
@@ -281,18 +281,21 @@ switch ($type) {
 					<?php if (array_key_exists('type_link', $fields) && !empty($fields['type_link']) && is_array($fields['type_link'])) : ?>
 						<div class="single-hero__types">
 							<style>
+								.cpt-list-item__author-info span {
+									color: var(--color--white) !important;
+								}
+
 								.single-hero__types {
 									display: flex;
 									gap: 1rem;
 									flex-wrap: wrap;
-									/* Ensure items wrap if necessary */
 								}
 
 								@media (max-width: 768px) {
 									.single-hero__types {
 										flex-direction: column;
 										gap: 0.5rem;
-										/* Adjust gap for smaller screens */
+
 									}
 								}
 							</style>
@@ -305,15 +308,21 @@ switch ($type) {
 							endforeach; ?>
 						</div>
 					<?php endif; ?>
-					<h1 class="single-hero__titles" id="main-headissssng"> <?php
-    ?></h1>
+
+					<h1 class="single-hero__title" id="main-headissssng">
+						<?php
+
+						$clean_title = clean_non_standard_spaces($title);
+						echo esc_html($clean_title);
+						?>
+					</h1>
+
 					<?php if ($excerpt) : ?>
 						<div class="single-hero__excerpt"><?php echo $excerpt; ?></div>
-					<?php endif; ?>
+					<?php endif;
 
-					<?php
 					if (!empty($authors)) {
-						$author_class = 'single-hero__author cpt-list-item__author';
+						$author_class = 'single-hero__author cpt-list-item__author white';
 
 						if (count($authors) > 1) {
 							$author_class .= ' cpt-list-item__author--multiple';
@@ -323,15 +332,15 @@ switch ($type) {
 					?>
 
 					<?php if (!empty($post_meta_items)) : ?>
-						<h2 class="single-hero__titles" id="main-headissssng"><?php echo esc_html($title); ?></h1>
 
 						<ul class="post-meta single-hero__meta">
 							<?php
+							if ($type !== 'members') {
 							$post_ID = get_the_ID();
 							$views = get_post_views($post_ID);
 							echo " $views";
 
-							set_post_views($post_ID); ?>
+							set_post_views($post_ID); }?>
 							<?php foreach ($post_meta_items as $item) :
 								$id = isset($item[2]) ? 'id="' . $item[2] . '"' : '';
 							?>
@@ -346,7 +355,7 @@ switch ($type) {
 							<?php
 							if ($type === 'theme') : ?>
 								<div class="wp-block-button">
-									<button class="wp-block-button__link has-background" data-post-id="<?php echo esc_attr($post_ID); ?>" data-post-type="forum" data-popup="post-creation" onclick="setPostDetails(this)">
+									<button class="wp-block-button__link has-background" style="background-color: white; color: black;" data-post-id="<?php echo esc_attr($post_ID); ?>" data-post-type="forum" data-popup="post-creation" onclick="setPostDetails(this)">
 										<?php echo sprintf("<span>%s</span>", esc_html__("Add a forum post", "weadapt")); ?>
 									</button>
 								</div>
