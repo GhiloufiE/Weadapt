@@ -125,17 +125,27 @@ add_action('admin_head', 'toast_resizable_sidebar');
         wp_mail($recipient_email, $subject, $message, $headers);
     }
 } */
-function replace_howdy($wp_admin_bar)
-{
+function enqueue_select2_assets() {
+    // Select2 CSS
+    wp_enqueue_style( 'select2-css', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css', array(), '4.0.13' );
+    
+    // Select2 JS
+    wp_enqueue_script( 'select2-js', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js', array('jquery'), '4.0.13', true );
+}
+add_action( 'wp_enqueue_scripts', 'enqueue_select2_assets' );
+function replace_howdy($wp_admin_bar) {
     $my_account = $wp_admin_bar->get_node('my-account');
-    $greeting = str_replace('Howdy,', 'Hello,', $my_account->title);
-    $wp_admin_bar->add_node(array(
-        'id' => 'my-account',
-        'title' => $greeting,
-    ));
+    
+    if (is_object($my_account) && isset($my_account->title)) {
+        $greeting = str_replace('Howdy,', 'Hello,', $my_account->title);
+
+        $wp_admin_bar->add_node(array(
+            'id' => 'my-account',
+            'title' => $greeting,
+        ));
+    }
 }
 add_filter('admin_bar_menu', 'replace_howdy', 25);
-
 
 // Enqueue the custom JavaScript file
 function enqueue_custom_scripts()
