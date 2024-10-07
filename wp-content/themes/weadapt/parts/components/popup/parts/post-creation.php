@@ -21,7 +21,7 @@
                 <input type="text" id="forum-search" placeholder="<?php _e('Search forum...', 'weadapt'); ?>" onkeyup="filterForums()">
                 <div id="forum-list" class="forum-list">
                     <?php
-                    $forums = get_posts(array('post_type' => 'forum', 'numberposts' => -1));
+                    $forums = get_posts(array('post_type' => 'forums', 'numberposts' => -1));
                     foreach ($forums as $forum) :
                     ?>
                         <div class="forum-item" data-id="<?php echo esc_attr($forum->ID); ?>" data-title="<?php echo esc_attr($forum->post_title); ?>" onclick="selectForum(<?php echo esc_attr($forum->ID); ?>)">
