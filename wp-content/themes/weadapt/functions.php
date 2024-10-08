@@ -768,6 +768,58 @@ function notify_editors_after_publish($post_id, $new_theme)
                     }
                 }
             }
+            if ($published_for_the_first_time) {
+                $post_author_ID = get_post_field('post_author', $post_id);
+                error_log('Post author ID: ' . $post_author_ID);
+                
+                $post_author = get_userdata($post_author_ID);
+                if ($post_author) {
+                    $author_name = $post_author->display_name;
+                    $author_email = $post_author->user_email;
+                }
+            
+                global $wpdb;
+                $table_name = $wpdb->prefix . 'wa_join';
+                // Sanitize query to avoid SQL injection
+                $results = $wpdb->get_results($wpdb->prepare(
+                    "SELECT user_id FROM $table_name WHERE Type = %s AND join_id = %d", 'user', $post_author_ID
+                ));
+            
+                $user_emails = array();
+                $user_ids = array();
+                
+                foreach ($results as $result) {
+                    $user_data = get_userdata($result->user_id); // Only fetch once per user
+                    if ($user_data && $user_data->user_email) {
+                        $user_emails[] = $user_data->user_email;
+                        $user_ids[] = $result->user_id;
+                    }
+                }
+            
+                // Construct the email
+                $subject = 'Someone you follow has published something new!';
+                $message = "Hi there,<br><br>";
+                $message .= "$author_name has published new content! Check it out here: <br><br>";
+                $message .= "Content: $post->post_title <br>";
+                $message .= "Summary: $post_excerpt ";
+                $message .= sprintf(
+                    '<a href="%s">%s</a>',
+                    get_permalink($post),
+                    __('Go to the content', 'weadapt')
+                );
+                $message .= "Best Regards,<br>WeAdapt";
+            
+                // Save the email content to the database
+                theme_mail_save_to_db($theme_editors_user_ids, $subject, $message);
+            
+                // Ensure unique user_ids before sending emails
+                $user_ids = array_unique($user_ids);
+                foreach ($user_ids as $user_id) {
+                    send_email_immediately($user_id, $subject, $message, $post_id); // Pass individual user_id
+                }
+            }
+            
+    
 
             set_transient('notified_post_' . $post_id, true, 60);
             update_post_meta($post_id, '_notification_sent', true);
