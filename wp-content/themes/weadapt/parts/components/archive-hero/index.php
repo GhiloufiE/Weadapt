@@ -56,25 +56,6 @@ $link_class = 'wp-block-button__link';
                                 <?php echo sprintf("<span>%s</span>", esc_html__("Add a forum post", "weadapt")); ?>
                             </button>
                         </div>
-                        <script>
-                            function setPostDetails(button) {
-                                const postId = button.getAttribute('data-post-id');
-                                const postType = button.getAttribute('data-post-type');
-                                const pageSource = button.getAttribute('data-page-source');
-                                const forumField = document.getElementById('forum-field');
-                                const postTypeField = document.getElementById('post-type-field');
-                                const pageSourceField = document.getElementById('page-source-field');
-                                if (forumField) {
-                                    forumField.value = postId;
-                                }
-                                if (postTypeField) {
-                                    postTypeField.value = postType;
-                                }
-                                if (pageSourceField) {
-                                    pageSourceField.value = pageSource;
-                                }
-                            }
-                        </script>
                     <?php
                     }
                     ?>
@@ -93,6 +74,23 @@ $link_class = 'wp-block-button__link';
 </section>
 
 <script>
+    function setPostDetails(button) {
+        const postId = button.getAttribute('data-post-id');
+        const postType = button.getAttribute('data-post-type');
+        const pageSource = button.getAttribute('data-page-source');
+        const forumField = document.getElementById('forum-field');
+        const postTypeField = document.getElementById('post-type-field');
+        const pageSourceField = document.getElementById('page-source-field');
+        if (forumField) {
+            forumField.value = postId;
+        }
+        if (postTypeField) {
+            postTypeField.value = postType;
+        }
+        if (pageSourceField) {
+            pageSourceField.value = pageSource;
+        }
+    }
     document.addEventListener('DOMContentLoaded', function() {
         const button = document.querySelector('[data-popup="post-creation"]');
         const popup = document.querySelector('.popup[data-popup-content="post-creation"]');
